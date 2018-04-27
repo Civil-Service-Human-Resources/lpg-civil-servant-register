@@ -11,7 +11,7 @@ server:
 
 oauth:
   clientId: ${CLIENT_ID:9fbd4ae2-2db3-44c7-9544-88e80255b56e}
-  clientSecret: ${CLIETN_SECRET:test}
+  clientSecret: ${CLIENT_SECRET:test}
   checkTokenEndpointUrl: ${CHECK_TOKEN_URL:http://localhost:8080/oauth/check_token}
 
 ---
