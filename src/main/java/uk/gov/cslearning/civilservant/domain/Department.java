@@ -62,6 +62,11 @@ public class Department {
         return unmodifiableCollection(organisations);
     }
 
+    public void addOrganisation(Organisation organisation) {
+        checkArgument(organisation != null);
+        organisations.add(organisation);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

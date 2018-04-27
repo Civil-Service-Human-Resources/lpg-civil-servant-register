@@ -10,9 +10,9 @@ server:
   port: 9002
 
 oauth:
-  clientId: 9fbd4ae2-2db3-44c7-9544-88e80255b56e
-  clientSecret: test
-  checkTokenEndpointUrl: http://localhost:8080/oauth/check_token
+  clientId: ${CLIENT_ID:9fbd4ae2-2db3-44c7-9544-88e80255b56e}
+  clientSecret: ${CLIENT_SECRET:test}
+  checkTokenEndpointUrl: ${CHECK_TOKEN_URL:http://localhost:8080/oauth/check_token}
 
 ---
 

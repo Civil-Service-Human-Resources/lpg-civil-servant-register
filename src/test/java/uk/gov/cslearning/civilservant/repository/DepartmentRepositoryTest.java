@@ -10,6 +10,7 @@ import uk.gov.cslearning.civilservant.domain.Department;
 
 import java.util.Optional;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
@@ -23,5 +24,11 @@ public class DepartmentRepositoryTest {
     public void shouldFindDepartmentByExistingCode() {
         Optional<Department> department = departmentRepository.findByCode("co");
         assertTrue(department.isPresent());
+    }
+
+    @Test
+    public void shouldNotFindDepartmentByUnrecognisedCode() {
+        Optional<Department> department = departmentRepository.findByCode("unknown");
+        assertFalse(department.isPresent());
     }
 }
