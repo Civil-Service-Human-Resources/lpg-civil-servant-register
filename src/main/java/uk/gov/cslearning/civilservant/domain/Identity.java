@@ -19,6 +19,9 @@ public class Identity {
     @Column(unique = true, nullable = false)
     private String uid;
 
+    protected Identity() {
+    }
+
     public Identity(String uid) {
         checkArgument(isNotBlank(uid));
         this.uid = uid;

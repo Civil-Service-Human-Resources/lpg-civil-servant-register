@@ -3,7 +3,6 @@ package uk.gov.cslearning.civilservant.domain;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.data.annotation.PersistenceConstructor;
 
 import javax.persistence.*;
 
@@ -27,7 +26,9 @@ public class CivilServant {
     @OneToOne
     private Identity identity;
 
-    @PersistenceConstructor
+    protected CivilServant() {
+    }
+
     public CivilServant(Identity identity) {
         checkArgument(identity != null);
         this.identity = identity;

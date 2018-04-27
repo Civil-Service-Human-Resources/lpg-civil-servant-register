@@ -3,7 +3,6 @@ package uk.gov.cslearning.civilservant.domain;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.data.annotation.PersistenceConstructor;
 
 import javax.persistence.*;
 
@@ -23,7 +22,9 @@ public class Grade {
     @Column(nullable = false)
     private String name;
 
-    @PersistenceConstructor
+    protected Grade() {
+    }
+
     public Grade(String code, String name) {
         setCode(code);
         setName(name);

@@ -3,7 +3,6 @@ package uk.gov.cslearning.civilservant.domain;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.data.annotation.PersistenceConstructor;
 
 import javax.persistence.*;
 import java.util.List;
@@ -31,7 +30,9 @@ public class Organisation {
     @ManyToOne(optional = false)
     private Department department;
 
-    @PersistenceConstructor
+    protected Organisation() {
+    }
+
     public Organisation(String code, String name) {
         setCode(code);
         setName(name);

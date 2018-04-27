@@ -3,7 +3,6 @@ package uk.gov.cslearning.civilservant.domain;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.data.annotation.PersistenceConstructor;
 
 import javax.persistence.*;
 import java.util.Collection;
@@ -29,7 +28,9 @@ public class Department {
     @OneToMany
     private Collection<Organisation> organisations = new HashSet<>();
 
-    @PersistenceConstructor
+    protected Department() {
+    }
+
     public Department(String code, String name) {
         setCode(code);
         setName(name);
