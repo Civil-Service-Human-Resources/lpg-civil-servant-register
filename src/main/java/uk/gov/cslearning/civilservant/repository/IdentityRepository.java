@@ -2,13 +2,12 @@ package uk.gov.cslearning.civilservant.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import uk.gov.cslearning.civilservant.domain.CivilServant;
 import uk.gov.cslearning.civilservant.domain.Identity;
 
 import java.util.Optional;
 
 @Repository
-public interface CivilServantRepository extends CrudRepository<CivilServant, Long> {
+public interface IdentityRepository extends CrudRepository<Identity, Long> {
 
-    Optional<CivilServant> findByIdentity(Identity identity);
+    Optional<Identity> findByUid(String uid);
 }

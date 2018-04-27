@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -25,7 +26,7 @@ public class Organisation {
     private String name;
 
     @OneToMany
-    private List<Grade> grades;
+    private List<Grade> grades = new ArrayList<>();
 
     @ManyToOne(optional = false)
     private Department department;
@@ -61,14 +62,16 @@ public class Organisation {
     }
 
     public List<Grade> getGrades() {
-        if (grades == null) {
-            return null;
-        }
         return unmodifiableList(grades);
     }
 
     public Department getDepartment() {
         return department;
+    }
+
+    public void addGrade(Grade grade) {
+        checkArgument(grade != null);
+        grades.add(grade);
     }
 
     @Override
