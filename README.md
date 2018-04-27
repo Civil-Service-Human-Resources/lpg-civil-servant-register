@@ -1,3 +1,3 @@
-# Learning Catalogue
+# Civil Servant Registry Service
 
-Simple CRUD service for learning resources.
+CRUD services to hold employment and personal details of civil servants.

@@ -13,12 +13,12 @@ apply plugin: 'io.spring.dependency-management'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-group = 'uk.gov.cslearning'
-version = '0.1.0-' + (System.getenv('TRAVIS_COMMIT') ?: 'local')
+group = 'uk.gov.cshr'
+version = '0.0.1'
 
 bootJar {
     archiveName = 'civil-servant-register.jar'
-    mainClassName = 'uk.gov.cslearning.civilservant.Application'
+    mainClassName = 'uk.gov.cshr.civilservant.Application'
 }
 
 dependencies {
