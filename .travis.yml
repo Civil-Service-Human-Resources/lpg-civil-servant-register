@@ -1,0 +1,9 @@
+sudo: required
+
+language: java
+
+services:
+  - docker
+
+install: true
+script: ./environ/ci
