@@ -17,7 +17,7 @@ group = 'uk.gov.cshr'
 version = '0.0.1'
 
 bootJar {
-    archiveName = 'civil-servant-register.jar'
+    archiveName = 'civil-servant-registry-service.jar'
     mainClassName = 'uk.gov.cshr.civilservant.Application'
 }
 

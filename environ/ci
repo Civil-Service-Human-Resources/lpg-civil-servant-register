@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-SERVICE_NAME=lpg-civil-servant-register
+SERVICE_NAME=civil-servant-registry-service
 
 ./gradlew init
 ./gradlew build
