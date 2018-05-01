@@ -19,13 +19,6 @@ import org.springframework.security.oauth2.provider.token.ResourceServerTokenSer
 @EnableWebSecurity
 public class SecurityConfig extends ResourceServerConfigurerAdapter {
 
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/actuator/health").permitAll()
-                .anyRequest().authenticated();
-    }
-
     @Bean
     public ResourceServerTokenServices tokenService(@Value("${oauth.clientId}") String clientId,
                                                     @Value("${oauth.clientSecret}") String clientSecret,

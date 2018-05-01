@@ -12,6 +12,9 @@ public class GradeResource extends ResourceSupport {
 
     private String code;
 
+    public GradeResource() {
+    }
+
     public GradeResource(Grade grade) {
         checkArgument(grade != null);
         this.name = grade.getName();

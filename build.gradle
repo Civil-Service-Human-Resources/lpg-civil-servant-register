@@ -33,7 +33,6 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-jetty'
     compile 'org.springframework.boot:spring-boot-starter-jersey'
     compile 'org.springframework.boot:spring-boot-starter-security'
-    compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'org.springframework.boot:spring-boot-configuration-processor'
     compile 'org.springframework.data:spring-data-jpa:2.0.6.RELEASE'
     compile 'org.springframework.hateoas:spring-hateoas:0.24.0.RELEASE'

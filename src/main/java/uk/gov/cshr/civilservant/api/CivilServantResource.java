@@ -1,6 +1,10 @@
 package uk.gov.cshr.civilservant.api;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.hateoas.Link;
 import org.springframework.hateoas.ResourceSupport;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 
 import javax.validation.constraints.NotEmpty;
@@ -10,7 +14,6 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
 public class CivilServantResource extends ResourceSupport {
 
-    @NotEmpty
     private String fullName;
 
     private GradeResource grade;
@@ -45,5 +48,29 @@ public class CivilServantResource extends ResourceSupport {
 
     public GradeResource getGrade() {
         return grade;
+    }
+
+    @JsonIgnore
+    public Long getGradeId() {
+        if (grade != null) {
+            Link gradeIdLink = grade.getId();
+            UriComponents uriComponents = UriComponentsBuilder.fromUriString(gradeIdLink.getHref()).build();
+            if (uriComponents.getPathSegments().size() == 2) {
+                return Long.decode(uriComponents.getPathSegments().get(1));
+            }
+        }
+        return null;
+    }
+
+    @JsonIgnore
+    public Long getOrganisationId() {
+        if (organisation != null) {
+            Link organisationIdLink = organisation.getId();
+            UriComponents uriComponents = UriComponentsBuilder.fromUriString(organisationIdLink.getHref()).build();
+            if (uriComponents.getPathSegments().size() == 2) {
+                return Long.decode(uriComponents.getPathSegments().get(1));
+            }
+        }
+        return null;
     }
 }

@@ -21,9 +21,9 @@ import java.util.Optional;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
+import static org.hamcrest.core.IsNull.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -100,5 +100,53 @@ public class CivilServantControllerTest {
         CivilServant civilServant = optionalCivilServant.get();
 
         assertThat(civilServant.getFullName(), equalTo(fullName));
+    }
+
+    @Test
+    @WithMockUser("uid")
+    public void shouldChangeCivilServantGradeWhenUpdated() throws Exception {
+
+        mockMvc.perform(
+                put("/civil-servant")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"grade\": { \"links\": [{ \"rel\": \"self\", \"href\": \"http://localhost:8080/grades/1\"}] }}"))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        Optional<Identity> identity = identityRepository.findByUid("uid");
+        assertThat(identity.isPresent(), is(true));
+
+        Optional<CivilServant> optionalCivilServant = civilServantRepository.findByIdentity(identity.get());
+        assertThat(optionalCivilServant.isPresent(), is(true));
+
+        CivilServant civilServant = optionalCivilServant.get();
+
+        assertThat(civilServant.getGrade(), notNullValue());
+        assertThat(civilServant.getGrade().getId(), equalTo(1L));
+    }
+
+    @Test
+    @WithMockUser("uid")
+    public void shouldChangeCivilServantOrganisationWhenUpdated() throws Exception {
+
+        mockMvc.perform(
+                put("/civil-servant")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"organisation\": { \"links\": [{ \"rel\": \"self\", \"href\": \"http://localhost:8080/organisations/1\"}] }}"))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        Optional<Identity> identity = identityRepository.findByUid("uid");
+        assertThat(identity.isPresent(), is(true));
+
+        Optional<CivilServant> optionalCivilServant = civilServantRepository.findByIdentity(identity.get());
+        assertThat(optionalCivilServant.isPresent(), is(true));
+
+        CivilServant civilServant = optionalCivilServant.get();
+
+        assertThat(civilServant.getOrganisation(), notNullValue());
+        assertThat(civilServant.getOrganisation().getId(), equalTo(1L));
     }
 }

@@ -17,6 +17,9 @@ public class OrganisationResource extends ResourceSupport {
 
     private List<GradeResource> grades;
 
+    public OrganisationResource() {
+    }
+
     public OrganisationResource(Organisation organisation) {
         this(organisation, true);
     }

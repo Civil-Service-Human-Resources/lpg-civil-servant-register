@@ -3,13 +3,18 @@ package uk.gov.cshr.civilservant.api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.domain.Grade;
 import uk.gov.cshr.civilservant.domain.Identity;
+import uk.gov.cshr.civilservant.domain.Organisation;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
+import uk.gov.cshr.civilservant.repository.GradeRepository;
 import uk.gov.cshr.civilservant.repository.IdentityRepository;
+import uk.gov.cshr.civilservant.repository.OrganisationRepository;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -28,12 +33,21 @@ public class CivilServantController {
 
     private IdentityRepository identityRepository;
 
+    private GradeRepository gradeRepository;
+
+    private OrganisationRepository organisationRepository;
+
     @Autowired
-    public CivilServantController(CivilServantRepository civilServantRepository, IdentityRepository identityRepository) {
+    public CivilServantController(CivilServantRepository civilServantRepository, IdentityRepository identityRepository,
+                                  GradeRepository gradeRepository, OrganisationRepository organisationRepository) {
         checkArgument(civilServantRepository != null);
         checkArgument(identityRepository != null);
+        checkArgument(gradeRepository != null);
+        checkArgument(organisationRepository != null);
         this.civilServantRepository = civilServantRepository;
         this.identityRepository = identityRepository;
+        this.gradeRepository = gradeRepository;
+        this.organisationRepository = organisationRepository;
     }
 
     @GetMapping
@@ -55,6 +69,28 @@ public class CivilServantController {
 
         CivilServant civilServant = findOrCreateCivilServant(principal);
         civilServant.setFullName(civilServantResource.getFullName());
+
+        if (civilServantResource.getGradeId() != null) {
+            Long gradeId = civilServantResource.getGradeId();
+            LOGGER.debug("Looking up grade with id {}", gradeId);
+            Optional<Grade> grade = gradeRepository.findById(gradeId);
+            if (grade.isPresent()) {
+                civilServant.setGrade(grade.get());
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
+        }
+
+        if (civilServantResource.getOrganisationId() != null) {
+            Long organisationId = civilServantResource.getOrganisationId();
+            LOGGER.debug("Looking up organisation with id {}", organisationId);
+            Optional<Organisation> organisation = organisationRepository.findById(organisationId);
+            if (organisation.isPresent()) {
+                civilServant.setOrganisation(organisation.get());
+            } else {
+                return ResponseEntity.badRequest().build();
+            }
+        }
 
         civilServantRepository.save(civilServant);
 
