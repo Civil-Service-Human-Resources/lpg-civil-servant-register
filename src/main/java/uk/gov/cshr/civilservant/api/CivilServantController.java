@@ -4,15 +4,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.repository.IdentityRepository;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.security.Principal;
 import java.util.Optional;
 
@@ -38,8 +38,30 @@ public class CivilServantController {
 
     @GetMapping
     @Transactional
-    public ResponseEntity<CivilServant> get(Principal principal) {
-        LOGGER.debug("Getting civil servant details");
+    public ResponseEntity<CivilServantResource> get(Principal principal) {
+        LOGGER.debug("Getting civil servant details for user {}", principal.getName());
+        return ResponseEntity.ok(new CivilServantResource(findOrCreateCivilServant(principal)));
+    }
+
+    @PutMapping
+    @Transactional
+    public ResponseEntity<Void> update(@Valid @RequestBody CivilServantResource civilServantResource, BindingResult bindingResult, Principal principal) {
+        LOGGER.debug("Updating civil servant details for user {}", principal.getName());
+
+        if (bindingResult.hasErrors()) {
+            LOGGER.debug("Request has errors, responding with bad request", bindingResult);
+            return ResponseEntity.badRequest().build();
+        }
+
+        CivilServant civilServant = findOrCreateCivilServant(principal);
+        civilServant.setFullName(civilServantResource.getFullName());
+
+        civilServantRepository.save(civilServant);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    private CivilServant findOrCreateCivilServant(Principal principal) {
 
         String identityUid = principal.getName();
 
@@ -52,12 +74,11 @@ public class CivilServantController {
         });
 
         Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(storedIdentity);
-        CivilServant storedCivilServant = civilServant.orElseGet(() -> {
+
+        return civilServant.orElseGet(() -> {
             LOGGER.debug("No civil servant exists for identity {}, creating.", identity);
             CivilServant newCivilServant = new CivilServant(storedIdentity);
             return civilServantRepository.save(newCivilServant);
         });
-
-        return ResponseEntity.ok(storedCivilServant);
     }
 }
