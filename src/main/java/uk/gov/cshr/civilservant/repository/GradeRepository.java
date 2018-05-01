@@ -7,5 +7,5 @@ import uk.gov.cshr.civilservant.domain.Grade;
 @Repository
 public interface GradeRepository extends CrudRepository<Grade, Long> {
 
-    Iterable<Grade> findByDefaultTrue();
+    Iterable<Grade> findByCoreTrue();
 }

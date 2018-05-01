@@ -1,13 +1,9 @@
 package uk.gov.cshr.civilservant.api;
 
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.verification.VerificationMode;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -177,7 +173,7 @@ public class OrganisationControllerTest {
         Grade grade = new Grade(gradeCode, gradeName);
 
         when(organisationRepository.findById(id)).thenReturn(Optional.of(organisation));
-        when(gradeRepository.findByDefaultTrue()).thenReturn(newArrayList(grade));
+        when(gradeRepository.findByCoreTrue()).thenReturn(newArrayList(grade));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisations/{id}/grades", id)
@@ -188,6 +184,6 @@ public class OrganisationControllerTest {
                 .andExpect(jsonPath("$.results[0].code", equalTo(gradeCode)))
                 .andExpect(jsonPath("$.results[0].name", equalTo(gradeName)));
 
-        verify(gradeRepository, times(1)).findByDefaultTrue();
+        verify(gradeRepository, times(1)).findByCoreTrue();
     }
 }

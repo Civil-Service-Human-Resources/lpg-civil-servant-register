@@ -71,7 +71,7 @@ public class OrganisationController {
                 .map(organisation -> {
                     Iterable<Grade> grades = organisation.getGrades();
                     if (Iterables.isEmpty(grades)) {
-                        grades = gradeRepository.findByDefaultTrue();
+                        grades = gradeRepository.findByCoreTrue();
                     }
                     return ResponseEntity.ok(new Results<>(StreamSupport.stream(grades.spliterator(), false).map(GradeResource::new).collect(toList())));
                 })
