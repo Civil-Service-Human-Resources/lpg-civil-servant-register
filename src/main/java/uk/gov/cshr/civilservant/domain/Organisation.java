@@ -25,7 +25,7 @@ public class Organisation {
     @Column(unique = true, nullable = false)
     private String name;
 
-    @OneToMany
+    @OneToMany(mappedBy = "organisation")
     private List<Grade> grades = new ArrayList<>();
 
     @ManyToOne(optional = false)

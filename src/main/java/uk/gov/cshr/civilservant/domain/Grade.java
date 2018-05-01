@@ -22,7 +22,8 @@ public class Grade {
     @Column(nullable = false)
     private String name;
 
-    private Boolean core = Boolean.FALSE;
+    @ManyToOne
+    private Organisation organisation;
 
     protected Grade() {
     }
@@ -52,14 +53,6 @@ public class Grade {
     public void setName(String name) {
         checkArgument(isNotEmpty(name));
         this.name = name;
-    }
-
-    public void setCore(Boolean core) {
-        this.core = core;
-    }
-
-    public Boolean getCore() {
-        return core;
     }
 
     @Override

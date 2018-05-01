@@ -31,7 +31,7 @@ public class OrganisationResource extends ResourceSupport {
                     .collect(toList());
         }
         add(linkTo(OrganisationController.class).slash(organisation.getId()).withSelfRel());
-        add(linkTo(OrganisationController.class).slash(organisation.getId()).slash("grades").withRel("grades"));
+        add(linkTo(GradeController.class, "organisation").withRel("grades").expand(organisation.getId()));
     }
 
     public String getName() {

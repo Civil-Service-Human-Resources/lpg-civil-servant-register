@@ -9,18 +9,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cshr.civilservant.domain.Grade;
 import uk.gov.cshr.civilservant.domain.Organisation;
-import uk.gov.cshr.civilservant.repository.GradeRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationRepository;
 
 import java.util.ArrayList;
 import java.util.Optional;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -34,9 +29,6 @@ public class OrganisationControllerTest {
 
     @InjectMocks
     private OrganisationController controller;
-
-    @Mock
-    private GradeRepository gradeRepository;
 
     @Mock
     private OrganisationRepository organisationRepository;
@@ -123,67 +115,5 @@ public class OrganisationControllerTest {
                 .andExpect(jsonPath("$.grades", hasSize(1)))
                 .andExpect(jsonPath("$.grades[0].code", equalTo(gradeCode)))
                 .andExpect(jsonPath("$.grades[0].name", equalTo(gradeName)));
-    }
-
-    @Test
-    public void shouldReturnNotFoundForGradesQueryOfUnknownOrganisation() throws Exception {
-
-        final Long id = 1L;
-
-        when(organisationRepository.findById(id)).thenReturn(Optional.empty());
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/organisations/{id}/grades", id)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void shouldReturnOrganisationsGradesForGradesQueryOfOrganisationWithGrades() throws Exception {
-
-        final Long id = 1L;
-        final String gradeCode = "gradeCode";
-        final String gradeName = "gradeName";
-
-        Organisation organisation = new Organisation("code", "name");
-        organisation.addGrade(new Grade(gradeCode, gradeName));
-
-        when(organisationRepository.findById(id)).thenReturn(Optional.of(organisation));
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/organisations/{id}/grades", id)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results", hasSize(1)))
-                .andExpect(jsonPath("$.results[0].code", equalTo(gradeCode)))
-                .andExpect(jsonPath("$.results[0].name", equalTo(gradeName)));
-
-    }
-
-    @Test
-    public void shouldReturnDefaultGradesForGradesQueryOfOrganisationWithNoGrades() throws Exception {
-
-        final Long id = 1L;
-        final String gradeCode = "gradeCode";
-        final String gradeName = "gradeName";
-
-        Organisation organisation = new Organisation("code", "name");
-        Grade grade = new Grade(gradeCode, gradeName);
-
-        when(organisationRepository.findById(id)).thenReturn(Optional.of(organisation));
-        when(gradeRepository.findByCoreTrue()).thenReturn(newArrayList(grade));
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.get("/organisations/{id}/grades", id)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.results", hasSize(1)))
-                .andExpect(jsonPath("$.results[0].code", equalTo(gradeCode)))
-                .andExpect(jsonPath("$.results[0].name", equalTo(gradeName)));
-
-        verify(gradeRepository, times(1)).findByCoreTrue();
     }
 }

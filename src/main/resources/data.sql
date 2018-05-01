@@ -6,9 +6,9 @@ TRUNCATE TABLE `organisation`;
 TRUNCATE TABLE `grade`;
 TRUNCATE TABLE `identity`;
 
-INSERT INTO grade (code, name, core) VALUES
-  ('G6', 'Grade 6', 1),
-  ('G7', 'Grade 7', 1);
+INSERT INTO grade (code, name, organisation_id) VALUES
+  ('G6', 'Grade 6', null),
+  ('G7', 'Grade 7', null);
 
 INSERT INTO department (code, name) VALUES
   ('co', 'Cabinet Office');
