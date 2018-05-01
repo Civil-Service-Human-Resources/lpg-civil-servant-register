@@ -6,7 +6,6 @@ EXPOSE 9002
 
 CMD java -jar /data/app.jar
 
-ADD environ/wait-for-it.sh .
 ADD build/libs/civil-servant-registry-service.jar /data/app.jar
 
 ADD https://github.com/Civil-Service-Human-Resources/lpg-terraform-paas/releases/download/hammer-0.1/hammer /bin/hammer
