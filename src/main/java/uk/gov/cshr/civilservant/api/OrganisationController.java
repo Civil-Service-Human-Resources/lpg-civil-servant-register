@@ -14,8 +14,6 @@ import java.util.stream.StreamSupport;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/organisations")
@@ -37,9 +35,9 @@ public class OrganisationController {
         LOGGER.debug("Listing organisations for query {}", query);
 
         Iterable<Organisation> results = organisationRepository.findByNameStartsWithIgnoringCase(query);
-        return new ResponseEntity<>(new Results<>(StreamSupport.stream(results.spliterator(), false)
+        return ResponseEntity.ok(new Results<>(StreamSupport.stream(results.spliterator(), false)
                 .map(OrganisationResource::new)
-                .collect(toList())), OK);
+                .collect(toList())));
     }
 
     @GetMapping("/{organisationId}")
@@ -49,7 +47,7 @@ public class OrganisationController {
 
         Optional<Organisation> result = organisationRepository.findById(organisationId);
         return result
-                .map(organisation -> new ResponseEntity<>(new OrganisationResource(organisation, false), OK))
-                .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
+                .map(organisation -> ResponseEntity.ok(new OrganisationResource(organisation, false)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

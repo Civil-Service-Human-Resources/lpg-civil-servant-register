@@ -18,8 +18,6 @@ import java.util.stream.StreamSupport;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequestMapping("/grades")
@@ -64,7 +62,7 @@ public class GradeController {
 
         Optional<Grade> result = gradeRepository.findById(gradeId);
         return result
-                .map(organisation -> new ResponseEntity<>(new GradeResource(organisation), OK))
-                .orElseGet(() -> new ResponseEntity<>(NOT_FOUND));
+                .map(grade -> ResponseEntity.ok(new GradeResource(grade)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
