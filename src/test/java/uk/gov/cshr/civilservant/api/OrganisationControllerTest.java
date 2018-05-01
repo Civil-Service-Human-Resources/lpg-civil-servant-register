@@ -9,7 +9,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cshr.civilservant.domain.Department;
 import uk.gov.cshr.civilservant.domain.Organisation;
-import uk.gov.cshr.civilservant.repository.DepartmentRepository;
+import uk.gov.cshr.civilservant.repository.OrganisationRepository;
 
 import java.util.Optional;
 
@@ -30,7 +30,7 @@ public class OrganisationControllerTest {
     private OrganisationController controller;
 
     @Mock
-    private DepartmentRepository departmentRepository;
+    private OrganisationRepository organisationRepository;
 
     @Before
     public void setup() {
@@ -41,7 +41,7 @@ public class OrganisationControllerTest {
     @Test
     public void shouldReturnEmptyListForUnknownOrganisation() throws Exception {
 
-        when(departmentRepository.findByCode("unknown")).thenReturn(Optional.empty());
+        when(organisationRepository.findByCode("unknown")).thenReturn(Optional.empty());
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisations?department=unknown")
@@ -57,7 +57,7 @@ public class OrganisationControllerTest {
         Department department = new Department("code", "name");
         department.addOrganisation(new Organisation("org", "Org"));
 
-        when(departmentRepository.findByCode("code")).thenReturn(Optional.of(department));
+        when(organisationRepository.findById("code")).thenReturn(Optional.of(department));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisations?department=code")

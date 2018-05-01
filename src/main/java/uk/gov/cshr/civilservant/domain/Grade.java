@@ -1,6 +1,5 @@
 package uk.gov.cshr.civilservant.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -15,7 +14,6 @@ public class Grade {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
     private Long id;
 
     @Column(unique = true, nullable = false)
