@@ -31,7 +31,7 @@ public class GradeController {
         this.gradeRepository = gradeRepository;
     }
 
-    @GetMapping("/{gradeId")
+    @GetMapping("/{gradeId}")
     public ResponseEntity<GradeResource> get(@PathVariable Long gradeId) {
         LOGGER.debug("Getting grade with id {}", gradeId);
 

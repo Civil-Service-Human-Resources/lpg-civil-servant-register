@@ -7,5 +7,5 @@ import uk.gov.cshr.civilservant.domain.Organisation;
 @Repository
 public interface OrganisationRepository extends CrudRepository<Organisation, Long> {
 
-    Iterable<Organisation> findByNameStartsWith(String query);
+    Iterable<Organisation> findByNameStartsWithIgnoringCase(String query);
 }
