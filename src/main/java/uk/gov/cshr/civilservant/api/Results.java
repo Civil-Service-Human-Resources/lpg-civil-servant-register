@@ -1,4 +1,4 @@
-package uk.gov.cslearning.civilservant.api;
+package uk.gov.cshr.civilservant.api;
 
 import java.util.Collection;
 import java.util.List;

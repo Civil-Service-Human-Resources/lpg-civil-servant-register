@@ -1,0 +1,53 @@
+package uk.gov.cshr.civilservant.api;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+import uk.gov.cshr.civilservant.domain.Organisation;
+import uk.gov.cshr.civilservant.repository.OrganisationRepository;
+
+import java.util.Optional;
+import java.util.stream.StreamSupport;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.stream.Collectors.toList;
+
+@RestController
+@RequestMapping("/organisations")
+public class OrganisationController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationController.class);
+
+    private OrganisationRepository organisationRepository;
+
+    @Autowired
+    public OrganisationController(OrganisationRepository organisationRepository) {
+        checkArgument(organisationRepository != null);
+        this.organisationRepository = organisationRepository;
+    }
+
+    @GetMapping
+    @Transactional(readOnly = true)
+    public ResponseEntity<Results<OrganisationResource>> list(@RequestParam("query") String query) {
+        LOGGER.debug("Listing organisations for query {}", query);
+
+        Iterable<Organisation> results = organisationRepository.findByNameStartsWithIgnoringCase(query);
+        return ResponseEntity.ok(new Results<>(StreamSupport.stream(results.spliterator(), false)
+                .map(OrganisationResource::new)
+                .collect(toList())));
+    }
+
+    @GetMapping("/{organisationId}")
+    @Transactional(readOnly = true)
+    public ResponseEntity<OrganisationResource> get(@PathVariable Long organisationId) {
+        LOGGER.debug("Getting organisation with id {}", organisationId);
+
+        Optional<Organisation> result = organisationRepository.findById(organisationId);
+        return result
+                .map(organisation -> ResponseEntity.ok(new OrganisationResource(organisation, false)))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+}

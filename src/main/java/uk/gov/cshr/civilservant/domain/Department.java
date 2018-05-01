@@ -1,4 +1,4 @@
-package uk.gov.cslearning.civilservant.domain;
+package uk.gov.cshr.civilservant.domain;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -60,6 +60,11 @@ public class Department {
 
     public Collection<Organisation> getOrganisations() {
         return unmodifiableCollection(organisations);
+    }
+
+    public void addOrganisation(Organisation organisation) {
+        checkArgument(organisation != null);
+        organisations.add(organisation);
     }
 
     @Override

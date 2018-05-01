@@ -1,4 +1,4 @@
-package uk.gov.cslearning.civilservant;
+package uk.gov.cshr.civilservant;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

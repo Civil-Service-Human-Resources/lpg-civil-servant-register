@@ -13,12 +13,12 @@ apply plugin: 'io.spring.dependency-management'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
-group = 'uk.gov.cslearning'
-version = '0.1.0-' + (System.getenv('TRAVIS_COMMIT') ?: 'local')
+group = 'uk.gov.cshr'
+version = '0.0.1'
 
 bootJar {
-    archiveName = 'civil-servant-register.jar'
-    mainClassName = 'uk.gov.cslearning.civilservant.Application'
+    archiveName = 'civil-servant-registry-service.jar'
+    mainClassName = 'uk.gov.cshr.civilservant.Application'
 }
 
 dependencies {
@@ -33,8 +33,10 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-jetty'
     compile 'org.springframework.boot:spring-boot-starter-jersey'
     compile 'org.springframework.boot:spring-boot-starter-security'
+    compile 'org.springframework.boot:spring-boot-starter-actuator'
     compile 'org.springframework.boot:spring-boot-configuration-processor'
-    compile 'org.springframework.data:spring-data-jpa'
+    compile 'org.springframework.data:spring-data-jpa:2.0.6.RELEASE'
+    compile 'org.springframework.hateoas:spring-hateoas:0.24.0.RELEASE'
     compile 'org.springframework.security.oauth:spring-security-oauth2:2.3.0.RELEASE'
 
     compile 'org.hibernate:hibernate-core:5.2.16.Final'

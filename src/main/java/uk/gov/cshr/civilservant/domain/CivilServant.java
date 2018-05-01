@@ -1,4 +1,4 @@
-package uk.gov.cslearning.civilservant.domain;
+package uk.gov.cshr.civilservant.domain;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
