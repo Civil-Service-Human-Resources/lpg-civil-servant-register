@@ -18,10 +18,10 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
-public class CivilServantRepositoryTest {
+public class InternalCivilServantRepositoryTest {
 
     @Autowired
-    private CivilServantRepository civilServantRepository;
+    private InternalCivilServantRepository civilServantRepository;
 
     @Autowired
     private IdentityRepository identityRepository;
