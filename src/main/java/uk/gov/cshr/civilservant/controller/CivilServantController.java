@@ -25,7 +25,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 @ExposesResourceFor(CivilServant.class)
 @RepositoryRestController
 @RequestMapping("/civilServants")
-@PreAuthorize("isAuthenticated()")
 public class CivilServantController implements ResourceProcessor<RepositoryLinksResource> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CivilServantController.class);
@@ -53,6 +52,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     }
 
     @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Resource<CivilServantResource>> get() {
         LOGGER.debug("Getting civil servant details for logged in user");
 
