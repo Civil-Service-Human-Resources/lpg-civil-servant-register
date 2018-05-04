@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.data.rest.core.annotation.RestResource;
-import org.springframework.data.rest.core.config.Projection;
 
 import javax.persistence.*;
 
@@ -25,6 +23,12 @@ public class CivilServant {
 
     @ManyToOne
     private Grade grade;
+
+    @ManyToOne
+    private Profession profession;
+
+    @ManyToOne
+    private JobRole jobRole;
 
     @OneToOne
     @JsonIgnore
@@ -70,6 +74,22 @@ public class CivilServant {
         this.grade = grade;
     }
 
+    public Profession getProfession() {
+        return profession;
+    }
+
+    public void setProfession(Profession profession) {
+        this.profession = profession;
+    }
+
+    public JobRole getJobRole() {
+        return jobRole;
+    }
+
+    public void setJobRole(JobRole jobRole) {
+        this.jobRole = jobRole;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -96,6 +116,8 @@ public class CivilServant {
                 .append("id", id)
                 .append("organisation", organisation)
                 .append("grade", grade)
+                .append("profession", profession)
+                .append("jobRole", jobRole)
                 .append("identity", identity)
                 .toString();
     }
