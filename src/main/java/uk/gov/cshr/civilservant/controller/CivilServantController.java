@@ -3,10 +3,11 @@ package uk.gov.cshr.civilservant.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.*;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,14 +16,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
+@ExposesResourceFor(CivilServant.class)
 @RepositoryRestController
 @RequestMapping("/civilServants")
 @PreAuthorize("isAuthenticated()")
-public class CivilServantController {
+public class CivilServantController implements ResourceProcessor<RepositoryLinksResource> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CivilServantController.class);
 
@@ -39,6 +43,15 @@ public class CivilServantController {
         this.repositoryEntityLinks = repositoryEntityLinks;
     }
 
+    @GetMapping
+    public ResponseEntity<Resources<Void>> list() {
+        LOGGER.debug("Listing civil servant links");
+
+        Resources<Void> resource = new Resources<>(new ArrayList<>());
+        resource.add(repositoryEntityLinks.linkToSingleResource(CivilServant.class, "me").withRel("me"));
+        return ResponseEntity.ok(resource);
+    }
+
     @GetMapping("/me")
     public ResponseEntity<Resource<CivilServantResource>> get() {
         LOGGER.debug("Getting civil servant details for logged in user");
@@ -51,8 +64,16 @@ public class CivilServantController {
                     resource.add(repositoryEntityLinks.linkToSingleResource(CivilServant.class, civilServant.getId()).withSelfRel());
                     resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("organisation").withRel("organisation"));
                     resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("grade").withRel("grade"));
+                    resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("profession").withRel("profession"));
+                    resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("jobRole").withRel("jobRole"));
                     return ResponseEntity.ok(resource);
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Override
+    public RepositoryLinksResource process(RepositoryLinksResource resource) {
+        resource.add(ControllerLinkBuilder.linkTo(CivilServantController.class).withRel("civilServants"));
+        return resource;
     }
 }
