@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -75,6 +76,11 @@ public class JobRole {
         if (children != null) {
             this.children.addAll(children);
         }
+    }
+
+    @JsonProperty
+    public boolean hasChildren() {
+        return !children.isEmpty();
     }
 
     @Override
