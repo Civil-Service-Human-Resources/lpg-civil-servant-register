@@ -7,7 +7,11 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.util.Collections.unmodifiableSet;
 
 @Entity
 public class CivilServant {
@@ -33,6 +37,9 @@ public class CivilServant {
     @OneToOne
     @JsonIgnore
     private Identity identity;
+
+    @ManyToMany
+    private Set<Profession> otherAreasOfWork = new HashSet<>();
 
     protected CivilServant() {
     }
@@ -90,6 +97,17 @@ public class CivilServant {
         this.jobRole = jobRole;
     }
 
+    public Set<Profession> getOtherAreasOfWork() {
+        return unmodifiableSet(otherAreasOfWork);
+    }
+
+    public void setOtherAreasOfWork(Set<Profession> otherAreasOfWork) {
+        this.otherAreasOfWork.clear();
+        if (otherAreasOfWork != null) {
+            this.otherAreasOfWork.addAll(otherAreasOfWork);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -118,6 +136,7 @@ public class CivilServant {
                 .append("grade", grade)
                 .append("profession", profession)
                 .append("jobRole", jobRole)
+                .append("otherAreasOfWork", otherAreasOfWork)
                 .append("identity", identity)
                 .toString();
     }
