@@ -2,6 +2,8 @@ package uk.gov.cshr.civilservant.resource;
 
 import uk.gov.cshr.civilservant.domain.*;
 
+import java.util.Set;
+
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class CivilServantResource {
@@ -16,6 +18,8 @@ public class CivilServantResource {
 
     private JobRole jobRole;
 
+    private Set<Profession> otherAreasOfWork;
+
     public CivilServantResource(CivilServant civilServant) {
         checkArgument(civilServant != null);
         this.fullName = civilServant.getFullName();
@@ -23,6 +27,7 @@ public class CivilServantResource {
         this.organisation = civilServant.getOrganisation();
         this.profession = civilServant.getProfession();
         this.jobRole = civilServant.getJobRole();
+        this.otherAreasOfWork = civilServant.getOtherAreasOfWork();
     }
 
     public String getFullName() {
@@ -43,5 +48,10 @@ public class CivilServantResource {
 
     public JobRole getJobRole() {
         return jobRole;
+    }
+
+
+    public Set<Profession> getOtherAreasOfWork() {
+        return otherAreasOfWork;
     }
 }
