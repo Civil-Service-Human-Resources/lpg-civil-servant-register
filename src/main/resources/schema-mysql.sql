@@ -37,6 +37,21 @@ CREATE TABLE IF NOT EXISTS `civil_servant` (
 /*!40000 ALTER TABLE `civil_servant` DISABLE KEYS */;
 /*!40000 ALTER TABLE `civil_servant` ENABLE KEYS */;
 
+-- Dumping structure for table csrs.civil_servant_other_areas_of_work
+DROP TABLE IF EXISTS `civil_servant_other_areas_of_work`;
+CREATE TABLE IF NOT EXISTS `civil_servant_other_areas_of_work` (
+  `civil_servant_id` mediumint(8) unsigned NOT NULL,
+  `other_areas_of_work_id` smallint(5) unsigned NOT NULL,
+  PRIMARY KEY (`civil_servant_id`,`other_areas_of_work_id`),
+  KEY `FK_civil_servant_other_areas_of_work_profession` (`other_areas_of_work_id`),
+  CONSTRAINT `FK_civil_servant_other_areas_of_work_civil_servant` FOREIGN KEY (`civil_servant_id`) REFERENCES `civil_servant` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_civil_servant_other_areas_of_work_profession` FOREIGN KEY (`other_areas_of_work_id`) REFERENCES `profession` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Dumping data for table csrs.civil_servant_other_areas_of_work: ~0 rows (approximately)
+/*!40000 ALTER TABLE `civil_servant_other_areas_of_work` DISABLE KEYS */;
+/*!40000 ALTER TABLE `civil_servant_other_areas_of_work` ENABLE KEYS */;
+
 -- Dumping structure for table csrs.department
 DROP TABLE IF EXISTS `department`;
 CREATE TABLE IF NOT EXISTS `department` (
@@ -56,6 +71,7 @@ DROP TABLE IF EXISTS `department_organisations`;
 CREATE TABLE IF NOT EXISTS `department_organisations` (
   `department_id` smallint(6) unsigned NOT NULL,
   `organisations_id` smallint(6) unsigned NOT NULL,
+  PRIMARY KEY (`department_id`,`organisations_id`),
   KEY `FK_department_organisations_department` (`department_id`),
   KEY `FK_department_organisations_organisation` (`organisations_id`),
   CONSTRAINT `FK_department_organisations_department` FOREIGN KEY (`department_id`) REFERENCES `department` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
