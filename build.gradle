@@ -29,23 +29,46 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web') {
         exclude module: 'spring-boot-starter-tomcat'
     }
-    compile 'org.springframework.boot:spring-boot-starter-jetty'
-    compile 'org.springframework.boot:spring-boot-starter-jersey'
-    compile 'org.springframework.boot:spring-boot-starter-security'
-    compile 'org.springframework.boot:spring-boot-configuration-processor'
-    compile 'org.springframework.data:spring-data-jpa:2.0.6.RELEASE'
-    compile 'org.springframework.data:spring-data-rest-webmvc:3.0.6.RELEASE'
-    compile 'org.springframework.hateoas:spring-hateoas:0.24.0.RELEASE'
-    compile 'org.springframework.security.oauth:spring-security-oauth2:2.3.0.RELEASE'
+    // https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
+    compile group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.0.5.RELEASE'
 
-    compile 'org.hibernate:hibernate-core:5.2.16.Final'
-    compile 'org.hibernate:hibernate-entitymanager:5.2.16.Final'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jdbc
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: '2.0.2.RELEASE'
 
-    compile 'com.google.guava:guava:23.5-jre'
-    compile 'com.h2database:h2:1.4.197'
-    compile 'org.apache.commons:commons-lang3:3.7'
-    compile 'org.codehaus.janino:janino:3.0.8'
-    compile 'mysql:mysql-connector-java:8.0.8-dmr'
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.0.RELEASE'
+
+    // https://mvnrepository.com/artifact/org.springframework.data/spring-data-rest-core
+    compile group: 'org.springframework.data', name: 'spring-data-rest-core', version: '3.0.7.RELEASE'
+
+    // https://mvnrepository.com/artifact/org.springframework.data/spring-data-rest-webmvc
+    compile group: 'org.springframework.data', name: 'spring-data-rest-webmvc', version: '3.0.7.RELEASE'
+
+    // https://mvnrepository.com/artifact/org.springframework.security/spring-security-core
+    compile group: 'org.springframework.security', name: 'spring-security-core', version: '5.0.5.RELEASE'
+
+    // https://mvnrepository.com/artifact/org.springframework.security/spring-security-config
+    compile group: 'org.springframework.security', name: 'spring-security-config', version: '5.0.5.RELEASE'
+
+    // https://mvnrepository.com/artifact/org.springframework.security.oauth/spring-security-oauth2
+    compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.3.3.RELEASE'
+
+    // https://mvnrepository.com/artifact/com.h2database/h2
+    compile group: 'com.h2database', name: 'h2', version: '1.4.197'
+
+    // https://mvnrepository.com/artifact/org.hibernate/hibernate-core
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.16.Final'
+    // https://mvnrepository.com/artifact/org.hibernate/hibernate-entitymanager
+    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.2.16.Final'
+
+    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+    compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.8-dmr'
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    compile group: 'com.google.guava', name: 'guava', version: '25.0-jre'
 
     testCompile 'com.google.code.gson:gson:2.8.2'
     testCompile 'org.springframework.boot:spring-boot-starter-test'

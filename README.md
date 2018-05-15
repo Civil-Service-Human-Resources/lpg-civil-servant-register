@@ -1,3 +1,33 @@
 # Civil Servant Registry Service
 
 CRUD services to hold employment and personal details of civil servants.
+
+Service uses [spring-data-rest](https://projects.spring.io/spring-data-rest/) to expose resources.
+
+## Getting Started
+### Environment Variables
+You will need to add the following env variables to run code locally, or to run the test suite.
+
+| VARIABLE | DESCRIPTION | DEFAULT |
+|--|--|--|
+|CLIENT_ID | Identity Service client ID |NO|
+|CLIENT_SECRET|Identity Service client secret|NO|
+|CHECK_TOKEN_URL|Identity service check token url|NO|
+|DATASOURCE|The Datasource connectiong string|NO|
+
+### Build
+Build the application using Gradle ```./gradlew build```  
+
+Run the project with Gradle or ```./gradlew bootRun``` import project into IntelliJ and Run Application.  
+
+The application uses HAL and self exploring.
+`localhost:9002`  
+
+
+## Requirements
+
+A Backing storage solution is required. 
+
+Currently MySQL is chosen for the small footprint and Free plans. 
+
+For setting up and linking the storage solution please see - https://docs.cloud.service.gov.uk/#set-up-a-mysql-service

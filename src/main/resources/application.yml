@@ -21,11 +21,12 @@ spring:
   profiles: production
   datasource:
     url: ${DATASOURCE:jdbc:mysql://localhost:3306/civil0-servant-register?user=root&password=secret&useSSL=false}
-    initialization-mode: always
+    platform: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.MySQL5Dialect
+        dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         enable_lazy_load_no_trans: true
