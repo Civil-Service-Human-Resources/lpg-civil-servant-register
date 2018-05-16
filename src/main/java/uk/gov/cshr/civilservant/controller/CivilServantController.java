@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-@ExposesResourceFor(CivilServant.class)
 @RepositoryRestController
 @RequestMapping("/civilServants")
 public class CivilServantController implements ResourceProcessor<RepositoryLinksResource> {
