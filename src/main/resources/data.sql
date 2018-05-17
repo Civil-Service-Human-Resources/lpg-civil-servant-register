@@ -8,7 +8,7 @@ INSERT INTO department (code, name) VALUES
   ('co', 'Cabinet Office');
 
 INSERT INTO organisation (code, name, department_id) VALUES
-  ('co', 'Cabinet Office', SELECT id FROM department WHERE code = 'co');
+  ('co', 'Cabinet Office', (SELECT id FROM department WHERE code = 'co'));
 
 INSERT INTO profession (name) VALUES
   ('Commercial'),
@@ -24,27 +24,33 @@ INSERT INTO profession (name) VALUES
   ('Property'),
   ('Other');
 
+SELECT id INTO @profession FROM profession WHERE name = 'Commercial';
+
 INSERT INTO job_role (name, profession_id) VALUES
-  ('Strategy and Policy Development', SELECT id FROM profession WHERE name = 'Commercial'),
-  ('Business Needs and Sourcing', SELECT id FROM profession WHERE name = 'Commercial'),
-  ('Procurement', SELECT id FROM profession WHERE name = 'Commercial'),
-  ('Contract and Supplier Management', SELECT id FROM profession WHERE name = 'Commercial'),
-  ('Category Management', SELECT id FROM profession WHERE name = 'Commercial');
+  ('Strategy and Policy Development', @profession),
+  ('Business Needs and Sourcing', @profession),
+  ('Procurement', @profession),
+  ('Contract and Supplier Management', @profession),
+  ('Category Management', @profession);
+  
+SELECT id INTO @parent FROM job_role WHERE name = 'Strategy and Policy Development';
 
 INSERT INTO job_role (name, parent_id) VALUES
-  ('Commercial Strategy', SELECT id FROM job_role WHERE name = 'Strategy and Policy Development'),
-  ('Market Maker & Supplier Engagement', SELECT id FROM job_role WHERE name = 'Strategy and Policy Development'),
-  ('Commercial Risk and Assurance Specialist', SELECT id FROM job_role WHERE name = 'Strategy and Policy Development'),
-  ('Commerical Policy Advisor', SELECT id FROM job_role WHERE name = 'Strategy and Policy Development');
-
+  ('Commercial Strategy', @parent),
+  ('Market Maker & Supplier Engagement', @parent),
+  ('Commercial Risk and Assurance Specialist', @parent),
+  ('Commerical Policy Advisor', @parent);
+  
+SELECT id INTO @parent FROM job_role WHERE name = 'Commercial Strategy';
+  
 INSERT INTO job_role (name, parent_id) VALUES
-  ('Commercial Support', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
-  ('Associate Commercial Practitioner', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
-  ('Commercial Practitioner', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
-  ('Commercial Lead', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
-  ('Associate Commercial Specialist', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
-  ('Commercial Specialist', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
-  ('Senior Commercial Specialist', SELECT id FROM job_role WHERE name = 'Commercial Strategy');
+  ('Commercial Support', @parent),
+  ('Associate Commercial Practitioner', @parent),
+  ('Commercial Practitioner', @parent),
+  ('Commercial Lead', @parent),
+  ('Associate Commercial Specialist', @parent),
+  ('Commercial Specialist', @parent),
+  ('Senior Commercial Specialist', @parent);
 
 SET FOREIGN_KEY_CHECKS = 1;
 
