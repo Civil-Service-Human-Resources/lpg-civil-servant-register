@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
-import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
@@ -14,9 +13,13 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
+import uk.gov.cshr.civilservant.repository.IdentityRepository;
+import uk.gov.cshr.civilservant.repository.InternalCivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 
 import java.util.ArrayList;
@@ -34,13 +37,23 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private RepositoryEntityLinks repositoryEntityLinks;
 
+    private InternalCivilServantRepository internalCivilServantRepository;
+
+    private IdentityRepository identityRepository;
+
     @Autowired
     public CivilServantController(CivilServantRepository civilServantRepository,
-                                  RepositoryEntityLinks repositoryEntityLinks) {
+                                  RepositoryEntityLinks repositoryEntityLinks,
+                                  InternalCivilServantRepository internalCivilServantRepository,
+                                  IdentityRepository identityRepository) {
         checkArgument(civilServantRepository != null);
         checkArgument(repositoryEntityLinks != null);
+        checkArgument(internalCivilServantRepository != null);
+        checkArgument(identityRepository != null);
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
+        this.internalCivilServantRepository = internalCivilServantRepository;
+        this.identityRepository = identityRepository;
     }
 
     @GetMapping
@@ -59,6 +72,32 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
         Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
 
+        return getResourceResponseEntity(optionalCivilServant);
+    }
+
+    @GetMapping("/{uid}")
+    @PreAuthorize("hasAuthority('CLIENT')")
+    public ResponseEntity<Resource<CivilServantResource>> getById(@PathVariable("uid") String uid) {
+        LOGGER.debug("Getting civil servant details for user with uid {}", uid);
+
+        Optional<Identity> identity = identityRepository.findByUid(uid);
+
+        if(!identity.isPresent()){
+            return ResponseEntity.notFound().build();
+        }
+
+        Optional<CivilServant> optionalCivilServant = internalCivilServantRepository.findByIdentity(identity.get());
+
+        return getResourceResponseEntity(optionalCivilServant);
+    }
+
+    @Override
+    public RepositoryLinksResource process(RepositoryLinksResource resource) {
+        resource.add(ControllerLinkBuilder.linkTo(CivilServantController.class).withRel("civilServants"));
+        return resource;
+    }
+
+    private ResponseEntity<Resource<CivilServantResource>> getResourceResponseEntity(Optional<CivilServant> optionalCivilServant) {
         return optionalCivilServant
                 .map(civilServant -> {
                     Resource<CivilServantResource> resource = new Resource<>(new CivilServantResource(civilServant));
@@ -70,11 +109,5 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                     return ResponseEntity.ok(resource);
                 })
                 .orElse(ResponseEntity.notFound().build());
-    }
-
-    @Override
-    public RepositoryLinksResource process(RepositoryLinksResource resource) {
-        resource.add(ControllerLinkBuilder.linkTo(CivilServantController.class).withRel("civilServants"));
-        return resource;
     }
 }
