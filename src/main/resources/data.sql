@@ -1,20 +1,31 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 INSERT INTO grade (code, name, organisation_id) VALUES
-  ('G6', 'Grade 6', null),
-  ('G7', 'Grade 7', null);
+	('AA', 'Administrative level',null),
+	('AO', 'Administrative Officer',null),
+    ('EO', 'Executive Office',null),
+	('SEO','Senior Executive Office',null),
+    ('HEO','Higher Executive manager',null),
+ 	('G6', 'Grade 6', null),
+  	('G7', 'Grade 7', null),
+	('SCS', 'Director', null);
 
 INSERT INTO department (code, name) VALUES
-  ('co', 'Cabinet Office');
+	('co', 'Cabinet Office'),
+	('dh', 'Department of Health'),
+	('hmrc', 'HM Revenue & Customs');
 
 INSERT INTO organisation (code, name, department_id) VALUES
-  ('co', 'Cabinet Office', SELECT id FROM department WHERE code = 'co');
+  ('co', 'Cabinet Office', SELECT id FROM department WHERE code = 'co'),
+  ('dh', 'Department of Health', SELECT id FROM department WHERE code = 'dh'),
+  ('hmrc', 'HM Revenue & Customs', SELECT id FROM department WHERE code = 'hmrc');
 
 INSERT INTO profession (name) VALUES
+  ('Analysis'),
   ('Commercial'),
   ('Communications'),
   ('Corporate finance'),
-  ('Digital, Data and Technology'),
+  ('Digital'),
   ('Finance'),
   ('Fraud, error, debt and grants'),
   ('Human resources'),
