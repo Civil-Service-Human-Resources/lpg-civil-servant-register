@@ -1,13 +1,11 @@
 package uk.gov.cshr.civilservant.controller;
 
-import org.checkerframework.checker.units.qual.A;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
-import org.springframework.hateoas.ExposesResourceFor;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
@@ -30,7 +28,6 @@ import java.util.Optional;
 import static com.google.common.base.Preconditions.checkArgument;
 
 @RepositoryRestController
-@ExposesResourceFor(CivilServant.class)
 @RequestMapping("/civilServants")
 public class CivilServantController implements ResourceProcessor<RepositoryLinksResource> {
 
@@ -79,6 +76,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     }
 
     @GetMapping("/{uid}")
+    @PreAuthorize("hasAuthority('CLIENT')")
     public ResponseEntity<Resource<CivilServantResource>> getById(@PathVariable("uid") String uid) {
         LOGGER.debug("Getting civil servant details for user with uid {}", uid);
 
