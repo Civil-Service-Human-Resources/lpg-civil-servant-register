@@ -8,7 +8,6 @@ import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 
 import javax.persistence.*;
 
-import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
