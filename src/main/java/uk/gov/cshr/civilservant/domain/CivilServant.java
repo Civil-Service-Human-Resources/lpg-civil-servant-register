@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 
 import javax.persistence.*;
 
@@ -40,6 +41,9 @@ public class CivilServant {
 
     @ManyToMany
     private Set<Profession> otherAreasOfWork = new HashSet<>();
+
+    @ManyToOne
+    private CivilServant lineManager;
 
     protected CivilServant() {
     }
@@ -139,5 +143,13 @@ public class CivilServant {
                 .append("otherAreasOfWork", otherAreasOfWork)
                 .append("identity", identity)
                 .toString();
+    }
+
+    public CivilServant getLineManager() {
+        return lineManager;
+    }
+
+    public void setLineManager(CivilServant lineManager) {
+        this.lineManager = lineManager;
     }
 }

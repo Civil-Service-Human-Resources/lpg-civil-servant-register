@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
+import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
+import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -28,6 +31,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class CivilServantController implements ResourceProcessor<RepositoryLinksResource> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CivilServantController.class);
+
+
+    private IdentityService identityService;
 
     private CivilServantRepository civilServantRepository;
 
@@ -40,6 +46,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         checkArgument(repositoryEntityLinks != null);
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
+        this.identityService = identityService;
     }
 
     @GetMapping
@@ -60,6 +67,23 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
         return getResourceResponseEntity(optionalCivilServant);
     }
+
+    @GetMapping("/manager")
+    public ResponseEntity<Resources<Void>> check() {
+
+        Resources<Void> resource = new Resources<>(new ArrayList<>());
+
+
+
+        Collection<IdentityFromService> identities = identityService.listAll();
+
+        for (IdentityFromService identity : identities) {
+            LOGGER.info("Got identity with uid {} and username {}", identity.getUid(), identity.getUsername());
+        }
+
+        return ResponseEntity.ok(resource);
+    }
+
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
