@@ -20,6 +20,9 @@ public class CivilServantResource {
 
     private Set<Profession> otherAreasOfWork;
 
+    private String lineManager;
+
+
     public CivilServantResource(CivilServant civilServant) {
         checkArgument(civilServant != null);
         this.fullName = civilServant.getFullName();
@@ -28,6 +31,7 @@ public class CivilServantResource {
         this.profession = civilServant.getProfession();
         this.jobRole = civilServant.getJobRole();
         this.otherAreasOfWork = civilServant.getOtherAreasOfWork();
+        this.lineManager = civilServant.getLineManager();
     }
 
     public String getFullName() {
@@ -37,6 +41,12 @@ public class CivilServantResource {
     public Grade getGrade() {
         return grade;
     }
+
+
+    public String getLineManager() {
+        return lineManager;
+    }
+
 
     public Organisation getOrganisation() {
         return organisation;

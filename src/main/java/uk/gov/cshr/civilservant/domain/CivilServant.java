@@ -8,6 +8,7 @@ import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 
 import javax.persistence.*;
 
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,8 +43,8 @@ public class CivilServant {
     @ManyToMany
     private Set<Profession> otherAreasOfWork = new HashSet<>();
 
-    @ManyToOne
-    private CivilServant lineManager;
+
+    private String lineManager;
 
     protected CivilServant() {
     }
@@ -64,6 +65,15 @@ public class CivilServant {
     public String getFullName() {
         return fullName;
     }
+
+    public String getLineManager() {
+        return lineManager;
+    }
+
+    public void setLineManager(String lineManager) {
+        System.out.println(lineManager);
+        this.lineManager =lineManager;
+    };
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
@@ -145,11 +155,5 @@ public class CivilServant {
                 .toString();
     }
 
-    public CivilServant getLineManager() {
-        return lineManager;
-    }
 
-    public void setLineManager(CivilServant lineManager) {
-        this.lineManager = lineManager;
-    }
 }
