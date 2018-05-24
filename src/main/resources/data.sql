@@ -16,7 +16,7 @@ INSERT INTO grade (code, name, organisation_id) VALUES
 
 INSERT INTO department (code, name) VALUES
 	('co', 'Cabinet Office'),
-	('dh', 'Department of Health'),
+	('dh', 'Department of Health & Social Care'),
 	('hmrc', 'HM Revenue & Customs');
 
 INSERT INTO organisation (code, name, department_id) VALUES
