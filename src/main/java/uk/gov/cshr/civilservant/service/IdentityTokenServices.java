@@ -45,7 +45,7 @@ public class IdentityTokenServices extends RemoteTokenServices {
 
         String identityId = (String) authentication.getPrincipal();
 
-        Optional<Identity> identity = identityRepository.findById(identityId);
+        Optional<Identity> identity = identityRepository.findByUid(identityId);
 
         Identity storedIdentity = identity.orElseGet(() -> {
             LOGGER.debug("No identity exists for id {}, creating.", identityId);

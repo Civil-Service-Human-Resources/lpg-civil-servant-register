@@ -11,5 +11,5 @@ import java.util.Optional;
 @RepositoryRestResource(exported = false)
 public interface IdentityRepository extends CrudRepository<Identity, Long> {
 
-    Optional<Identity> findById(String id);
+    Optional<Identity> findByUid(String uid);
 }

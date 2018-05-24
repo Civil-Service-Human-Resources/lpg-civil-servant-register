@@ -7,13 +7,15 @@ import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
+import uk.gov.cshr.civilservant.domain.AllCivilServantDetails;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 
 import java.util.Optional;
 
+
 @Repository
-@RepositoryRestResource
 @PreAuthorize("isAuthenticated()")
+@RepositoryRestResource(excerptProjection = AllCivilServantDetails.class)
 public interface CivilServantRepository extends org.springframework.data.repository.Repository<CivilServant, Long> {
 
     @RestResource(exported = false)
@@ -25,4 +27,8 @@ public interface CivilServantRepository extends org.springframework.data.reposit
 
     @PostAuthorize("returnObject.isPresent() && returnObject.get().identity.uid eq principal")
     Optional<CivilServant> findById(Long id);
+
+    @RestResource(path = "findByIdentity", rel = "findByIdentity")
+    @Query("select c from CivilServant c where c.identity.uid = ?1")
+    Optional<CivilServant> findByIdentity(String uid);
 }
