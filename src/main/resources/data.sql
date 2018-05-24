@@ -16,7 +16,7 @@ INSERT INTO grade (code, name, organisation_id) VALUES
 
 INSERT INTO department (code, name) VALUES
 	('co', 'Cabinet Office'),
-	('dh', 'Department of Health'),
+	('dh', 'Department of Health & Social Care'),
 	('hmrc', 'HM Revenue & Customs');
 
 INSERT INTO organisation (code, name, department_id) VALUES
@@ -62,28 +62,5 @@ INSERT INTO job_role (name, parent_id) VALUES
   ('Commercial Specialist', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
   ('Senior Commercial Specialist', SELECT id FROM job_role WHERE name = 'Commercial Strategy');
 
-/*
-21/05 MATT - adding identity and civil_servant inserts for local development of the notifications service.
-As we are lazy loading Identities and Civil Servants into CSRS, this creates problems trying to notify users who have never signed-up/logged into LPG
-These inserts probably shouldn't be run in any of the environments.
-*/
--- INSERT INTO `identity` (uid) VALUES
--- ('3c706a70-3fff-4e7b-ae7f-102c1d46f569'), ('8dc80f78-9a52-4c31-ac54-d280a70c18eb');
---
--- INSERT INTO `civil_servant` (identity_id, organisation_id, grade_id, profession_id, job_role_id, full_name) VALUES
--- (SELECT id from identity where uid = '3c706a70-3fff-4e7b-ae7f-102c1d46f569',
--- SELECT id from organisation where code = 'co',
--- SELECT id from grade where code = 'G7',
--- SELECT id from profession where name = 'Commercial',
--- SELECT id from job_role where name = 'Commercial Support',
--- 'Learner'
--- ),
--- (SELECT id from identity where uid = '8dc80f78-9a52-4c31-ac54-d280a70c18eb',
--- SELECT id from organisation where code = 'co',
--- SELECT id from grade where code = 'G6',
--- SELECT id from profession where name = 'Communications',
--- SELECT id from job_role where name = 'Commercial Strategy',
--- 'Super'
--- )
--- ;
+
 SET FOREIGN_KEY_CHECKS = 1;

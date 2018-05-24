@@ -2,7 +2,6 @@ package uk.gov.cshr.civilservant.repository;
 
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,17 +25,20 @@ public class IdentityRepositoryTest {
     private IdentityRepository identityRepository;
 
     @Test
-    public void shouldFindIdentityByExistingId() {
+    public void shouldFindIdentityByExistingUid() {
 
         final String uid = "uid";
 
         identityRepository.save(new Identity(uid));
 
-        Assert.assertThat(1, equalTo(1));
+        Optional<Identity> identity = identityRepository.findById(1L);
+
+        assertTrue(identity.isPresent());
+        Assert.assertThat(identity.get().getUid(), equalTo(uid));
     }
 
-    @Ignore
-    public void shouldNotFindIdentityByUnrecognisedId() {
+    @Test
+    public void shouldNotFindIdentityByUnrecognisedUid() {
         Optional<Identity> identity = identityRepository.findById(2L);
         assertFalse(identity.isPresent());
     }
