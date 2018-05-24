@@ -22,6 +22,6 @@ public class GradeRepositoryTest {
     @Test
     public void shouldFindGradesWithNoOrganisation() {
         Iterable<Grade> results = gradeRepository.findByOrganisationIsNull();
-        assertThat(Iterables.size(results), is(2));
+        assertThat(Iterables.size(results), is(11));
     }
 }
