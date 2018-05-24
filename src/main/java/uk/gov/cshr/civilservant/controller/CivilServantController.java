@@ -13,13 +13,9 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
-import uk.gov.cshr.civilservant.repository.IdentityRepository;
-import uk.gov.cshr.civilservant.repository.InternalCivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 
 import java.util.ArrayList;
@@ -37,23 +33,13 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private RepositoryEntityLinks repositoryEntityLinks;
 
-    private InternalCivilServantRepository internalCivilServantRepository;
-
-    private IdentityRepository identityRepository;
-
     @Autowired
     public CivilServantController(CivilServantRepository civilServantRepository,
-                                  RepositoryEntityLinks repositoryEntityLinks,
-                                  InternalCivilServantRepository internalCivilServantRepository,
-                                  IdentityRepository identityRepository) {
+                                  RepositoryEntityLinks repositoryEntityLinks) {
         checkArgument(civilServantRepository != null);
         checkArgument(repositoryEntityLinks != null);
-        checkArgument(internalCivilServantRepository != null);
-        checkArgument(identityRepository != null);
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
-        this.internalCivilServantRepository = internalCivilServantRepository;
-        this.identityRepository = identityRepository;
     }
 
     @GetMapping
@@ -71,22 +57,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         LOGGER.debug("Getting civil servant details for logged in user");
 
         Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
-
-        return getResourceResponseEntity(optionalCivilServant);
-    }
-
-    @GetMapping("/{uid}")
-    @PreAuthorize("hasAuthority('CLIENT')")
-    public ResponseEntity<Resource<CivilServantResource>> getById(@PathVariable("uid") String uid) {
-        LOGGER.debug("Getting civil servant details for user with uid {}", uid);
-
-        Optional<Identity> identity = identityRepository.findByUid(uid);
-
-        if(!identity.isPresent()){
-            return ResponseEntity.notFound().build();
-        }
-
-        Optional<CivilServant> optionalCivilServant = internalCivilServantRepository.findByIdentity(identity.get());
 
         return getResourceResponseEntity(optionalCivilServant);
     }

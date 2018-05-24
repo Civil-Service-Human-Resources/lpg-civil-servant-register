@@ -28,7 +28,6 @@ public class InternalCivilServantRepositoryTest {
 
     @Test
     public void shouldFindCivilServantByIdentity() {
-
         final Identity identity = new Identity("uid");
         final CivilServant civilServant = new CivilServant(identity);
 
