@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.Identity;
 
 import java.util.Optional;
@@ -17,27 +18,28 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
 public class IdentityRepositoryTest {
 
     @Autowired
     private IdentityRepository identityRepository;
 
     @Test
-    public void shouldFindIdentityByExistingUid() {
+    public void shouldFindIdentityByExistingId() {
 
         final String uid = "uid";
 
         identityRepository.save(new Identity(uid));
 
-        Optional<Identity> identity = identityRepository.findByUid(uid);
+        Optional<Identity> identity = identityRepository.findById(1L);
 
         assertTrue(identity.isPresent());
         Assert.assertThat(identity.get().getUid(), equalTo(uid));
     }
 
     @Test
-    public void shouldNotFindIdentityByUnrecognisedUid() {
-        Optional<Identity> identity = identityRepository.findByUid("unknown");
+    public void shouldNotFindIdentityByUnrecognisedId() {
+        Optional<Identity> identity = identityRepository.findById(2L);
         assertFalse(identity.isPresent());
     }
 }

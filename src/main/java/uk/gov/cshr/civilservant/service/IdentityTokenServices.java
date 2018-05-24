@@ -21,7 +21,6 @@ public class IdentityTokenServices extends RemoteTokenServices {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IdentityTokenServices.class);
 
-
     private InternalCivilServantRepository civilServantRepository;
 
     private IdentityRepository identityRepository;
@@ -44,13 +43,13 @@ public class IdentityTokenServices extends RemoteTokenServices {
 
         OAuth2Authentication authentication = super.loadAuthentication(accessToken);
 
-        String identityUid = (String) authentication.getPrincipal();
+        String identityId = (String) authentication.getPrincipal();
 
-        Optional<Identity> identity = identityRepository.findByUid(identityUid);
+        Optional<Identity> identity = identityRepository.findById(identityId);
 
         Identity storedIdentity = identity.orElseGet(() -> {
-            LOGGER.debug("No identity exists for uid {}, creating.", identityUid);
-            Identity newIdentity = new Identity(identityUid);
+            LOGGER.debug("No identity exists for id {}, creating.", identityId);
+            Identity newIdentity = new Identity(identityId);
             return identityRepository.save(newIdentity);
         });
 
