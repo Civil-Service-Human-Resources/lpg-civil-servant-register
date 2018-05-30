@@ -26,9 +26,9 @@ public interface CivilServantRepository extends org.springframework.data.reposit
     CivilServant save(@Param("civilServant") CivilServant civilServant);
 
     @PostAuthorize("returnObject.isPresent() && returnObject.get().identity.uid eq principal")
-    Optional<CivilServant> findById(Long id);
+    Optional<CivilServant> findById(@Param("id") Long id);
 
     @RestResource(path = "findByIdentity", rel = "findByIdentity")
     @Query("select c from CivilServant c where c.identity.uid = ?1")
-    Optional<CivilServant> findByIdentity(String uid);
+    Optional<CivilServant> findByIdentity(@Param("uid") String uid);
 }
