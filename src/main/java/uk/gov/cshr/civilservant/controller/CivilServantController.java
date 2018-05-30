@@ -41,7 +41,8 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     @Autowired
     public CivilServantController(CivilServantRepository civilServantRepository,
-                                  RepositoryEntityLinks repositoryEntityLinks) {
+                                  RepositoryEntityLinks repositoryEntityLinks,
+                                  IdentityService identityService) {
         checkArgument(civilServantRepository != null);
         checkArgument(repositoryEntityLinks != null);
         this.civilServantRepository = civilServantRepository;

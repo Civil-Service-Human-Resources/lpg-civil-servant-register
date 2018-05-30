@@ -27,6 +27,8 @@ public class IdentityService {
 
     @Autowired
     public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.listAllUrl}") String listAllIdentitiesUrl) {
+        System.out.println("LIST ALL URL");
+        System.out.println(listAllIdentitiesUrl);
         this.restOperations = restOperations;
         this.listAllIdentitiesUrl = listAllIdentitiesUrl;
     }
