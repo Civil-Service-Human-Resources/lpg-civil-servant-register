@@ -44,7 +44,9 @@ public class CivilServant {
     private Set<Profession> otherAreasOfWork = new HashSet<>();
 
 
-    private String lineManager;
+    private String lineManagerUid;
+
+    private String lineManagerEmail;
 
     protected CivilServant() {
     }
@@ -66,13 +68,12 @@ public class CivilServant {
         return fullName;
     }
 
-    public String getLineManager() {
-        return lineManager;
+    public String getLineManagerUid() {
+        return lineManagerUid;
     }
 
-    public void setLineManager(String lineManager) {
-        System.out.println(lineManager);
-        this.lineManager =lineManager;
+    public void setLineManagerUid(String lineManager) {
+        this.lineManagerUid =lineManager;
     };
 
     public void setFullName(String fullName) {
@@ -156,4 +157,11 @@ public class CivilServant {
     }
 
 
+    public String getLineManagerEmail() {
+        return lineManagerEmail;
+    }
+
+    public void setLineManagerEmail(String lineManagerEmail) {
+        this.lineManagerEmail = lineManagerEmail;
+    }
 }

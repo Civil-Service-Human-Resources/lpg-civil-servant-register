@@ -10,11 +10,14 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
@@ -70,19 +73,35 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     }
 
     @GetMapping("/manager")
-    public ResponseEntity<Resources<Void>> check() {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Resource<CivilServantResource>> check(@RequestParam(value = "email") String email) {
+        IdentityFromService lineManager = new IdentityFromService();
 
-        Resources<Void> resource = new Resources<>(new ArrayList<>());
 
+        Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
 
+        if (optionalCivilServant.isPresent()) {
+            CivilServant civilServant =  optionalCivilServant.get();
 
-        Collection<IdentityFromService> identities = identityService.listAll();
+            lineManager = getIdentityFromEmail(email);
+            if (lineManager != null) {
+                    // check to see if line manager is the same person
+                    if (email.equals(civilServant.getIdentity().getUid())) {
+                        return ResponseEntity.badRequest().build();
+                    } else {
 
-        for (IdentityFromService identity : identities) {
-            LOGGER.info("Got identity with uid {} and username {}", identity.getUid(), identity.getUsername());
+                        civilServant.setLineManagerUid(lineManager.getUid());
+                        civilServant.setLineManagerEmail(lineManager.getUsername());
+                        civilServantRepository.save(civilServant);
+
+                        return getResourceResponseEntity(optionalCivilServant);
+                    }
+            }
+
+            return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(resource);
+        // can't find current user record
+        return ResponseEntity.unprocessableEntity().build();
     }
 
 
@@ -90,6 +109,21 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
         resource.add(ControllerLinkBuilder.linkTo(CivilServantController.class).withRel("civilServants"));
         return resource;
+    }
+
+    private IdentityFromService getIdentityFromEmail(String email) {
+        //** find by email ... move to identity ?
+        Collection<IdentityFromService> identities = identityService.listAll();
+
+        for (IdentityFromService identity : identities) {
+            if (email.equals(identity.getUsername())) {
+               return identity;
+
+            }
+            LOGGER.info("Got identity with uid {} and username {}", identity.getUid(), identity.getUsername());
+        }
+        //** end
+        return null;
     }
 
     private ResponseEntity<Resource<CivilServantResource>> getResourceResponseEntity(Optional<CivilServant> optionalCivilServant) {

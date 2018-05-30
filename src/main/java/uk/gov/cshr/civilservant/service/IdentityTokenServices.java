@@ -40,7 +40,7 @@ public class IdentityTokenServices extends RemoteTokenServices {
         this.identityRepository = identityRepository;
         setClientId(clientId);
         setClientSecret(clientSecret);
-        System.out.println("TOKEN URL");
+        System.out.println("CHECK TOKEN URL");
         System.out.println(checkTokenEndpointUrl);
         setCheckTokenEndpointUrl(checkTokenEndpointUrl);
     }
