@@ -19,10 +19,9 @@ INSERT INTO department (code, name) VALUES
 	('dh', 'Department of Health & Social Care'),
 	('hmrc', 'HM Revenue & Customs');
 
-INSERT INTO organisation (code, name, department_id) VALUES
-  ('co', 'Cabinet Office', SELECT id FROM department WHERE code = 'co'),
-  ('dh', ' Department of Health & Social Care', SELECT id FROM department WHERE code = 'dh'),
-  ('hmrc', 'HM Revenue & Customs', SELECT id FROM department WHERE code = 'hmrc');
+INSERT INTO organisation (code, name, department_id) SELECT 'co', 'Cabinet Office', id FROM department WHERE code = 'co');
+INSERT INTO organisation (code, name, department_id) SELECT 'dh', ' Department of Health & Social Care', id FROM department WHERE code = 'co');
+INSERT INTO organisation (code, name, department_id) SELECT 'hmrc', 'HM Revenue & Customs', id FROM department WHERE code = 'co');
 
 INSERT INTO profession (name) VALUES
   ('Analysis'),
@@ -40,27 +39,23 @@ INSERT INTO profession (name) VALUES
   ('Property'),
   ('Other');
 
-INSERT INTO job_role (name, profession_id) VALUES
-  ('Strategy and Policy Development', SELECT id FROM profession WHERE name = 'Commercial'),
-  ('Business Needs and Sourcing', SELECT id FROM profession WHERE name = 'Commercial'),
-  ('Procurement', SELECT id FROM profession WHERE name = 'Commercial'),
-  ('Contract and Supplier Management', SELECT id FROM profession WHERE name = 'Commercial'),
-  ('Category Management', SELECT id FROM profession WHERE name = 'Commercial');
+INSERT INTO job_role (name, profession_id) SELECT 'Strategy and Policy Development', id FROM profession WHERE name = 'Commercial';
+INSERT INTO job_role (name, profession_id) SELECT 'Business Needs and Sourcing', id FROM profession WHERE name = 'Commercial';
+INSERT INTO job_role (name, profession_id) SELECT 'Procurement', id FROM profession WHERE name = 'Commercial';
+INSERT INTO job_role (name, profession_id) SELECT 'Contract and Supplier Management', id FROM profession WHERE name = 'Commercial';
+INSERT INTO job_role (name, profession_id) SELECT 'Category Management', id FROM profession WHERE name = 'Commercial';
 
-INSERT INTO job_role (name, parent_id) VALUES
-  ('Commercial Strategy', SELECT id FROM job_role WHERE name = 'Strategy and Policy Development'),
-  ('Market Maker & Supplier Engagement', SELECT id FROM job_role WHERE name = 'Strategy and Policy Development'),
-  ('Commercial Risk and Assurance Specialist', SELECT id FROM job_role WHERE name = 'Strategy and Policy Development'),
-  ('Commerical Policy Advisor', SELECT id FROM job_role WHERE name = 'Strategy and Policy Development');
+INSERT INTO job_role (name, parent_id) SELECT 'Commercial Strategy', id FROM job_role WHERE name = 'Strategy and Policy Development');
+INSERT INTO job_role (name, parent_id) SELECT 'Market Maker & Supplier Engagement', id FROM job_role WHERE name = 'Strategy and Policy Development');
+INSERT INTO job_role (name, parent_id) SELECT 'Commercial Risk and Assurance Specialist', id FROM job_role WHERE name = 'Strategy and Policy Development');
+INSERT INTO job_role (name, parent_id) SELECT 'Commercial Policy Advisor', id FROM job_role WHERE name = 'Strategy and Policy Development');
 
-INSERT INTO job_role (name, parent_id) VALUES
-  ('Commercial Support', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
-  ('Associate Commercial Practitioner', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
-  ('Commercial Practitioner', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
-  ('Commercial Lead', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
-  ('Associate Commercial Specialist', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
-  ('Commercial Specialist', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
-  ('Senior Commercial Specialist', SELECT id FROM job_role WHERE name = 'Commercial Strategy');
-
+INSERT INTO job_role (name, parent_id) SELECT 'Commercial Support', id FROM job_role WHERE name = 'Commercial Strategy');
+INSERT INTO job_role (name, parent_id) SELECT 'Associate Commercial Practitioner', id FROM job_role WHERE name = 'Commercial Strategy');
+INSERT INTO job_role (name, parent_id) SELECT 'Commercial Practitioner', id FROM job_role WHERE name = 'Commercial Strategy');
+INSERT INTO job_role (name, parent_id) SELECT 'Commercial Lead', id FROM job_role WHERE name = 'Commercial Strategy');
+INSERT INTO job_role (name, parent_id) SELECT 'Associate Commercial Specialist', id FROM job_role WHERE name = 'Commercial Strategy');
+INSERT INTO job_role (name, parent_id) SELECT 'Commercial Specialist', id FROM job_role WHERE name = 'Commercial Strategy');
+INSERT INTO job_role (name, parent_id) SELECT 'Senior Commercial Specialist', id FROM job_role WHERE name = 'Commercial Strategy');
 
 SET FOREIGN_KEY_CHECKS = 1;
