@@ -3,6 +3,7 @@ package uk.gov.cshr.civilservant.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
@@ -20,8 +21,10 @@ import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
+import uk.gov.cshr.civilservant.service.NotifyService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
+import uk.gov.service.notify.NotificationClientException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,17 +43,24 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private CivilServantRepository civilServantRepository;
 
+    private NotifyService notifyService;
+
     private RepositoryEntityLinks repositoryEntityLinks;
+
+    @Value("${govNotify.template.lineManager}")
+    private String govNotifyLineManagerTemplateId;
 
     @Autowired
     public CivilServantController(CivilServantRepository civilServantRepository,
                                   RepositoryEntityLinks repositoryEntityLinks,
-                                  IdentityService identityService) {
+                                  IdentityService identityService,
+                                  NotifyService notifyService) {
         checkArgument(civilServantRepository != null);
         checkArgument(repositoryEntityLinks != null);
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
         this.identityService = identityService;
+        this.notifyService = notifyService;
     }
 
     @GetMapping
@@ -74,7 +84,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     @GetMapping("/manager")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Resource<CivilServantResource>> check(@RequestParam(value = "email") String email) {
+    public ResponseEntity<Resource<CivilServantResource>> check(@RequestParam(value = "email") String email) throws NotificationClientException {
         IdentityFromService lineManager = new IdentityFromService();
 
 
@@ -94,6 +104,21 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                         civilServant.setLineManagerEmail(lineManager.getUsername());
                         civilServantRepository.save(civilServant);
 
+                        Optional<CivilServant> optionalLineManager = civilServantRepository.findByIdentity(lineManager.getUid());
+
+                        String lineManagerName = "";
+
+                        if (optionalLineManager.isPresent()) {
+                            CivilServant lineManagerProfile = optionalLineManager.get();
+                            lineManagerName =lineManagerProfile.getFullName();
+                        }
+
+                        String learnerName = civilServant.getFullName();
+                        if (learnerName == null) {
+                            learnerName = "";
+                        }
+
+                        notifyService.notify("alan.work@teamsmog.com", govNotifyLineManagerTemplateId, lineManagerName,learnerName);
                         return getResourceResponseEntity(optionalCivilServant);
                     }
             }

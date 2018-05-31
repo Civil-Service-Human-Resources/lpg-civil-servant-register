@@ -19,6 +19,12 @@ oauth:
 
 identity:
   listAllUrl: "${oauth.serviceUrl}/api/identities"
+
+govNotify:
+  key: ${GOV_NOTIFY_API_KEY:key}
+  template:
+    lineManager: ${GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID:template}
+
 ---
 
 spring:
