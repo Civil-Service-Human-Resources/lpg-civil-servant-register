@@ -28,7 +28,7 @@ public class InternalCivilServantRepositoryTest {
 
     @Test
     public void shouldFindCivilServantByIdentity() {
-        final Identity identity = new Identity("uid");
+        final Identity identity = new Identity("1");
         final CivilServant civilServant = new CivilServant(identity);
 
         identityRepository.save(identity);
@@ -41,7 +41,7 @@ public class InternalCivilServantRepositoryTest {
     @Test
     public void shouldNotFindCivilServantIfNotCreated() {
 
-        final Identity identity = new Identity("uid");
+        final Identity identity = new Identity("2");
 
         identityRepository.save(identity);
 

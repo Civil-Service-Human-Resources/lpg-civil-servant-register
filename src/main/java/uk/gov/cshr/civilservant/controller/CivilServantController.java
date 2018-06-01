@@ -63,7 +63,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
-        resource.add(ControllerLinkBuilder.linkTo(CivilServantController.class).withRel("civilServants"));
         return resource;
     }
 
