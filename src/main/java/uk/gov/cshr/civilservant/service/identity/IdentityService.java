@@ -8,11 +8,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URL;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
+
 
 import static java.util.Collections.emptySet;
 
@@ -23,14 +24,13 @@ public class IdentityService {
 
     private OAuth2RestOperations restOperations;
 
-    private String listAllIdentitiesUrl;
+    private String identityAPIUrl;
 
     @Autowired
-    public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.listAllUrl}") String listAllIdentitiesUrl) {
-        System.out.println("LIST ALL URL");
-        System.out.println(listAllIdentitiesUrl);
+    public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.identityAPIUrl}") String identityAPIUrl) {
+
         this.restOperations = restOperations;
-        this.listAllIdentitiesUrl = listAllIdentitiesUrl;
+        this.identityAPIUrl = identityAPIUrl;
     }
 
     public OAuth2AccessToken getAccessToken() {
@@ -39,10 +39,27 @@ public class IdentityService {
 
     public Collection<IdentityFromService> listAll() {
         LOGGER.debug("Retrieving all identities");
-        IdentityFromService[] identities = restOperations.getForObject(listAllIdentitiesUrl, IdentityFromService[].class);
+        IdentityFromService[] identities = restOperations.getForObject(identityAPIUrl, IdentityFromService[].class);
         if (identities != null) {
             return Sets.newHashSet(identities);
         }
         return emptySet();
+    }
+
+    public IdentityFromService findByEmail(String email) {
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl)
+                .queryParam("emailAddress", email);
+
+        LOGGER.debug(" Checking email {}", email);
+        IdentityFromService identity;
+
+        try {
+            identity = restOperations.getForObject(builder.toUriString(), IdentityFromService.class);
+        } catch (HttpClientErrorException http) {
+            return null;
+        }
+
+        return identity;
     }
 }

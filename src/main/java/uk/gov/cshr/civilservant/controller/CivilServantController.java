@@ -87,23 +87,23 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     public ResponseEntity<Resource<CivilServantResource>> check(@RequestParam(value = "email") String email) throws NotificationClientException {
         IdentityFromService lineManager = new IdentityFromService();
 
-
         Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
 
         if (optionalCivilServant.isPresent()) {
             CivilServant civilServant =  optionalCivilServant.get();
 
-            lineManager = getIdentityFromEmail(email);
+            lineManager = identityService.findByEmail(email);
             if (lineManager != null) {
                     // check to see if line manager is the same person
                     if (email.equals(civilServant.getIdentity().getUid())) {
+                        // you can't be your own line manager
                         return ResponseEntity.badRequest().build();
                     } else {
-
+                        // update and save
                         civilServant.setLineManagerUid(lineManager.getUid());
                         civilServant.setLineManagerEmail(lineManager.getUsername());
                         civilServantRepository.save(civilServant);
-
+                        // now notify
                         Optional<CivilServant> optionalLineManager = civilServantRepository.findByIdentity(lineManager.getUid());
 
                         String lineManagerName = "";
@@ -118,11 +118,11 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                             learnerName = "";
                         }
 
-                        notifyService.notify("alan.work@teamsmog.com", govNotifyLineManagerTemplateId, lineManagerName,learnerName);
+                        notifyService.notify(email, govNotifyLineManagerTemplateId, lineManagerName,learnerName);
                         return getResourceResponseEntity(optionalCivilServant);
                     }
             }
-
+            // line manager not found
             return ResponseEntity.notFound().build();
         }
         // can't find current user record
@@ -136,20 +136,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         return resource;
     }
 
-    private IdentityFromService getIdentityFromEmail(String email) {
-        //** find by email ... move to identity ?
-        Collection<IdentityFromService> identities = identityService.listAll();
-
-        for (IdentityFromService identity : identities) {
-            if (email.equals(identity.getUsername())) {
-               return identity;
-
-            }
-            LOGGER.info("Got identity with uid {} and username {}", identity.getUid(), identity.getUsername());
-        }
-        //** end
-        return null;
-    }
 
     private ResponseEntity<Resource<CivilServantResource>> getResourceResponseEntity(Optional<CivilServant> optionalCivilServant) {
         return optionalCivilServant

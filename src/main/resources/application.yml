@@ -18,7 +18,7 @@ oauth:
   tokenUrl: "${oauth.serviceUrl}/oauth/token"
 
 identity:
-  listAllUrl: "${oauth.serviceUrl}/api/identities"
+  identityAPIUrl: "${oauth.serviceUrl}/api/identities"
 
 govNotify:
   key: ${GOV_NOTIFY_API_KEY:key}
