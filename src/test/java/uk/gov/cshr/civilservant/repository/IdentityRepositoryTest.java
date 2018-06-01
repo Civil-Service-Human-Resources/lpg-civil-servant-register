@@ -31,7 +31,7 @@ public class IdentityRepositoryTest {
 
         identityRepository.save(new Identity(uid));
 
-        Optional<Identity> identity = identityRepository.findById(1L);
+        Optional<Identity> identity = identityRepository.findByUid(uid);
 
         assertTrue(identity.isPresent());
         Assert.assertThat(identity.get().getUid(), equalTo(uid));
@@ -39,7 +39,7 @@ public class IdentityRepositoryTest {
 
     @Test
     public void shouldNotFindIdentityByUnrecognisedUid() {
-        Optional<Identity> identity = identityRepository.findById(2L);
+        Optional<Identity> identity = identityRepository.findByUid("??");
         assertFalse(identity.isPresent());
     }
 }
