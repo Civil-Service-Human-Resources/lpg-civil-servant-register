@@ -28,12 +28,16 @@ public class NotifyService {
         personalisation.put(NAME_PERSONALISATION, name);
         personalisation.put(LEARNER_PERSONALISATION, learner);
 
-        System.out.println(personalisation);
-
         NotificationClient client = new NotificationClient(govNotifyKey);
-        SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
+        SendEmailResponse response = null;
 
-        LOGGER.info("Line Manager Notify email sent to: {}", response.getBody());
+        try {
+            response = client.sendEmail(templateId, email, personalisation, "");
+        } catch (NotificationClientException nce) {
+            LOGGER.error("Error sending Line Manager Notify email: {}", response.getBody());
+        }
+
+        LOGGER.info("Line Manager Notify email: {}", response.getBody());
     }
 
 }

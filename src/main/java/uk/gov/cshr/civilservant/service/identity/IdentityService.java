@@ -33,18 +33,7 @@ public class IdentityService {
         this.identityAPIUrl = identityAPIUrl;
     }
 
-    public OAuth2AccessToken getAccessToken() {
-        return restOperations.getAccessToken();
-    }
 
-    public Collection<IdentityFromService> listAll() {
-        LOGGER.debug("Retrieving all identities");
-        IdentityFromService[] identities = restOperations.getForObject(identityAPIUrl, IdentityFromService[].class);
-        if (identities != null) {
-            return Sets.newHashSet(identities);
-        }
-        return emptySet();
-    }
 
     public IdentityFromService findByEmail(String email) {
 
@@ -57,6 +46,7 @@ public class IdentityService {
         try {
             identity = restOperations.getForObject(builder.toUriString(), IdentityFromService.class);
         } catch (HttpClientErrorException http) {
+            LOGGER.error(" Error with findByEmail when contacting identity service {}", builder.toUriString());
             return null;
         }
 
