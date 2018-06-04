@@ -22,7 +22,7 @@ public class NotifyService {
     @Value("${govNotify.key}")
     private String govNotifyKey;
 
-    public void notify(String email,  String templateId, String name, String learner) throws NotificationClientException {
+    public SendEmailResponse notify(String email,  String templateId, String name, String learner) throws NotificationClientException {
 
         HashMap<String, String> personalisation = new HashMap<>();
         personalisation.put(NAME_PERSONALISATION, name);
@@ -34,10 +34,12 @@ public class NotifyService {
         try {
             response = client.sendEmail(templateId, email, personalisation, "");
         } catch (NotificationClientException nce) {
-            LOGGER.error("Error sending Line Manager Notify email: {}", response.getBody());
+           LOGGER.error("Error sending line manager notification: {}", response.getBody());
+           throw  nce;
         }
 
         LOGGER.info("Line Manager Notify email: {}", response.getBody());
+        return response;
     }
 
 }

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
+import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.NotifyService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
@@ -35,6 +36,8 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CivilServantController.class);
 
+    private LineManagerService lineManagerService;
+
 
     private IdentityService identityService;
 
@@ -44,20 +47,18 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private RepositoryEntityLinks repositoryEntityLinks;
 
-    @Value("${govNotify.template.lineManager}")
-    private String govNotifyLineManagerTemplateId;
 
     @Autowired
     public CivilServantController(CivilServantRepository civilServantRepository,
                                   RepositoryEntityLinks repositoryEntityLinks,
-                                  IdentityService identityService,
-                                  NotifyService notifyService) {
+                                  LineManagerService lineManagerService) {
         checkArgument(civilServantRepository != null);
         checkArgument(repositoryEntityLinks != null);
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
-        this.identityService = identityService;
-        this.notifyService = notifyService;
+
+
+        this.lineManagerService = lineManagerService;
     }
 
     @GetMapping
@@ -87,38 +88,21 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
 
         if (optionalCivilServant.isPresent()) {
-            CivilServant civilServant =  optionalCivilServant.get();
+            lineManager = lineManagerService.checkLineManager(email);
 
-            lineManager = identityService.findByEmail(email);
+
             if (lineManager != null) {
-                    // check to see if line manager is the same person
-                    if (email.equals(civilServant.getIdentity().getUid())) {
-                        // you can't be your own line manager
-                        return ResponseEntity.badRequest().build();
-                    } else {
-                        // update and save
-                        civilServant.setLineManagerUid(lineManager.getUid());
-                        civilServant.setLineManagerEmail(lineManager.getUsername());
-                        civilServantRepository.save(civilServant);
-                        // now notify
-                        Optional<CivilServant> optionalLineManager = civilServantRepository.findByIdentity(lineManager.getUid());
+                CivilServant civilServant = optionalCivilServant.get();
 
-                        String lineManagerName = "";
+                civilServant = lineManagerService.UpdateAndNotifyLineManager(civilServant, lineManager, email);
 
-                        if (optionalLineManager.isPresent()) {
-                            CivilServant lineManagerProfile = optionalLineManager.get();
-                            lineManagerName =lineManagerProfile.getFullName();
-                        }
-
-                        String learnerName = civilServant.getFullName();
-                        if (learnerName == null) {
-                            learnerName = "";
-                        }
-
-                        notifyService.notify(email, govNotifyLineManagerTemplateId, lineManagerName,learnerName);
-                        return getResourceResponseEntity(optionalCivilServant);
-                    }
+                if (civilServant == null) {
+                    return ResponseEntity.badRequest().build();
+                } else {
+                    return getResourceResponseEntity(optionalCivilServant);
+                }
             }
+
             // line manager not found
             return ResponseEntity.notFound().build();
         }

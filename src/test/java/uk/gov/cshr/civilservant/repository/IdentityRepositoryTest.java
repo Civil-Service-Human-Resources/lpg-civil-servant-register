@@ -33,9 +33,8 @@ public class IdentityRepositoryTest {
 
         Optional<Identity> identity = identityRepository.findByUid(uid);
 
-        //assertTrue(identity.isPresent());
-        //Assert.assertThat(identity.get().getUid(), equalTo(uid));
-        Assert.assertThat(1, equalTo(1));
+        assertTrue(identity.isPresent());
+        Assert.assertThat(identity.get().getUid(), equalTo(uid));
     }
 
     @Test

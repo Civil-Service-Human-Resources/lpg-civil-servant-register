@@ -33,8 +33,6 @@ public class IdentityService {
         this.identityAPIUrl = identityAPIUrl;
     }
 
-
-
     public IdentityFromService findByEmail(String email) {
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl)
