@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 import uk.gov.cshr.civilservant.domain.AllCivilServantDetails;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.domain.Identity;
 
 import java.util.Optional;
 
@@ -22,7 +23,7 @@ public interface CivilServantRepository extends org.springframework.data.reposit
     @Query("select c from CivilServant c where c.identity.uid = ?#{principal}")
     Optional<CivilServant> findByPrincipal();
 
-    @PreAuthorize("#civilServant.identity.uid eq principal")
+    @PreAuthorize("#civilServant.identity.uid eq principal || hasAuthority('internal')")
     CivilServant save(@Param("civilServant") CivilServant civilServant);
 
     @PostAuthorize("returnObject.isPresent() && returnObject.get().identity.uid eq principal")
@@ -31,4 +32,7 @@ public interface CivilServantRepository extends org.springframework.data.reposit
     @RestResource(path = "findByIdentity", rel = "findByIdentity")
     @Query("select c from CivilServant c where c.identity.uid = ?1")
     Optional<CivilServant> findByIdentity(@Param("uid") String uid);
+
+    @RestResource(exported = false)
+    Optional<CivilServant> findByIdentity(Identity identity);
 }

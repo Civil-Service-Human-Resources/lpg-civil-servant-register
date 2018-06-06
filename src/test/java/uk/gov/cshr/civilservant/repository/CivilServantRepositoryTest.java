@@ -1,10 +1,16 @@
 package uk.gov.cshr.civilservant.repository;
 
 
+import com.google.common.collect.ImmutableSet;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.access.intercept.RunAsUserToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.CivilServant;
@@ -18,13 +24,20 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @Transactional
-public class InternalCivilServantRepositoryTest {
+public class CivilServantRepositoryTest {
 
     @Autowired
-    private InternalCivilServantRepository civilServantRepository;
+    private CivilServantRepository civilServantRepository;
 
     @Autowired
     private IdentityRepository identityRepository;
+
+    @Before
+    public void setUp() throws Exception {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        securityContext.setAuthentication(new RunAsUserToken("internal", null, null, ImmutableSet.of(new SimpleGrantedAuthority("internal")), null));
+    }
 
     @Test
     public void shouldFindCivilServantByIdentity() {
