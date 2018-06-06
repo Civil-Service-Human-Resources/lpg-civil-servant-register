@@ -23,7 +23,7 @@ public interface CivilServantRepository extends org.springframework.data.reposit
     @Query("select c from CivilServant c where c.identity.uid = ?#{principal}")
     Optional<CivilServant> findByPrincipal();
 
-    @PreAuthorize("#civilServant.identity.uid eq principal || hasAuthority('internal')")
+    @PreAuthorize("#civilServant.identity.uid eq principal || hasAuthority('INTERNAL')")
     CivilServant save(@Param("civilServant") CivilServant civilServant);
 
     @PostAuthorize("returnObject.isPresent() && returnObject.get().identity.uid eq principal")
