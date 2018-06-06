@@ -43,7 +43,7 @@ public class LineManagerService {
 
     public CivilServant UpdateAndNotifyLineManager(CivilServant civilServant, IdentityFromService lineManager,  String email) {
         // check to see if line manager is the same person
-        if (email.equals(civilServant.getIdentity().getUid())) {
+        if (lineManager.getUid().equals(civilServant.getIdentity().getUid())) {
             // you can't be your own line manager
             return null;
         } else {

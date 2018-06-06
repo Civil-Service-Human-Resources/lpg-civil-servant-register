@@ -34,7 +34,7 @@ public class NotifyService {
         try {
             response = client.sendEmail(templateId, email, personalisation, "");
         } catch (NotificationClientException nce) {
-           LOGGER.error("Error sending line manager notification: {}", response.getBody());
+            LOGGER.error("Error sending line manager notification: {}", nce);
            throw  nce;
         }
 

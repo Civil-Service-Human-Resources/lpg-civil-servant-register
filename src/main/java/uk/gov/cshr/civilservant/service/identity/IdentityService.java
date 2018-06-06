@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,9 @@ public class IdentityService {
         try {
             identity = restOperations.getForObject(builder.toUriString(), IdentityFromService.class);
         } catch (HttpClientErrorException http) {
+            if (http.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return null; // we kind of have to assume 403 is email not found rather than service not there ...
+            }
             LOGGER.error(" Error with findByEmail when contacting identity service {}", builder.toUriString());
             return null;
         }
