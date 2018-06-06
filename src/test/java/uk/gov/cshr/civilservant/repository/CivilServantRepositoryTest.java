@@ -11,6 +11,7 @@ import org.springframework.security.access.intercept.RunAsUserToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.CivilServant;
@@ -26,6 +27,7 @@ import static org.junit.Assert.assertTrue;
 @Transactional
 public class CivilServantRepositoryTest {
 
+    public static final String INTERNAL_ROLE = "INTERNAL";
     @Autowired
     private CivilServantRepository civilServantRepository;
 
@@ -36,10 +38,11 @@ public class CivilServantRepositoryTest {
     public void setUp() throws Exception {
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
-        securityContext.setAuthentication(new RunAsUserToken("internal", null, null, ImmutableSet.of(new SimpleGrantedAuthority("internal")), null));
+        securityContext.setAuthentication(new RunAsUserToken(INTERNAL_ROLE, null, null, ImmutableSet.of(new SimpleGrantedAuthority(INTERNAL_ROLE)), null));
     }
 
     @Test
+    @WithMockUser(roles = INTERNAL_ROLE)
     public void shouldFindCivilServantByIdentity() {
         final Identity identity = new Identity("1");
         final CivilServant civilServant = new CivilServant(identity);
@@ -52,6 +55,7 @@ public class CivilServantRepositoryTest {
     }
 
     @Test
+    @WithMockUser(roles = INTERNAL_ROLE)
     public void shouldNotFindCivilServantIfNotCreated() {
 
         final Identity identity = new Identity("2");

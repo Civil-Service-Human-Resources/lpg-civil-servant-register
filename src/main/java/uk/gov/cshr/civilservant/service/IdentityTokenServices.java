@@ -25,6 +25,7 @@ import java.util.Optional;
 public class IdentityTokenServices extends RemoteTokenServices {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(IdentityTokenServices.class);
+    public static final String INTERNAL_ROLE = "INTERNAL";
 
     private CivilServantRepository civilServantRepository;
 
@@ -78,6 +79,6 @@ public class IdentityTokenServices extends RemoteTokenServices {
     private void configureInternalUser() {
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
-        securityContext.setAuthentication(new RunAsUserToken("internal", null, null, ImmutableSet.of(new SimpleGrantedAuthority("internal")), null));
+        securityContext.setAuthentication(new RunAsUserToken(INTERNAL_ROLE, null, null, ImmutableSet.of(new SimpleGrantedAuthority(INTERNAL_ROLE)), null));
     }
 }
