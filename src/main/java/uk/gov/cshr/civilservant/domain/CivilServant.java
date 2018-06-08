@@ -146,6 +146,9 @@ public class CivilServant {
     public String toString() {
         return new ToStringBuilder(this)
                 .append("id", id)
+                .append("fullName", fullName)
+                .append("LineManagerEmail", lineManagerEmail)
+                .append("LineManagerUid", lineManagerUid)
                 .append("organisation", organisation)
                 .append("grade", grade)
                 .append("profession", profession)
