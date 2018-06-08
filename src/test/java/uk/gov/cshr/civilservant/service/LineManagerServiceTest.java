@@ -37,7 +37,7 @@ public class LineManagerServiceTest {
 
     @Test
     public void shouldNotAllowToBeOwnManager() {
-        final Identity identity = new Identity("test@test.com");
+        final Identity identity = new Identity("3c706a70-3fff-4e7b-ae7f-102c1d46f569");
         final CivilServant civilServant = new CivilServant(identity);
 
         final IdentityFromService lineManager = lineManagerService.checkLineManager("learner@domain.com");
