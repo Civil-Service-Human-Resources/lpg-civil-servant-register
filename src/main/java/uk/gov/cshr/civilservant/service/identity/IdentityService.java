@@ -29,7 +29,6 @@ public class IdentityService {
 
     @Autowired
     public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.identityAPIUrl}") String identityAPIUrl) {
-
         this.restOperations = restOperations;
         this.identityAPIUrl = identityAPIUrl;
     }

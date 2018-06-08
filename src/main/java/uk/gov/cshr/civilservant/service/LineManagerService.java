@@ -35,8 +35,6 @@ public class LineManagerService {
         this.notifyService = notifyService;
     }
 
-
-
     public IdentityFromService checkLineManager(String email){
         return identityService.findByEmail(email);
     }

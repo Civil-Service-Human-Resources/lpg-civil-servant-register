@@ -48,7 +48,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private RepositoryEntityLinks repositoryEntityLinks;
 
-
     @Autowired
     public CivilServantController(CivilServantRepository civilServantRepository,
                                   RepositoryEntityLinks repositoryEntityLinks,
@@ -57,8 +56,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         checkArgument(repositoryEntityLinks != null);
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
-
-
         this.lineManagerService = lineManagerService;
     }
 
@@ -111,13 +108,11 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         return ResponseEntity.unprocessableEntity().build();
     }
 
-
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
         resource.add(ControllerLinkBuilder.linkTo(CivilServantController.class).withRel("civilServants"));
         return resource;
     }
-
 
     private ResponseEntity<Resource<CivilServantResource>> getResourceResponseEntity(Optional<CivilServant> optionalCivilServant) {
         return optionalCivilServant
