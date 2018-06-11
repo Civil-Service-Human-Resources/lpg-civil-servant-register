@@ -20,8 +20,8 @@ INSERT INTO department (code, name) VALUES
 	('hmrc', 'HM Revenue & Customs');
 
 INSERT INTO organisation (code, name, department_id) SELECT 'co', 'Cabinet Office', id FROM department WHERE code = 'co';
-INSERT INTO organisation (code, name, department_id) SELECT 'dh', ' Department of Health & Social Care', id FROM department WHERE code = 'co';
-INSERT INTO organisation (code, name, department_id) SELECT 'hmrc', 'HM Revenue & Customs', id FROM department WHERE code = 'co';
+INSERT INTO organisation (code, name, department_id) SELECT 'dh', ' Department of Health & Social Care', id FROM department WHERE code = 'dh';
+INSERT INTO organisation (code, name, department_id) SELECT 'hmrc', 'HM Revenue & Customs', id FROM department WHERE code = 'hmrc';
 
 INSERT INTO profession (name) VALUES
   ('Analysis'),
