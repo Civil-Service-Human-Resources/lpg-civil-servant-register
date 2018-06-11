@@ -11,8 +11,9 @@ import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 import uk.gov.service.notify.NotificationClientException;
 
-
 import java.util.Optional;
+
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
 @Service
 public class LineManagerService {
@@ -35,43 +36,24 @@ public class LineManagerService {
         this.notifyService = notifyService;
     }
 
-    public IdentityFromService checkLineManager(String email){
+    public IdentityFromService checkLineManager(String email) {
         return identityService.findByEmail(email);
     }
 
-    public CivilServant UpdateAndNotifyLineManager(CivilServant civilServant, IdentityFromService lineManager,  String email) {
-        // check to see if line manager is the same person
-        if (lineManager.getUid().equals(civilServant.getIdentity().getUid())) {
-            // you can't be your own line manager
-            return null;
-        } else {
-            // update and save
-            civilServant.setLineManagerUid(lineManager.getUid());
-            civilServant.setLineManagerEmail(lineManager.getUsername());
-            civilServantRepository.save(civilServant);
-            // now notify
-            Optional<CivilServant> optionalLineManager = civilServantRepository.findByIdentity(lineManager.getUid());
+    public void notifyLineManager(CivilServant civilServant, IdentityFromService lineManager, String email) {
 
-            String lineManagerName = "";
+        Optional<CivilServant> optionalLineManager = civilServantRepository.findByIdentity(lineManager.getUid());
 
-            if (optionalLineManager.isPresent()) {
-                CivilServant lineManagerProfile = optionalLineManager.get();
-                lineManagerName = lineManagerProfile.getFullName();
-            }
+        String learnerName = defaultIfNull(civilServant.getFullName(), "");
+        String lineManagerName = optionalLineManager
+                .map(lm -> Optional.of(lm.getFullName()))
+                .orElse(Optional.of(""))
+                .get();
 
-            String learnerName = civilServant.getFullName();
-            if (learnerName == null) {
-                learnerName = "";
-            }
-
-            try {
-                notifyService.notify(email, govNotifyLineManagerTemplateId, lineManagerName, learnerName);
-            } catch (NotificationClientException nce) {
-                LOGGER.error("Could not send Line Manager notification");
-            }
-
-            return civilServant;
+        try {
+            notifyService.notify(email, govNotifyLineManagerTemplateId, lineManagerName, learnerName);
+        } catch (NotificationClientException nce) {
+            LOGGER.error("Could not send Line Manager notification", nce);
         }
     }
-
 }

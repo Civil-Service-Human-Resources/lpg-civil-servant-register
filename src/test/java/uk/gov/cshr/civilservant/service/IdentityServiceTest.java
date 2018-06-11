@@ -1,6 +1,5 @@
 package uk.gov.cshr.civilservant.service;
 
-import com.google.common.collect.Iterables;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -9,13 +8,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
-import java.util.Collection;
-
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -34,12 +29,6 @@ public class IdentityServiceTest {
         identityService = new IdentityService(restOperations, FIND_BY_EMAIL_URL);
     }
 
-   /* @Test
-    public void shouldReturnEmptySetForNoIdentities() {
-        when(restOperations.getForObject(any(), any())).thenReturn(new Identity[]{});
-        assertThat(identityService.listAll(), hasSize(0));
-    }*/
-
     @Test
     public void shouldReturnFoundIdentities() {
 
@@ -53,9 +42,7 @@ public class IdentityServiceTest {
         when(restOperations.getForObject(builder.toUriString(), IdentityFromService.class)).thenReturn(identity);
 
         IdentityFromService foundIdentity = identityService.findByEmail(identity.getUsername());
-        assertThat(foundIdentity.getUsername(),equalTo("test@domain.com"));
-
-
+        assertThat(foundIdentity.getUsername(), equalTo("test@domain.com"));
     }
 
     @Test
@@ -72,7 +59,5 @@ public class IdentityServiceTest {
 
         IdentityFromService foundIdentity = identityService.findByEmail(identity.getUsername());
         assertNull(foundIdentity);
-
-
     }
 }

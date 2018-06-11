@@ -3,7 +3,6 @@ package uk.gov.cshr.civilservant.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
@@ -13,6 +12,7 @@ import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +24,6 @@ import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.NotifyService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
-import uk.gov.service.notify.NotificationClientException;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -39,12 +38,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private LineManagerService lineManagerService;
 
-
-    private IdentityService identityService;
-
     private CivilServantRepository civilServantRepository;
-
-    private NotifyService notifyService;
 
     private RepositoryEntityLinks repositoryEntityLinks;
 
@@ -54,6 +48,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                                   LineManagerService lineManagerService) {
         checkArgument(civilServantRepository != null);
         checkArgument(repositoryEntityLinks != null);
+        checkArgument(lineManagerService != null);
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
         this.lineManagerService = lineManagerService;
@@ -80,31 +75,31 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     @PatchMapping("/manager")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Resource<CivilServantResource>> check(@RequestParam(value = "email") String email) throws NotificationClientException {
-        IdentityFromService lineManager = new IdentityFromService();
+    @Transactional
+    public ResponseEntity<Resource<CivilServantResource>> updateLineManager(@RequestParam(value = "email") String email) {
+
+        IdentityFromService lineManager = lineManagerService.checkLineManager(email);
+        if (lineManager == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
 
         if (optionalCivilServant.isPresent()) {
-            lineManager = lineManagerService.checkLineManager(email);
-
-
-            if (lineManager != null) {
-                CivilServant civilServant = optionalCivilServant.get();
-
-                civilServant = lineManagerService.UpdateAndNotifyLineManager(civilServant, lineManager, email);
-
-                if (civilServant == null) {
-                    return ResponseEntity.badRequest().build();
-                } else {
-                    return getResourceResponseEntity(optionalCivilServant);
-                }
+            CivilServant civilServant = optionalCivilServant.get();
+            if (lineManager.getUid().equals(civilServant.getIdentity().getUid())) {
+                LOGGER.info("User tried to set line manager to themself, uid = {}.", lineManager.getUid());
+                return ResponseEntity.badRequest().build();
             }
 
-            // line manager not found
-            return ResponseEntity.notFound().build();
+            civilServant.setLineManagerUid(lineManager.getUid());
+            civilServant.setLineManagerEmail(lineManager.getUsername());
+            civilServantRepository.save(civilServant);
+
+            lineManagerService.notifyLineManager(civilServant, lineManager, email);
+
+            return getResourceResponseEntity(Optional.of(civilServant));
         }
-        // can't find current user record
         return ResponseEntity.unprocessableEntity().build();
     }
 
