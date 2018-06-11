@@ -21,6 +21,7 @@ public class CivilServantResource {
     private Set<Profession> otherAreasOfWork;
 
     private String lineManagerUid;
+
     private String lineManagerEmail;
 
     public CivilServantResource(CivilServant civilServant) {
@@ -43,16 +44,13 @@ public class CivilServantResource {
         return grade;
     }
 
-
     public String getLineManagerUid() {
         return lineManagerUid;
     }
 
-
     public String getLineManagerEmail() {
         return lineManagerEmail;
     }
-
 
     public Organisation getOrganisation() {
         return organisation;
@@ -65,7 +63,6 @@ public class CivilServantResource {
     public JobRole getJobRole() {
         return jobRole;
     }
-
 
     public Set<Profession> getOtherAreasOfWork() {
         return otherAreasOfWork;

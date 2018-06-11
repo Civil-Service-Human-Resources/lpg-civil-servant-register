@@ -42,7 +42,6 @@ public class CivilServant {
     @ManyToMany
     private Set<Profession> otherAreasOfWork = new HashSet<>();
 
-
     private String lineManagerUid;
 
     private String lineManagerEmail;
@@ -157,7 +156,6 @@ public class CivilServant {
                 .append("identity", identity)
                 .toString();
     }
-
 
     public String getLineManagerEmail() {
         return lineManagerEmail;
