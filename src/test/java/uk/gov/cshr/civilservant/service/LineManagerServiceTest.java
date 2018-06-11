@@ -72,35 +72,4 @@ public class LineManagerServiceTest {
 
         verify(notifyService).notify("manager@domain.com", null, "fullName", "learner");
     }
-
-//    @Test
-//    public void shouldNotAllowToBeOwnManager() {
-//
-//        final Identity identity = new Identity("uid");
-//        final CivilServant civilServant = new CivilServant(identity);
-//
-//        final IdentityFromService lineManager = new IdentityFromService();
-//        lineManager.setUid("uid");
-//
-//
-//
-//        assertThat(lineManagerService.notifyLineManager(civilServant, lineManager, "test@test.com"), nullValue());
-//    }
-//
-//    @Test
-//    public void shouldAllowUpdatingOfLineManager() {
-//        final Identity identity = new Identity("test@test.com");
-//        CivilServant civilServant = new CivilServant(identity);
-//
-//        final IdentityFromService lineManager = lineManagerService.checkLineManager("learner@domain.com");
-//
-//        Boolean triedToUpdate = false;
-//        try {
-//            civilServant = lineManagerService.notifyLineManager(civilServant, lineManager, "manager@test.com");
-//        } catch (AuthenticationCredentialsNotFoundException authException) {
-//            triedToUpdate = true; // this will be triggered if identity is told to update civilservant linemanager
-//        }
-//        assertTrue(triedToUpdate);
-//    }
-
 }
