@@ -14,7 +14,9 @@ You will need to add the following env variables to run code locally, or to run 
 |CLIENT_SECRET|Identity Service client secret|NO|
 |CHECK_TOKEN_URL|Identity service check token url|NO|
 |DATASOURCE|The Datasource connectiong string|NO|
-
+|GOV_NOTIFY_API_KEY| Gov Notify API Key |NO|
+|GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID| Template for Email sent to linemanager|NO|
+|OAUTH_SERVICE_URL| Url to OAUTH service|http://localhost:8080|
 ### Build
 Build the application using Gradle ```./gradlew build```  
 

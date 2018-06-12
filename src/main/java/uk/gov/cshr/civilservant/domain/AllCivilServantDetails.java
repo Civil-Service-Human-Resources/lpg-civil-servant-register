@@ -19,4 +19,7 @@ public interface AllCivilServantDetails {
 
     Set<Profession> getOtherAreasOfWork();
 
+    String getLineManagerName();
+
+    String getLineManagerEmailAddress();
 }

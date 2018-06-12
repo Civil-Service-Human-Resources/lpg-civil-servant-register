@@ -1,16 +1,16 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
 INSERT INTO grade (code, name, organisation_id) VALUES
-	('AA', 'Administrative Assistant',null),
-	('AO', 'Administrative Officer',null),
-  ('EO', 'Executive Officer',null),
-  ('G6', 'Grade 6', null),
-  ('G7', 'Grade 7', null),
-  ('HEO','Higher Executive Officer', null),
-  ('SEO','Senior Executive Officer', null),
-  ('PB1', 'Senior Civil Service - Deputy Director', null),
-  ('PB2', 'Senior Civil Service - Director', null),
-  ('PB3', 'Senior Civil Service - Director General', null),
+	('AA', 'Administrative Assistant', null),
+	('AO', 'Administrative Officer', null),
+    ('EO', 'Executive Officer', null),
+    ('G6', 'Grade 6', null),
+    ('G7', 'Grade 7', null),
+    ('HEO','Higher Executive Officer', null),
+    ('SEO','Senior Executive Officer', null),
+    ('PB1', 'Senior Civil Service - Deputy Director', null),
+    ('PB2', 'Senior Civil Service - Director', null),
+    ('PB3', 'Senior Civil Service - Director General', null),
 	('PS',  'Senior Civil Service - Permanent Secretary', null);
 
 
