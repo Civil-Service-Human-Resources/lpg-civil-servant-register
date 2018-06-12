@@ -1,14 +1,12 @@
 <configuration>
 
-    <property scope="context" name="profile" value="${spring.profile:-development}"/>
-
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
-    <root level="debug">
+    <root level="${APP_LOGGING_LEVEL:-info}">
         <appender-ref ref="console"/>
     </root>
 
