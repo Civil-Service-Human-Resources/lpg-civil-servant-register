@@ -8,7 +8,9 @@ spring:
     add-mappings: false
   flyway:
     locations: classpath:db/migration/{vendor}
-
+  jpa:
+    hibernate:
+      ddl-auto: none
 
 server:
   port: 9002
@@ -37,8 +39,6 @@ spring:
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    hibernate:
-      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
