@@ -6,6 +6,9 @@ spring:
     default-property-inclusion: non_null
   resources:
     add-mappings: false
+  flyway:
+    locations: classpath:db/migration/{vendor}
+
 
 server:
   port: 9002
@@ -30,7 +33,7 @@ govNotify:
 spring:
   profiles: production
   datasource:
-    url: ${DATASOURCE:jdbc:mysql://localhost:3306/civil0-servant-register?user=root&password=secret&useSSL=false}
+    url: ${DATASOURCE:jdbc:mysql://localhost:3306/civil-servant-register?user=root&password=password&useSSL=false}
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
