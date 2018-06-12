@@ -1,10 +1,13 @@
 package uk.gov.cshr.civilservant.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
 import javax.persistence.*;
 
@@ -14,6 +17,7 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.unmodifiableSet;
 
+@Configurable
 @Entity
 public class CivilServant {
 
@@ -42,9 +46,12 @@ public class CivilServant {
     @ManyToMany
     private Set<Profession> otherAreasOfWork = new HashSet<>();
 
-    private String lineManagerUid;
+    @JsonIgnore
+    @ManyToOne
+    private CivilServant lineManager;
 
-    private String lineManagerEmail;
+    @Autowired
+    private transient IdentityService identityService;
 
     protected CivilServant() {
     }
@@ -65,14 +72,6 @@ public class CivilServant {
     public String getFullName() {
         return fullName;
     }
-
-    public String getLineManagerUid() {
-        return lineManagerUid;
-    }
-
-    public void setLineManagerUid(String lineManager) {
-        this.lineManagerUid =lineManager;
-    };
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
@@ -121,6 +120,30 @@ public class CivilServant {
         }
     }
 
+    public CivilServant getLineManager() {
+        return lineManager;
+    }
+
+    public void setLineManager(CivilServant lineManager) {
+        this.lineManager = lineManager;
+    }
+
+    @JsonProperty
+    public String getLineManagerName() {
+       if (lineManager != null) {
+           return lineManager.getFullName();
+       }
+       return null;
+    }
+
+    @JsonProperty
+    public String getLineManagerEmailAddress() {
+        if (identityService != null && lineManager != null) {
+            return identityService.getEmailAddress(lineManager);
+        }
+        return null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -146,22 +169,13 @@ public class CivilServant {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .append("fullName", fullName)
-                .append("LineManagerEmail", lineManagerEmail)
-                .append("LineManagerUid", lineManagerUid)
                 .append("organisation", organisation)
                 .append("grade", grade)
                 .append("profession", profession)
                 .append("jobRole", jobRole)
                 .append("otherAreasOfWork", otherAreasOfWork)
                 .append("identity", identity)
+                .append("lineManager", lineManager)
                 .toString();
-    }
-
-    public String getLineManagerEmail() {
-        return lineManagerEmail;
-    }
-
-    public void setLineManagerEmail(String lineManagerEmail) {
-        this.lineManagerEmail = lineManagerEmail;
     }
 }

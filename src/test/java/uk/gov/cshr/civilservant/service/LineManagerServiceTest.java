@@ -66,9 +66,7 @@ public class LineManagerServiceTest {
         lineManager.setUid(managerIdentity.getUid());
         lineManager.setUsername("manager@domain.com");
 
-        when(civilServantRepository.findByIdentity("mid")).thenReturn(Optional.of(manager));
-
-        lineManagerService.notifyLineManager(learner, lineManager, "manager@domain.com");
+        lineManagerService.notifyLineManager(learner, manager, "manager@domain.com");
 
         verify(notifyService).notify("manager@domain.com", null, "fullName", "learner");
     }

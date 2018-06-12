@@ -6,12 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 import uk.gov.service.notify.NotificationClientException;
-
-import java.util.Optional;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
@@ -24,14 +21,11 @@ public class LineManagerService {
 
     private IdentityService identityService;
 
-    private CivilServantRepository civilServantRepository;
-
     @Value("${govNotify.template.lineManager}")
     private String govNotifyLineManagerTemplateId;
 
     @Autowired
-    public LineManagerService(CivilServantRepository civilServantRepository, IdentityService identityService, NotifyService notifyService) {
-        this.civilServantRepository = civilServantRepository;
+    public LineManagerService(IdentityService identityService, NotifyService notifyService) {
         this.identityService = identityService;
         this.notifyService = notifyService;
     }
@@ -40,15 +34,10 @@ public class LineManagerService {
         return identityService.findByEmail(email);
     }
 
-    public void notifyLineManager(CivilServant civilServant, IdentityFromService lineManager, String email) {
-
-        Optional<CivilServant> optionalLineManager = civilServantRepository.findByIdentity(lineManager.getUid());
+    public void notifyLineManager(CivilServant civilServant, CivilServant lineManager, String email) {
 
         String learnerName = defaultIfNull(civilServant.getFullName(), "");
-        String lineManagerName = optionalLineManager
-                .map(lm -> Optional.of(lm.getFullName()))
-                .orElse(Optional.of(""))
-                .get();
+        String lineManagerName = defaultIfNull(lineManager.getFullName(), "");
 
         try {
             notifyService.notify(email, govNotifyLineManagerTemplateId, lineManagerName, learnerName);

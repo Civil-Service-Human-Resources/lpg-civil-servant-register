@@ -20,9 +20,9 @@ public class CivilServantResource {
 
     private Set<Profession> otherAreasOfWork;
 
-    private String lineManagerUid;
+    private String lineManagerName;
 
-    private String lineManagerEmail;
+    private String lineManagerEmailAddress;
 
     public CivilServantResource(CivilServant civilServant) {
         checkArgument(civilServant != null);
@@ -32,8 +32,8 @@ public class CivilServantResource {
         this.profession = civilServant.getProfession();
         this.jobRole = civilServant.getJobRole();
         this.otherAreasOfWork = civilServant.getOtherAreasOfWork();
-        this.lineManagerUid = civilServant.getLineManagerUid();
-        this.lineManagerEmail = civilServant.getLineManagerEmail();
+        this.lineManagerName = civilServant.getLineManagerName();
+        this.lineManagerEmailAddress = civilServant.getLineManagerEmailAddress();
     }
 
     public String getFullName() {
@@ -44,12 +44,12 @@ public class CivilServantResource {
         return grade;
     }
 
-    public String getLineManagerUid() {
-        return lineManagerUid;
+    public String getLineManagerEmailAddress() {
+        return lineManagerEmailAddress;
     }
 
-    public String getLineManagerEmail() {
-        return lineManagerEmail;
+    public String getLineManagerName() {
+        return lineManagerName;
     }
 
     public Organisation getOrganisation() {

@@ -1,22 +1,15 @@
 package uk.gov.cshr.civilservant.service.identity;
 
-import com.google.common.collect.Sets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
-import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
-
-import java.util.Collection;
-import java.util.HashMap;
-
-
-import static java.util.Collections.emptySet;
+import uk.gov.cshr.civilservant.domain.CivilServant;
 
 @Service
 public class IdentityService {
@@ -52,5 +45,29 @@ public class IdentityService {
         }
 
         return identity;
+    }
+
+    public String getEmailAddress(CivilServant civilServant) {
+
+        LOGGER.debug("Getting email address for civil servant {}", civilServant);
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl)
+                .queryParam("uid", civilServant.getIdentity().getUid());
+
+        IdentityFromService identity;
+
+        try {
+            identity = restOperations.getForObject(builder.toUriString(), IdentityFromService.class);
+        } catch (HttpClientErrorException e) {
+            if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
+                return null;
+            }
+            throw new RuntimeException(e);
+        }
+
+        if (identity != null) {
+            return identity.getUsername();
+        }
+        return null;
     }
 }

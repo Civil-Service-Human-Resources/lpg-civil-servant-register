@@ -21,9 +21,7 @@ import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.service.LineManagerService;
-import uk.gov.cshr.civilservant.service.NotifyService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
-import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -78,22 +76,30 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     @Transactional
     public ResponseEntity<Resource<CivilServantResource>> updateLineManager(@RequestParam(value = "email") String email) {
 
-        IdentityFromService lineManager = lineManagerService.checkLineManager(email);
-        if (lineManager == null) {
-            return ResponseEntity.notFound().build();
-        }
-
         Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
 
         if (optionalCivilServant.isPresent()) {
+
+            IdentityFromService lineManagerIdentity = lineManagerService.checkLineManager(email);
+            if (lineManagerIdentity == null) {
+                LOGGER.debug("Line manager email address not found in identity-service.");
+                return ResponseEntity.notFound().build();
+            }
+
+            Optional<CivilServant> optionalLineManager = civilServantRepository.findByIdentity(lineManagerIdentity.getUid());
+            if (!optionalLineManager.isPresent()) {
+                LOGGER.debug("Line manager email address exists in identity-service, but no profile. uid = {}", lineManagerIdentity);
+                return ResponseEntity.notFound().build();
+            }
+
+            CivilServant lineManager = optionalLineManager.get();
             CivilServant civilServant = optionalCivilServant.get();
-            if (lineManager.getUid().equals(civilServant.getIdentity().getUid())) {
-                LOGGER.info("User tried to set line manager to themself, uid = {}.", lineManager.getUid());
+            if (lineManager.equals(civilServant)) {
+                LOGGER.info("User tried to set line manager to themself, {}.", civilServant);
                 return ResponseEntity.badRequest().build();
             }
 
-            civilServant.setLineManagerUid(lineManager.getUid());
-            civilServant.setLineManagerEmail(lineManager.getUsername());
+            civilServant.setLineManager(lineManager);
             civilServantRepository.save(civilServant);
 
             lineManagerService.notifyLineManager(civilServant, lineManager, email);
