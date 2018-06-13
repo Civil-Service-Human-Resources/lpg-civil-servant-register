@@ -38,6 +38,10 @@ govNotify:
   template:
     lineManager: ${GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID:template}
 
+email:
+  enabled: false
+
+
 ---
 
 spring:
@@ -51,3 +55,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         enable_lazy_load_no_trans: true
+
+email:
+  enabled: true
