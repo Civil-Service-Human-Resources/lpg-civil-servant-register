@@ -6,9 +6,22 @@ spring:
     default-property-inclusion: non_null
   resources:
     add-mappings: false
+  flyway:
+    locations: classpath:db/migration/{vendor}
+  jpa:
+    hibernate:
+      ddl-auto: none
 
 server:
   port: 9002
+
+logging:
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    root: ${ROOT_LOGGING_LEVEL:INFO}
+    com.zaxxer.hikari: ERROR
+    org.apache.http: WARN
 
 oauth:
   clientId: ${CLIENT_ID:9fbd4ae2-2db3-44c7-9544-88e80255b56e}
@@ -30,12 +43,10 @@ govNotify:
 spring:
   profiles: production
   datasource:
-    url: ${DATASOURCE:jdbc:mysql://localhost:3306/civil0-servant-register?user=root&password=secret&useSSL=false}
+    url: ${DATASOURCE:jdbc:mysql://localhost:3306/civil-servant-register?user=root&password=password&useSSL=false}
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    hibernate:
-      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect

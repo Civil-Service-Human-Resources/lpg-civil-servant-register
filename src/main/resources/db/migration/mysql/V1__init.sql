@@ -5,11 +5,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 
--- Dumping database structure for csrs
-DROP DATABASE IF EXISTS `csrs`;
-CREATE DATABASE IF NOT EXISTS `csrs` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `csrs`;
-
 -- Dumping structure for table csrs.civil_servant
 DROP TABLE IF EXISTS `civil_servant`;
 CREATE TABLE IF NOT EXISTS `civil_servant` (
@@ -20,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `civil_servant` (
   `profession_id` smallint(5) unsigned DEFAULT NULL,
   `job_role_id` smallint(5) unsigned DEFAULT NULL,
   `full_name` varchar(255) DEFAULT NULL,
-  `line_manager_id` mediumint(8) unsigned NOT NULL,
+  `line_manager_id` mediumint(8) unsigned,
   PRIMARY KEY (`id`),
   KEY `FK_civil_servant_identity` (`identity_id`),
   KEY `FK_civil_servant_organisation` (`organisation_id`),
@@ -32,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `civil_servant` (
   CONSTRAINT `FK_civil_servant_identity` FOREIGN KEY (`identity_id`) REFERENCES `identity` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_civil_servant_job_role` FOREIGN KEY (`job_role_id`) REFERENCES `job_role` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
   CONSTRAINT `FK_civil_servant_organisation` FOREIGN KEY (`organisation_id`) REFERENCES `organisation` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
-  CONSTRAINT `FK_civil_servant_profession` FOREIGN KEY (`profession_id`) REFERENCES `profession` (`id`) ON DELETE SET NULL ON UPDATE SET NULL
+  CONSTRAINT `FK_civil_servant_profession` FOREIGN KEY (`profession_id`) REFERENCES `profession` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
   CONSTRAINT `FK_civil_servant_line_manager` FOREIGN KEY (`line_manager_id`) REFERENCES `civil_servant` (`id`) ON DELETE SET NULL ON UPDATE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 

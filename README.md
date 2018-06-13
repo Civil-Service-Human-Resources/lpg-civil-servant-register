@@ -17,6 +17,7 @@ You will need to add the following env variables to run code locally, or to run 
 |GOV_NOTIFY_API_KEY| Gov Notify API Key |NO|
 |GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID| Template for Email sent to linemanager|NO|
 |OAUTH_SERVICE_URL| Url to OAUTH service|http://localhost:8080|
+|ROOT_LOGGING_LEVEL| Logging level|info|
 ### Build
 Build the application using Gradle ```./gradlew build```  
 
