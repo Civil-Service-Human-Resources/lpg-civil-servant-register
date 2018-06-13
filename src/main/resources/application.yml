@@ -16,8 +16,10 @@ server:
   port: 9002
 
 logging:
+  pattern:
+      console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   level:
-    root: ${ROOT_LOGGING_LEVEL:INFO}
+    root: ${ROOT_LOGGING_LEVEL:DEBUG}
     com.zaxxer.hikari: ERROR
     org.apache.http: WARN
 
