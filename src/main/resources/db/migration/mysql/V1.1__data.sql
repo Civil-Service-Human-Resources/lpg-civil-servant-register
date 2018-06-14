@@ -37,7 +37,7 @@ INSERT INTO profession (name) VALUES
   ('Operational delivery'),
   ('Project delivery'),
   ('Property'),
-  ('Other');
+  ('I don''t know');
 
 INSERT INTO job_role (name, profession_id) SELECT 'Strategy and Policy Development', id FROM profession WHERE name = 'Commercial';
 INSERT INTO job_role (name, profession_id) SELECT 'Business Needs and Sourcing', id FROM profession WHERE name = 'Commercial';
