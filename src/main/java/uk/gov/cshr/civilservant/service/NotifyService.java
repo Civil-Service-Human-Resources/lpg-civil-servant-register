@@ -20,7 +20,7 @@ public class NotifyService {
     @Value("${govNotify.key}")
     private String govNotifyKey;
 
-    @Value("${email.enabled}")
+    @Value("${govNotify.enabled}")
     private Boolean enabled;
 
     public void notify(String email, String templateId, String name, String learner) throws NotificationClientException {
