@@ -157,17 +157,6 @@ CREATE TABLE IF NOT EXISTS `profession` (
 /*!40000 ALTER TABLE `profession` DISABLE KEYS */;
 /*!40000 ALTER TABLE `profession` ENABLE KEYS */;
 
-DROP TABLE IF EXISTS `interest`;
-CREATE TABLE IF NOT EXISTS `interest` (
-  `id` smallint(6) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- Dumping data for table csrs.interest: ~0 rows (approximately)
-/*!40000 ALTER TABLE `interest` DISABLE KEYS */;
-/*!40000 ALTER TABLE `interest` ENABLE KEYS */;
-
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

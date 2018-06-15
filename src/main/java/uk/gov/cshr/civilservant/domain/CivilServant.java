@@ -36,6 +36,9 @@ public class CivilServant {
     @ManyToOne
     private Profession profession;
 
+    @ManyToMany
+    private Set<Interest> interests = new HashSet<>();
+
     @ManyToOne
     private JobRole jobRole;
 
@@ -99,6 +102,15 @@ public class CivilServant {
 
     public void setProfession(Profession profession) {
         this.profession = profession;
+    }
+
+
+    public Set<Interest> getInterests() {
+        return interests;
+    }
+
+    public void setInterests(Set<Interest> interests) {
+        this.interests = interests;
     }
 
     public JobRole getJobRole() {
@@ -174,8 +186,10 @@ public class CivilServant {
                 .append("profession", profession)
                 .append("jobRole", jobRole)
                 .append("otherAreasOfWork", otherAreasOfWork)
+                .append("interests", interests)
                 .append("identity", identity)
                 .append("lineManager", lineManager)
                 .toString();
     }
+
 }

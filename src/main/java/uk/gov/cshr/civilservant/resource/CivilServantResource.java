@@ -20,6 +20,8 @@ public class CivilServantResource {
 
     private Set<Profession> otherAreasOfWork;
 
+    private Set<Interest> interests;
+
     private String lineManagerName;
 
     private String lineManagerEmailAddress;
@@ -31,6 +33,7 @@ public class CivilServantResource {
         this.organisation = civilServant.getOrganisation();
         this.profession = civilServant.getProfession();
         this.jobRole = civilServant.getJobRole();
+        this.interests = civilServant.getInterests();
         this.otherAreasOfWork = civilServant.getOtherAreasOfWork();
         this.lineManagerName = civilServant.getLineManagerName();
         this.lineManagerEmailAddress = civilServant.getLineManagerEmailAddress();
@@ -66,5 +69,9 @@ public class CivilServantResource {
 
     public Set<Profession> getOtherAreasOfWork() {
         return otherAreasOfWork;
+    }
+
+    public Set<Interest> getInterests() {
+        return interests;
     }
 }
