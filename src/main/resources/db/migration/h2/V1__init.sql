@@ -38,6 +38,13 @@ CREATE TABLE IF NOT EXISTS `profession` (
   PRIMARY KEY (`id`)
 );
 
+
+CREATE TABLE IF NOT EXISTS `interest` (
+  `id` smallint(6) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+);
+
 CREATE TABLE IF NOT EXISTS `job_role` (
   `id` smallint(5) NOT NULL AUTO_INCREMENT,
   `parent_id` smallint(5) DEFAULT NULL,
