@@ -35,9 +35,9 @@ identity:
 
 govNotify:
   enabled: ${GOV_NOTIFY_ENABLED:false}
-  key: ${GOV_NOTIFY_API_KEY:key}
+  key: ${GOV_NOTIFY_API_KEY:changeme}
   template:
-    lineManager: ${GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID:template}
+    lineManager: ${GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID:changeme}
 
 ---
 
