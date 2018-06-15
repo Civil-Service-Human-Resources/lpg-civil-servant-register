@@ -34,7 +34,7 @@ public class NotifyService {
 
             LOGGER.debug("Line manager notification email: {}", response.getBody());
         } else {
-            LOGGER.info("email disabled");
+            LOGGER.info("Gov Notify disabled - email {}, name {}, learner {}", email, name, learner);
         }
     }
 }

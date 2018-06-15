@@ -34,18 +34,15 @@ identity:
   identityAPIUrl: "${oauth.serviceUrl}/api/identities"
 
 govNotify:
+  enabled: ${GOV_NOTIFY_ENABLED:false}
   key: ${GOV_NOTIFY_API_KEY:key}
   template:
     lineManager: ${GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID:template}
 
-email:
-  enabled: false
-
-
 ---
 
 spring:
-  profiles: production
+  profiles: test, production
   datasource:
     url: ${DATASOURCE:jdbc:mysql://localhost:3306/civil-servant-register?user=root&password=password&useSSL=false}
     platform: mysql
@@ -56,5 +53,5 @@ spring:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         enable_lazy_load_no_trans: true
 
-email:
-  enabled: true
+govNotify:
+  enabled: ${GOV_NOTIFY_ENABLED:true}
