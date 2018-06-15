@@ -105,12 +105,13 @@ public class CivilServant {
     }
 
 
-    public Set<Interest> getInterests() {
-        return interests;
-    }
+    public Set<Interest> getInterests() { return unmodifiableSet(interests);  }
 
     public void setInterests(Set<Interest> interests) {
-        this.interests = interests;
+        this.interests.clear();
+        if (interests != null) {
+            this.interests.addAll(interests);
+        }
     }
 
     public JobRole getJobRole() {

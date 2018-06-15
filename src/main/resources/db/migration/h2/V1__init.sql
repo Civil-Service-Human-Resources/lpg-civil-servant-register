@@ -65,8 +65,8 @@ CREATE TABLE IF NOT EXISTS `civil_servant` (
   `line_manager_id` mediumint(8),
   PRIMARY KEY (`id`),
   CONSTRAINT `FK_civil_servant_grade` FOREIGN KEY (`grade_id`) REFERENCES `grade` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
-  CONSTRAINT `FK_civil_servant_identity` FOREIGN KEY (`identity_id`) REFERENCES `identity` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_civil_servant_job_role` FOREIGN KEY (`job_role_id`) REFERENCES `job_role` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
+  CONSTRAINT `FK_civil_servant_identity` FOREIGN KEY
+  (`job_role_id`) REFERENCES `job_role` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
   CONSTRAINT `FK_civil_servant_organisation` FOREIGN KEY (`organisation_id`) REFERENCES `organisation` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
   CONSTRAINT `FK_civil_servant_profession` FOREIGN KEY (`profession_id`) REFERENCES `profession` (`id`) ON DELETE SET NULL ON UPDATE SET NULL,
   CONSTRAINT `FK_civil_servant_line_manager` FOREIGN KEY (`line_manager_id`) REFERENCES `civil_servant` (`id`) ON DELETE SET NULL ON UPDATE SET NULL
