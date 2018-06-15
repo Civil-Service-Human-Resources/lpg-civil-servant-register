@@ -20,16 +20,21 @@ public class NotifyService {
     @Value("${govNotify.key}")
     private String govNotifyKey;
 
-    public SendEmailResponse notify(String email, String templateId, String name, String learner) throws NotificationClientException {
+    @Value("${email.enabled}")
+    private Boolean enabled;
 
-        HashMap<String, String> personalisation = new HashMap<>();
-        personalisation.put(NAME_PERSONALISATION, name);
-        personalisation.put(LEARNER_PERSONALISATION, learner);
+    public void notify(String email, String templateId, String name, String learner) throws NotificationClientException {
+        if (enabled) {
+            HashMap<String, String> personalisation = new HashMap<>();
+            personalisation.put(NAME_PERSONALISATION, name);
+            personalisation.put(LEARNER_PERSONALISATION, learner);
 
-        NotificationClient client = new NotificationClient(govNotifyKey);
-        SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
+            NotificationClient client = new NotificationClient(govNotifyKey);
+            SendEmailResponse response = client.sendEmail(templateId, email, personalisation, "");
 
-        LOGGER.debug("Line manager notification email: {}", response.getBody());
-        return response;
+            LOGGER.debug("Line manager notification email: {}", response.getBody());
+        } else {
+            LOGGER.info("email disabled");
+        }
     }
 }
