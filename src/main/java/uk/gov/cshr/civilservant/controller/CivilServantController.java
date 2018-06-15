@@ -75,10 +75,11 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     @PreAuthorize("isAuthenticated()")
     @Transactional
     public ResponseEntity<Resource<CivilServantResource>> updateLineManager(@RequestParam(value = "email") String email) {
-
+        LOGGER.info("Updating line manager");
         Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
 
         if (optionalCivilServant.isPresent()) {
+            LOGGER.debug("{} setting line manager to {}", optionalCivilServant.get().getFullName(), email);
 
             IdentityFromService lineManagerIdentity = lineManagerService.checkLineManager(email);
             if (lineManagerIdentity == null) {
@@ -104,6 +105,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
             lineManagerService.notifyLineManager(civilServant, lineManager, email);
 
+            LOGGER.info("Updating line manager complete");
             return getResourceResponseEntity(Optional.of(civilServant));
         }
         return ResponseEntity.unprocessableEntity().build();

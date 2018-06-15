@@ -24,6 +24,7 @@ public class NotifyService {
     private Boolean enabled;
 
     public void notify(String email, String templateId, String name, String learner) throws NotificationClientException {
+        LOGGER.info("Sending line manager notification to {}");
         if (enabled) {
             HashMap<String, String> personalisation = new HashMap<>();
             personalisation.put(NAME_PERSONALISATION, name);
