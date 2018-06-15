@@ -24,11 +24,6 @@ INSERT INTO organisation (code, name, department_id) VALUES
   ('dh', ' Department of Health & Social Care', SELECT id FROM department WHERE code = 'dh'),
   ('hmrc', 'HM Revenue & Customs', SELECT id FROM department WHERE code = 'hmrc');
 
-INSERT INTO interests (name) VALUES
-  ('Contract management'),
-  ('Leadership');
-
-
 INSERT INTO profession (name) VALUES
   ('Analysis'),
   ('Commercial'),
