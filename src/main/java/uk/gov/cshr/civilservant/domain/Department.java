@@ -10,6 +10,7 @@ import java.util.HashSet;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.unmodifiableCollection;
+import static javax.persistence.EnumType.STRING;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 @Entity
@@ -27,6 +28,12 @@ public class Department {
 
     @OneToMany
     private Collection<Organisation> organisations = new HashSet<>();
+
+    @ElementCollection
+    @Enumerated(STRING)
+    @CollectionTable(name = "department_payment_methods", joinColumns = @JoinColumn(name = "department_id"))
+    @Column(name = "payment_method", nullable = false)
+    private Collection<PaymentMethod> paymentMethods = new HashSet<>();
 
     protected Department() {
     }
@@ -67,6 +74,15 @@ public class Department {
         organisations.add(organisation);
     }
 
+    public Collection<PaymentMethod> getPaymentMethods() {
+        return unmodifiableCollection(paymentMethods);
+    }
+
+    public void addPaymentMethod(PaymentMethod paymentMethod) {
+        checkArgument(paymentMethod != null);
+        paymentMethods.add(paymentMethod);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -93,6 +109,7 @@ public class Department {
                 .append("id", id)
                 .append("code", code)
                 .append("name", name)
+                .append("paymentMethods", paymentMethods)
                 .append("organisations", organisations)
                 .toString();
     }
