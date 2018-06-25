@@ -12,7 +12,7 @@ apply plugin: 'java'
 apply plugin: 'io.spring.dependency-management'
 
 group = 'uk.gov.cshr'
-version = '1.1.0'
+version = '1.5.0'
 
 bootJar {
     archiveName = 'civil-servant-registry-service.jar'
