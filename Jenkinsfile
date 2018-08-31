@@ -12,6 +12,7 @@ pipeline {
             agent any
             steps {
                 script {
+                    sh 'ls -la'
                     docker.withRegistry("${env.DOCKER_REGISTRY_URL}", 'docker_registry_credentials') {
                     def customImage = docker.build("civil-servant-registry-service:${env.BUILD_ID}")
                     customImage.push()
