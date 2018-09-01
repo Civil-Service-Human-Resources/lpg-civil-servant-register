@@ -22,7 +22,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry("${env.DOCKER_REGISTRY_URL}", 'docker_registry_credentials') {
-                        def customImage = docker.build("identity-service:${env.BUILD_ID}")
+                        def customImage = docker.build("civil-servant-registry-service:${env.BUILD_ID}")
                         customImage.push()
                     }
                 }
@@ -47,10 +47,8 @@ pipeline {
                         sh "terraform --version"
                         sh "terraform init"
                         sh "terraform validate"
-                        sh "terraform plan -target=module.identity -var 'identity_docker_tag=${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}'"
-                        sh "terraform apply -target=module.identity -var 'identity_docker_tag=${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}' -auto-approve"
-                        sh "terraform plan -target=module.identity-management -var 'identity_docker_tag=${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}'"
-                        sh "terraform apply -target=module.identity-management -var 'identity_docker_tag=${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}' -auto-approve"
+                        sh "terraform plan -target=module.civil-servant-registry-service -var 'civil_servant_registry_docker_tag=${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}'"
+                        sh "terraform apply -target=module.civil-servant-registry-service -var 'civil_servant_registry_docker_tag=${env.BUILD_ID}' -var 'docker_registry_server_username=${acr_username}' -var 'docker_registry_server_password=${acr_password}' -auto-approve"
                     }
                 }
             }
