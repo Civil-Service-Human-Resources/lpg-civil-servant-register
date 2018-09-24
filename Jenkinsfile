@@ -45,7 +45,7 @@ pipeline {
                 }
             }
         }
-        disabled */
+        disabled- */
         stage('Deploy to Integration') {
             agent { label 'master' }
             steps {
