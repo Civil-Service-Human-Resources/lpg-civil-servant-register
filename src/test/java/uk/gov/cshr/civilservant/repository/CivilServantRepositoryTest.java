@@ -50,8 +50,8 @@ public class CivilServantRepositoryTest {
         identityRepository.save(identity);
         civilServantRepository.save(civilServant);
 
-        Optional<CivilServant> organisation = civilServantRepository.findByIdentity(identity);
-        assertTrue(organisation.isPresent());
+        Optional<CivilServant> civilServantOptional = civilServantRepository.findByIdentity(identity);
+        assertTrue(civilServantOptional.isPresent());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class CivilServantRepositoryTest {
 
         identityRepository.save(identity);
 
-        Optional<CivilServant> organisation = civilServantRepository.findByIdentity(identity);
-        assertFalse(organisation.isPresent());
+        Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(identity);
+        assertFalse(civilServant.isPresent());
     }
 }

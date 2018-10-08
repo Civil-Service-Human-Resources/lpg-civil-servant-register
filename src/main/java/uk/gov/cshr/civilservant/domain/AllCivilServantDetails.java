@@ -9,7 +9,7 @@ public interface AllCivilServantDetails {
 
     String getFullName();
 
-    Organisation getOrganisation();
+    OrganisationalUnit getOrganisationalUnit();
 
     Grade getGrade();
 

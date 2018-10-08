@@ -23,7 +23,7 @@ public class Grade {
     private String name;
 
     @ManyToOne
-    private Organisation organisation;
+    private OrganisationalUnit organisationalUnit;
 
     protected Grade() {
     }

@@ -12,7 +12,7 @@ public class CivilServantResource {
 
     private Grade grade;
 
-    private Organisation organisation;
+    private OrganisationalUnit organisationalUnit;
 
     private Profession profession;
 
@@ -30,7 +30,7 @@ public class CivilServantResource {
         checkArgument(civilServant != null);
         this.fullName = civilServant.getFullName();
         this.grade = civilServant.getGrade();
-        this.organisation = civilServant.getOrganisation();
+        this.organisationalUnit = civilServant.getOrganisationalUnit();
         this.profession = civilServant.getProfession();
         this.jobRole = civilServant.getJobRole();
         this.interests = civilServant.getInterests();
@@ -55,8 +55,8 @@ public class CivilServantResource {
         return lineManagerName;
     }
 
-    public Organisation getOrganisation() {
-        return organisation;
+    public OrganisationalUnit getOrganisationalUnit() {
+        return organisationalUnit;
     }
 
     public Profession getProfession() {
