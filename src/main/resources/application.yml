@@ -44,7 +44,7 @@ govNotify:
 spring:
   profiles: test, production
   datasource:
-    url: ${DATASOURCE:jdbc:mysql://localhost:3306/civil-servant-register?user=root&password=password&useSSL=false}
+    url: ${DATASOURCE:jdbc:mysql://localhost:3306/civil_servant_register?user=root&password=password&useSSL=false}
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
