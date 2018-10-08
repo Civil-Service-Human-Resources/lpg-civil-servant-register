@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.*;
 
 @Entity
-public class OrganisationalUnit implements Cloneable {
+public class OrganisationalUnit {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,6 +23,18 @@ public class OrganisationalUnit implements Cloneable {
 
     @Column(name = "payment_methods")
     private String paymentMethods;
+
+    public OrganisationalUnit(OrganisationalUnit organisationalUnit) {
+        this.id = organisationalUnit.getId();
+        this.code = organisationalUnit.getCode();
+        this.name = organisationalUnit.getName();
+        this.parent = organisationalUnit.getParent();
+        this.subOrgs = organisationalUnit.getSubOrgs();
+        this.setPaymentMethods(organisationalUnit.getPaymentMethods());
+    }
+
+    public OrganisationalUnit() {
+    }
 
     public Long getId() {
         return id;
@@ -76,18 +88,6 @@ public class OrganisationalUnit implements Cloneable {
     }
 
     public void addtoSubOrgs(OrganisationalUnit organisationalUnit) {
-        this.subOrgs.add(organisationalUnit.clone());
-    }
-
-    @Override
-    protected OrganisationalUnit clone() {
-        OrganisationalUnit organisationalUnit = new OrganisationalUnit();
-        organisationalUnit.setId(this.id);
-        organisationalUnit.setParent(this.parent);
-        organisationalUnit.setName(this.name);
-        organisationalUnit.setSubOrgs(this.subOrgs);
-        organisationalUnit.setPaymentMethods(this.getPaymentMethods());
-
-        return organisationalUnit;
+        this.subOrgs.add(new OrganisationalUnit(organisationalUnit));
     }
 }
