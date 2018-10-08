@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS `organisational_unit`;
 
 CREATE TABLE `organisational_unit` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `parent_id` bigint(20) unsigned DEFAULT NULL,
+  `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
+  `parent_id` smallint(5) unsigned DEFAULT NULL,
   `code` varchar(10) NOT NULL,
   `abbreviation` varchar(255) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
@@ -28,5 +28,7 @@ ALTER TABLE `civil_servant` DROP FOREIGN KEY `FK_civil_servant_organisation`;
 ALTER TABLE `civil_servant` CHANGE `organisation_id` `organisational_unit_id` smallint(5) unsigned DEFAULT NULL;
 ALTER TABLE `civil_servant` ADD CONSTRAINT `FK_civil_servant_organisational_unit_id` FOREIGN KEY (`organisational_unit_id`) REFERENCES `organisational_unit` (`id`);
 
+DROP TABLE `department_organisations`;
+DROP TABLE `department_payment_methods`;
 DROP TABLE `organisation`;
 DROP TABLE `department`;
