@@ -4,7 +4,7 @@ CREATE TABLE `organisational_unit` (
   `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `parent_id` smallint(5) unsigned DEFAULT NULL,
   `code` varchar(10) NOT NULL,
-  `abbreviation` varchar(255) DEFAULT NULL,
+  `abbreviation` varchar(20) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   `payment_methods` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),

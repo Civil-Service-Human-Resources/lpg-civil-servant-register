@@ -9,8 +9,11 @@ public class OrganisationalUnit {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, length = 20)
+    @Column(unique = true, nullable = false, length = 10)
     private String code;
+
+    @Column(unique = true, nullable = false, length = 20)
+    private String abbreviation;
 
     @Column(unique = true, nullable = false)
     private String name;
@@ -89,5 +92,13 @@ public class OrganisationalUnit {
 
     public void addtoSubOrgs(OrganisationalUnit organisationalUnit) {
         this.subOrgs.add(new OrganisationalUnit(organisationalUnit));
+    }
+
+    public String getAbbreviation() {
+        return abbreviation;
+    }
+
+    public void setAbbreviation(String abbreviation) {
+        this.abbreviation = abbreviation;
     }
 }
