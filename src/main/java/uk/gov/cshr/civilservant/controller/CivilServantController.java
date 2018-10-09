@@ -120,7 +120,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                 .map(civilServant -> {
                     Resource<CivilServantResource> resource = new Resource<>(new CivilServantResource(civilServant));
                     resource.add(repositoryEntityLinks.linkToSingleResource(CivilServant.class, civilServant.getId()).withSelfRel());
-                    resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("organisationalUnit").withRel("organisationUnit"));
+                    resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("organisationalUnit").withRel("organisationalUnit"));
                     resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("grade").withRel("grade"));
                     resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("profession").withRel("profession"));
                     resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("jobRole").withRel("jobRole"));
