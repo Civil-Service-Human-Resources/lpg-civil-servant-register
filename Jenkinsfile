@@ -36,7 +36,7 @@ pipeline {
                 stash 'workspace'
             }
         }
-        /* diabled
+        /* disabled
         stage('Deploy to Integration?')  {
             agent none
             steps {
@@ -45,7 +45,6 @@ pipeline {
                 }
             }
         }
-        disabled- */
         stage('Deploy to Integration') {
             agent { label 'master' }
             steps {
@@ -72,7 +71,6 @@ pipeline {
                 }
             }
         }
-        /* disabled
         stage('Deploy to Staging?')  {
             agent none
             steps {
@@ -150,6 +148,9 @@ pipeline {
             post {
                 always {
                     junit 'build/test-results/**/TEST-*.xml'
+                }
+                cleanup {
+                    deleteDir()
                 }
             }
         }
