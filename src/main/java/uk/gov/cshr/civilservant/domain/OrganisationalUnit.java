@@ -1,8 +1,16 @@
 package uk.gov.cshr.civilservant.domain;
 
-import javax.persistence.*;
-import java.util.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.springframework.beans.factory.annotation.Configurable;
 
+import javax.persistence.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+@Configurable
 @Entity
 public class OrganisationalUnit {
     @Id
@@ -19,9 +27,11 @@ public class OrganisationalUnit {
     private String name;
 
     @ManyToOne
+    @JsonBackReference
     private OrganisationalUnit parent;
 
     @OneToMany(mappedBy = "parent")
+    @JsonManagedReference
     private Collection<OrganisationalUnit> subOrgs = Collections.emptySet();
 
     @Column(name = "payment_methods")
@@ -100,5 +110,13 @@ public class OrganisationalUnit {
 
     public void setAbbreviation(String abbreviation) {
         this.abbreviation = abbreviation;
+    }
+
+    public boolean hasParent() {
+        return getParent() != null;
+    }
+
+    public boolean hasSubOrgs() {
+        return !getSubOrgs().isEmpty();
     }
 }
