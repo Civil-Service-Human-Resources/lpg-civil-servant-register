@@ -2,7 +2,7 @@ INSERT INTO `organisational_unit` (`id`, `parent_id`, `code`, `abbreviation`, `n
 (4, 2, 'D2.1', 'DHC', 'DH Core'),
 (5, 2, 'D2.2', 'HRA', 'Health Research Authority'),
 (6, 2, 'D2.3', 'HFE', 'Human Fertilisation & Embryology'),
-(7, 2, 'D2.4', 'HFE', 'Medicines and Healthcare Products Regulatory Agency'),
+(7, 2, 'D2.4', 'MHPRA', 'Medicines and Healthcare Products Regulatory Agency'),
 (8, 2, 'D2.5', 'PHE', 'Public Health England'),
 (9, 4, 'D2.1.1', 'ACW', 'Acute Care and Workforce'),
 (10, 4, 'D2.1.2', 'CSCC', 'Community and Social Care Commercial'),
