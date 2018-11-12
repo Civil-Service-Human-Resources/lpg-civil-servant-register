@@ -56,8 +56,8 @@ public class OrganisationalUnitServiceTest {
         assertThat(organisationalUnitsMap.size(), equalTo(4));
         assertThat(organisationalUnitsMap.get("PT1"), equalTo("ParentTest1 (PT1)"));
         assertThat(organisationalUnitsMap.get("PT2"), equalTo("ParentTest2 (PT2)"));
-        assertThat(organisationalUnitsMap.get("CT1"), equalTo("ParentTest1 (PT1), ChildTest1 (CT1)"));
-        assertThat(organisationalUnitsMap.get("GCT1"), equalTo("ParentTest1 (PT1), ChildTest1 (CT1), GrandchildTest1 (GCT1)"));
+        assertThat(organisationalUnitsMap.get("CT1"), equalTo("ParentTest1 (PT1), ChildTest1"));
+        assertThat(organisationalUnitsMap.get("GCT1"), equalTo("ParentTest1 (PT1), ChildTest1, GrandchildTest1 (GCT1)"));
     }
 
     private ArrayList<OrganisationalUnit> createOrganisationalUnitStructure() {
@@ -74,7 +74,6 @@ public class OrganisationalUnitServiceTest {
         OrganisationalUnit childOrganisationalUnit = new OrganisationalUnit();
         childOrganisationalUnit.setName("ChildTest1");
         childOrganisationalUnit.setCode("CT1");
-        childOrganisationalUnit.setAbbreviation("CT1");
         childOrganisationalUnit.setParent(parentOrganisationalUnit1);
 
         OrganisationalUnit grandchildOrganisationalUnit = new OrganisationalUnit();
