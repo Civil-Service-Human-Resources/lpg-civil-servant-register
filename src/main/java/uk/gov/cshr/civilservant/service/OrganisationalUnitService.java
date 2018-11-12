@@ -48,7 +48,7 @@ public class OrganisationalUnitService {
 
             while (currentNode.hasParent()) {
                 currentNode = currentNode.getParent();
-                name = currentNode.getName() + formatAbbreviationForNode(currentNode) + ", " + name;
+                name = currentNode.getName() + formatAbbreviationForNode(currentNode) + " | " + name;
             }
 
             organisationalUnitsMap.put(organisationalUnit.getCode(), name);
