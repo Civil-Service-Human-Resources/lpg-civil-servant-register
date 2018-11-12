@@ -9,7 +9,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
-import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import java.util.ArrayList;
@@ -34,22 +33,18 @@ public class OrganisationalUnitControllerTest {
     @Mock
     private OrganisationalUnitService organisationalUnitService;
 
-    @Mock
-    private OrganisationalUnitRepository organisationalUnitRepository;
-
-
     @Before
     public void setup() {
         initMocks(this);
-        organisationalUnitController = new OrganisationalUnitController(organisationalUnitRepository, organisationalUnitService);
+        organisationalUnitController = new OrganisationalUnitController(organisationalUnitService);
         mockMvc = standaloneSetup(organisationalUnitController).build();
     }
 
     @Test
     public void shouldReturnOkIfRequestingOrganisationalUnitTree() throws Exception {
-        Iterable<OrganisationalUnit> organisationalUnits = new ArrayList<>();
+        ArrayList<OrganisationalUnit> organisationalUnits = new ArrayList<>();
 
-        when(organisationalUnitRepository.findAll()).thenReturn(organisationalUnits);
+        when(organisationalUnitService.getParentOrganisationalUnits()).thenReturn(organisationalUnits);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/tree")
@@ -60,11 +55,9 @@ public class OrganisationalUnitControllerTest {
 
     @Test
     public void shouldReturnOkIfRequestingOrganisationalUnitFlat() throws Exception {
-        Iterable<OrganisationalUnit> organisationalUnits = new ArrayList<>();
         Map<String, String> organisationalUnitsMap = new LinkedHashMap<>();
 
-        when(organisationalUnitRepository.findAll()).thenReturn(organisationalUnits);
-        when(organisationalUnitService.getOrganisationalUnitsMap(organisationalUnits)).thenReturn(organisationalUnitsMap);
+        when(organisationalUnitService.getOrganisationalUnitsMap()).thenReturn(organisationalUnitsMap);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat")
