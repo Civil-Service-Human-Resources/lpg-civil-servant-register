@@ -2,6 +2,7 @@ package uk.gov.cshr.civilservant.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 
@@ -10,9 +11,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Service
+@Transactional
 public class OrganisationalUnitService {
 
-    OrganisationalUnitRepository organisationalUnitRepository;
+    private OrganisationalUnitRepository organisationalUnitRepository;
 
     @Autowired
     public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository) {
@@ -56,6 +58,14 @@ public class OrganisationalUnitService {
     }
 
     private String formatAbbreviationForNode(OrganisationalUnit node) {
+        /*
+        * If an organisational unit has an abbreviation, we should format it to be surrounded by parenthesis,
+        * Otherwise, we should leave as blank
+        * e.g:
+        *   With abbreviation -> Cabinet Office (CO), Child (C), Subchild (SC)
+        *   With no abbreviation -> Cabinet Office, Child, Subchild
+        * */
+
         String formattedAbbreviation = node.getAbbreviation() != null ? " (" + node.getAbbreviation() + ")" : "";
 
         return formattedAbbreviation;
