@@ -59,12 +59,12 @@ public class OrganisationalUnitService {
 
     private String formatAbbreviationForNode(OrganisationalUnit node) {
         /*
-        * If an organisational unit has an abbreviation, we should format it to be surrounded by parenthesis,
-        * Otherwise, we should leave as blank
-        * e.g:
-        *   With abbreviation -> Cabinet Office (CO), Child (C), Subchild (SC)
-        *   With no abbreviation -> Cabinet Office, Child, Subchild
-        * */
+         * If an organisational unit has an abbreviation, we should format it to be surrounded by parenthesis,
+         * Otherwise, we should leave as blank
+         * e.g:
+         *   With abbreviation -> Cabinet Office (CO), Child (C), Subchild (SC)
+         *   With no abbreviation -> Cabinet Office, Child, Subchild
+         * */
 
         String formattedAbbreviation = node.getAbbreviation() != null ? " (" + node.getAbbreviation() + ")" : "";
 
