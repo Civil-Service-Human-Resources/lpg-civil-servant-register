@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class OrganisationalUnitService {
 
     private OrganisationalUnitRepository organisationalUnitRepository;
+
     private RepositoryEntityLinks repositoryEntityLinks;
 
     public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository, RepositoryEntityLinks repositoryEntityLinks) {
