@@ -1,11 +1,11 @@
 package uk.gov.cshr.civilservant.service;
 
+import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -15,9 +15,11 @@ import java.util.stream.Collectors;
 public class OrganisationalUnitService {
 
     private OrganisationalUnitRepository organisationalUnitRepository;
+    private RepositoryEntityLinks repositoryEntityLinks;
 
-    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository) {
+    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository, RepositoryEntityLinks repositoryEntityLinks) {
         this.organisationalUnitRepository = organisationalUnitRepository;
+        this.repositoryEntityLinks = repositoryEntityLinks;
     }
 
     public List<OrganisationalUnit> getParentOrganisationalUnits() {
@@ -30,7 +32,7 @@ public class OrganisationalUnitService {
 
     public Map<String, String> getOrganisationalUnitsMap() {
         return organisationalUnitRepository.findAll().stream()
-                .collect(Collectors.toMap(OrganisationalUnit::getCode, this::formatName, (oldValue, newValue) -> newValue, LinkedHashMap::new));
+                .collect(Collectors.toMap(org -> repositoryEntityLinks.linkFor(OrganisationalUnit.class).slash(org.getId()).toUri().toString(), this::formatName));
     }
 
     private String formatName(OrganisationalUnit organisationalUnit) {
