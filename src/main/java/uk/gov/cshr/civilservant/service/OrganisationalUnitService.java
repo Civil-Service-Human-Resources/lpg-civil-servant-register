@@ -70,4 +70,10 @@ public class OrganisationalUnitService {
 
         return formattedAbbreviation;
     }
+
+    public OrganisationalUnit findByCode(String code) {
+        OrganisationalUnit organisationalUnits = organisationalUnitRepository.findByCode(code);
+
+        return organisationalUnits;
+    }
 }
