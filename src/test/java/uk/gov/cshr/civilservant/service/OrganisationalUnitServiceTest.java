@@ -1,12 +1,15 @@
 package uk.gov.cshr.civilservant.service;
 
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -14,20 +17,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 
+@RunWith(MockitoJUnitRunner.class)
 public class OrganisationalUnitServiceTest {
-
-    private OrganisationalUnitService organisationalUnitService;
 
     @Mock
     private OrganisationalUnitRepository organisationalUnitRepository;
 
-    @Before
-    public void setup() {
-        initMocks(this);
-        organisationalUnitService = new OrganisationalUnitService(organisationalUnitRepository);
-    }
+    @InjectMocks
+    private OrganisationalUnitService organisationalUnitService;
 
     @Test
     public void shouldReturnParentOrganisationalUnits() {
@@ -35,7 +33,7 @@ public class OrganisationalUnitServiceTest {
 
         when(organisationalUnitRepository.findAll()).thenReturn(organisationalUnits);
 
-        ArrayList<OrganisationalUnit> parentOrganisationalUnits = organisationalUnitService.getParentOrganisationalUnits();
+        List<OrganisationalUnit> parentOrganisationalUnits = organisationalUnitService.getParentOrganisationalUnits();
 
         assertThat(parentOrganisationalUnits.size(), equalTo(2));
 
