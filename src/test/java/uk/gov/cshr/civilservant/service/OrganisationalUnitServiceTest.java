@@ -75,7 +75,7 @@ public class OrganisationalUnitServiceTest {
     public void shouldReturnParentOrganisationalUnits() {
         when(organisationalUnitRepository.findAll()).thenReturn(organisationalUnits);
 
-        List<OrganisationalUnit> parentOrganisationalUnits = organisationalUnitService.getParentOrganisationalUnitsWithSubOrgs();
+        List<OrganisationalUnit> parentOrganisationalUnits = organisationalUnitService.getParentOrganisationalUnits();
 
         assertThat(parentOrganisationalUnits.size(), equalTo(2));
 

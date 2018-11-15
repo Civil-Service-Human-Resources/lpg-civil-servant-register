@@ -1,12 +1,16 @@
 package uk.gov.cshr.civilservant.service;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,19 +29,12 @@ public class OrganisationalUnitService {
     /**
      * This will return all Parent organisations with any sub-organisations as a list
      */
-    public List<OrganisationalUnit> getParentOrganisationalUnitsWithSubOrgs() {
-        ArrayList<OrganisationalUnit> organisationalUnitArrayList = new ArrayList<>();
-
-        organisationalUnitRepository.findAll().forEach(organisationalUnit -> {
-            OrganisationalUnit currentNode = organisationalUnit;
-            if (!currentNode.hasParent()) {
-                organisationalUnitArrayList.add(currentNode);
-            }
-        });
-
-        return organisationalUnitArrayList;
+    public List<OrganisationalUnit> getParentOrganisationalUnits() {
+        return organisationalUnitRepository.findAll(sortByNameDesc())
+                .stream()
+                .filter(org -> !org.hasParent())
+                .collect(Collectors.toList());
     }
-
 
     /**
      * This will return all Organisations as a map.
@@ -92,5 +89,9 @@ public class OrganisationalUnitService {
      */
     private String formatAbbreviationForNode(OrganisationalUnit node) {
         return node.getAbbreviation() != null ? " (" + node.getAbbreviation() + ")" : "";
+    }
+
+    private Sort sortByNameDesc() {
+        return new Sort(Sort.Direction.DESC, "name");
     }
 }

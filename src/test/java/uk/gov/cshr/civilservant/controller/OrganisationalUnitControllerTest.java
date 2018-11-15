@@ -42,7 +42,7 @@ public class OrganisationalUnitControllerTest {
     public void shouldReturnOkIfRequestingOrganisationalUnitTree() throws Exception {
         ArrayList<OrganisationalUnit> organisationalUnits = new ArrayList<>();
 
-        when(organisationalUnitService.getParentOrganisationalUnitsWithSubOrgs()).thenReturn(organisationalUnits);
+        when(organisationalUnitService.getParentOrganisationalUnits()).thenReturn(organisationalUnits);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/tree")
