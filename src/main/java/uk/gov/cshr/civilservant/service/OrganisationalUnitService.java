@@ -1,14 +1,12 @@
 package uk.gov.cshr.civilservant.service;
 
+import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,14 +22,29 @@ public class OrganisationalUnitService {
         this.repositoryEntityService = repositoryEntityService;
     }
 
+    /**
+     * This will return all Parent organisations with any sub-organisations as a list
+     */
     public List<OrganisationalUnit> getParentOrganisationalUnits() {
-        return organisationalUnitRepository.findAll()
-                .stream()
-                .sequential()
-                .filter(org -> !org.hasParent())
-                .collect(Collectors.toList());
+        ArrayList<OrganisationalUnit> organisationalUnitArrayList = new ArrayList<>();
+
+        organisationalUnitRepository.findAll().forEach(organisationalUnit -> {
+            OrganisationalUnit currentNode = organisationalUnit;
+            if (!currentNode.hasParent()) {
+                organisationalUnitArrayList.add(currentNode);
+            }
+        });
+
+        return organisationalUnitArrayList;
     }
 
+
+    /**
+     * This will return all Organisations as a map.
+     * In the map, the key will be the href of the organisation which is obtained using {@link RepositoryEntityLinks} in {@link RepositoryEntityService}.
+     * The value will represent the organisation name, but formatted to include any parents recursively using {@link OrganisationalUnitService#formatName(OrganisationalUnit)}.
+     * Finally, this is map is sorted by value into a LinkedHashMap
+     */
     public Map<String, String> getOrganisationalUnitsMapSortedByValue() {
         return organisationalUnitRepository.findAll().stream()
                 .collect(Collectors.toMap(org -> repositoryEntityService.getUriFromOrganisationalUnit(org), this::formatName))
@@ -45,6 +58,11 @@ public class OrganisationalUnitService {
                         LinkedHashMap::new));
     }
 
+    /**
+     * Format the name of an organisationalUnit to be prefixed with parental hierarchy.
+     *
+     * e.g. Cabinet Office (CO) | Child (C) | Subchild (SC)
+     */
     private String formatName(OrganisationalUnit organisationalUnit) {
         OrganisationalUnit currentNode = organisationalUnit;
 
@@ -64,15 +82,15 @@ public class OrganisationalUnitService {
         return name;
     }
 
+    /**
+     * If an organisational unit has an abbreviation, we should format it to be surrounded by parenthesis,
+     * Otherwise, we should leave as blank
+     *
+     * e.g:
+     * With abbreviation -> Cabinet Office (CO) | Child (C) | Subchild (SC)
+     * With no abbreviation -> Cabinet Office | Child | Subchild
+     */
     private String formatAbbreviationForNode(OrganisationalUnit node) {
-        /*
-         * If an organisational unit has an abbreviation, we should format it to be surrounded by parenthesis,
-         * Otherwise, we should leave as blank
-         * e.g:
-         *   With abbreviation -> Cabinet Office (CO) | Child (C) | Subchild (SC)
-         *   With no abbreviation -> Cabinet Office | Child | Subchild
-         * */
-
         return node.getAbbreviation() != null ? " (" + node.getAbbreviation() + ")" : "";
     }
 }
