@@ -30,7 +30,7 @@ public class OrganisationalUnitService {
      * This will return all Parent organisations with any sub-organisations as a list
      */
     public List<OrganisationalUnit> getParentOrganisationalUnits() {
-        return organisationalUnitRepository.findAll(sortByNameDesc())
+        return organisationalUnitRepository.findAll(sortByNameAsc())
                 .stream()
                 .filter(org -> !org.hasParent())
                 .collect(Collectors.toList());
@@ -91,7 +91,7 @@ public class OrganisationalUnitService {
         return node.getAbbreviation() != null ? " (" + node.getAbbreviation() + ")" : "";
     }
 
-    private Sort sortByNameDesc() {
-        return new Sort(Sort.Direction.DESC, "name");
+    private Sort sortByNameAsc() {
+        return new Sort(Sort.Direction.ASC, "name");
     }
 }
