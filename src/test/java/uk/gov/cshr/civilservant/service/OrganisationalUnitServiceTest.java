@@ -73,7 +73,7 @@ public class OrganisationalUnitServiceTest {
 
     @Test
     public void shouldReturnParentOrganisationalUnits() {
-        when(organisationalUnitRepository.findAll()).thenReturn(organisationalUnits);
+        when(organisationalUnitRepository.findAllByOrderByNameAsc()).thenReturn(organisationalUnits);
 
         List<OrganisationalUnit> parentOrganisationalUnits = organisationalUnitService.getParentOrganisationalUnits();
 
