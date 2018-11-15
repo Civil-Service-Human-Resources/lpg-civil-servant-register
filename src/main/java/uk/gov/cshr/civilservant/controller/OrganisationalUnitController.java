@@ -22,7 +22,7 @@ public class OrganisationalUnitController {
 
     @GetMapping("/tree")
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
-        List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParentOrganisationalUnitsWithSubOrgs();
+        List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParentOrganisationalUnits();
 
         return ResponseEntity.ok(organisationalUnits);
     }
