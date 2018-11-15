@@ -25,7 +25,7 @@ public class OrganisationalUnitService {
     /**
      * This will return all Parent organisations with any sub-organisations as a list
      */
-    public List<OrganisationalUnit> getParentOrganisationalUnits() {
+    public List<OrganisationalUnit> getParentOrganisationalUnitsWithSubOrgs() {
         ArrayList<OrganisationalUnit> organisationalUnitArrayList = new ArrayList<>();
 
         organisationalUnitRepository.findAll().forEach(organisationalUnit -> {
