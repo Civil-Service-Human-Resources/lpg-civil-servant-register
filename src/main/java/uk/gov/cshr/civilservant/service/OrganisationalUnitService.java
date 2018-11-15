@@ -5,6 +5,8 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,9 +32,17 @@ public class OrganisationalUnitService {
                 .collect(Collectors.toList());
     }
 
-    public Map<String, String> getOrganisationalUnitsMap() {
+    public Map<String, String> getOrganisationalUnitsMapSortedByValue() {
         return organisationalUnitRepository.findAll().stream()
-                .collect(Collectors.toMap(org -> repositoryEntityService.getUriFromOrganisationalUnit(org), this::formatName));
+                .collect(Collectors.toMap(org -> repositoryEntityService.getUriFromOrganisationalUnit(org), this::formatName))
+                .entrySet()
+                .stream()
+                .sorted(Comparator.comparing(Map.Entry::getValue))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (u, v) -> {
+                            throw new IllegalStateException(String.format("Duplicate key %s", u));
+                        },
+                        LinkedHashMap::new));
     }
 
     private String formatName(OrganisationalUnit organisationalUnit) {

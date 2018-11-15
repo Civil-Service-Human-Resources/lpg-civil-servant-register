@@ -29,7 +29,7 @@ public class OrganisationalUnitController {
 
     @GetMapping("/flat")
     public ResponseEntity<Map<String, String>> listOrganisationalUnitsAsFlatStructure() {
-        Map<String, String> organisationalUnitsMap = organisationalUnitService.getOrganisationalUnitsMap();
+        Map<String, String> organisationalUnitsMap = organisationalUnitService.getOrganisationalUnitsMapSortedByValue();
 
         return ResponseEntity.ok(organisationalUnitsMap);
     }
