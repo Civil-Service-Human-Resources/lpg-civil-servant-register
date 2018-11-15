@@ -57,7 +57,7 @@ public class OrganisationalUnitControllerTest {
     public void shouldReturnOkIfRequestingOrganisationalUnitFlat() throws Exception {
         Map<String, String> organisationalUnitsMap = new LinkedHashMap<>();
 
-        when(organisationalUnitService.getOrganisationalUnitsMap()).thenReturn(organisationalUnitsMap);
+        when(organisationalUnitService.getOrganisationalUnitsMapSortedByValue()).thenReturn(organisationalUnitsMap);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat")

@@ -95,7 +95,7 @@ public class OrganisationalUnitServiceTest {
         when(repositoryEntityService.getUriFromOrganisationalUnit(childOrganisationalUnit)).thenReturn("CT1");
         when(repositoryEntityService.getUriFromOrganisationalUnit(grandchildOrganisationalUnit)).thenReturn("GCT1");
 
-        Map<String, String> organisationalUnitsMap = organisationalUnitService.getOrganisationalUnitsMap();
+        Map<String, String> organisationalUnitsMap = organisationalUnitService.getOrganisationalUnitsMapSortedByValue();
 
         assertThat(organisationalUnitsMap.size(), equalTo(4));
         assertThat(organisationalUnitsMap.get("PT1"), equalTo("ParentTest1 (PT1)"));
