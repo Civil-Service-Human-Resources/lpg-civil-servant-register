@@ -60,7 +60,7 @@ public class OrganisationalUnitService {
 
     /**
      * Format the name of an organisationalUnit to be prefixed with parental hierarchy.
-     *
+     * <p>
      * e.g. Cabinet Office (CO) | Child (C) | Subchild (SC)
      */
     private String formatName(OrganisationalUnit organisationalUnit) {
