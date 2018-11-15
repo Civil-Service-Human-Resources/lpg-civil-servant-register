@@ -1,6 +1,5 @@
 package uk.gov.cshr.civilservant.service;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +29,7 @@ public class OrganisationalUnitService {
      * This will return all Parent organisations with any sub-organisations as a list
      */
     public List<OrganisationalUnit> getParentOrganisationalUnits() {
-        return organisationalUnitRepository.findAll(sortByNameAsc())
+        return organisationalUnitRepository.findAllByOrderByNameAsc()
                 .stream()
                 .filter(org -> !org.hasParent())
                 .collect(Collectors.toList());
@@ -89,9 +88,5 @@ public class OrganisationalUnitService {
      */
     private String formatAbbreviationForNode(OrganisationalUnit node) {
         return node.getAbbreviation() != null ? " (" + node.getAbbreviation() + ")" : "";
-    }
-
-    private Sort sortByNameAsc() {
-        return new Sort(Sort.Direction.ASC, "name");
     }
 }

@@ -6,8 +6,12 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 
+import java.util.List;
+
 @Repository
 @RepositoryRestResource
 public interface OrganisationalUnitRepository extends JpaRepository<OrganisationalUnit, Long> {
+    public List<OrganisationalUnit> findAllByOrderByNameAsc();
+
     OrganisationalUnit findByCode(@Param("code") String code);
 }
