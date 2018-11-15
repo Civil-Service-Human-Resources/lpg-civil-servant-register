@@ -1,6 +1,5 @@
 package uk.gov.cshr.civilservant.service;
 
-import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
@@ -16,11 +15,11 @@ public class OrganisationalUnitService {
 
     private OrganisationalUnitRepository organisationalUnitRepository;
 
-    private RepositoryEntityLinks repositoryEntityLinks;
+    private RepositoryEntityService repositoryEntityService;
 
-    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository, RepositoryEntityLinks repositoryEntityLinks) {
+    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository, RepositoryEntityService repositoryEntityService) {
         this.organisationalUnitRepository = organisationalUnitRepository;
-        this.repositoryEntityLinks = repositoryEntityLinks;
+        this.repositoryEntityService = repositoryEntityService;
     }
 
     public List<OrganisationalUnit> getParentOrganisationalUnits() {
@@ -33,7 +32,7 @@ public class OrganisationalUnitService {
 
     public Map<String, String> getOrganisationalUnitsMap() {
         return organisationalUnitRepository.findAll().stream()
-                .collect(Collectors.toMap(org -> repositoryEntityLinks.linkFor(OrganisationalUnit.class).slash(org.getId()).toUri().toString(), this::formatName));
+                .collect(Collectors.toMap(org -> repositoryEntityService.getUriFromOrganisationalUnit(org), this::formatName));
     }
 
     private String formatName(OrganisationalUnit organisationalUnit) {
@@ -43,7 +42,13 @@ public class OrganisationalUnitService {
 
         while (currentNode.hasParent()) {
             currentNode = currentNode.getParent();
-            name = currentNode.getName() + formatAbbreviationForNode(currentNode) + " | " + name;
+
+            StringBuilder sb = new StringBuilder();
+            name = sb.append(currentNode.getName())
+                    .append(formatAbbreviationForNode(currentNode))
+                    .append(" | ")
+                    .append(name)
+                    .toString();
         }
 
         return name;
