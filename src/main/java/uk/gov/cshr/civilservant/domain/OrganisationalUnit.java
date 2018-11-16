@@ -1,7 +1,6 @@
 package uk.gov.cshr.civilservant.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.beans.factory.annotation.Configurable;
 
 import javax.persistence.*;
@@ -31,7 +30,6 @@ public class OrganisationalUnit {
     private OrganisationalUnit parent;
 
     @OneToMany(mappedBy = "parent")
-    @JsonManagedReference
     private Collection<OrganisationalUnit> subOrgs = Collections.emptySet();
 
     @Column(name = "payment_methods")
