@@ -1,6 +1,5 @@
 package uk.gov.cshr.civilservant.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -28,11 +27,15 @@ public class OrganisationalUnit {
     private String name;
 
     @ManyToOne
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
     private OrganisationalUnit parent;
 
     @OneToMany(mappedBy = "parent")
-    @JsonBackReference
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
     private Collection<OrganisationalUnit> subOrgs = Collections.emptySet();
 
     @Column(name = "payment_methods")
