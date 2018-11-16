@@ -87,6 +87,6 @@ public class OrganisationalUnitService {
      * With no abbreviation -> Cabinet Office | Child | Subchild
      */
     private String formatAbbreviationForNode(OrganisationalUnit node) {
-        return node.getAbbreviation() != null ? " (" + node.getAbbreviation() + ")" : "";
+        return (node.getAbbreviation() != null || node.getAbbreviation() != "") ? " (" + node.getAbbreviation() + ")" : "";
     }
 }
