@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 @RepositoryRestResource
 public interface OrganisationalUnitRepository extends JpaRepository<OrganisationalUnit, Long> {
-    public List<OrganisationalUnit> findAllByOrderByNameAsc();
-
     OrganisationalUnit findByCode(@Param("code") String code);
+
+    List<OrganisationalUnit> findAllByOrderByNameAsc();
 }
