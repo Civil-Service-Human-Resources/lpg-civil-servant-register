@@ -12,10 +12,8 @@ import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasProperty;
@@ -102,17 +100,5 @@ public class OrganisationalUnitServiceTest {
         assertThat(organisationalUnitsMap.get("PT2"), equalTo("ParentTest2 (PT2)"));
         assertThat(organisationalUnitsMap.get("CT1"), equalTo("ParentTest1 (PT1) | ChildTest1"));
         assertThat(organisationalUnitsMap.get("GCT1"), equalTo("ParentTest1 (PT1) | ChildTest1 | GrandchildTest1 (GCT1)"));
-    }
-
-    @Test
-    public void shouldReturnOrganisationalUnit() {
-        OrganisationalUnit organisationalUnit = new OrganisationalUnit();
-        Optional<OrganisationalUnit> optionalOrganisationalUnit = Optional.of(organisationalUnit);
-
-        when(organisationalUnitRepository.findById(1L)).thenReturn(optionalOrganisationalUnit);
-
-        Optional<OrganisationalUnit> expectedOptional = organisationalUnitService.getOrganisationalUnitById(1L);
-        assertThat(expectedOptional.isPresent(), is(true));
-        assertThat(expectedOptional.get(), equalTo(organisationalUnit));
     }
 }

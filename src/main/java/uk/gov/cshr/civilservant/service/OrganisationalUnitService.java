@@ -6,7 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,9 +88,5 @@ public class OrganisationalUnitService {
      */
     private String formatAbbreviationForNode(OrganisationalUnit node) {
         return (node.getAbbreviation() != null && node.getAbbreviation() != "") ? " (" + node.getAbbreviation() + ")" : "";
-    }
-
-    public Optional<OrganisationalUnit> getOrganisationalUnitById(Long id) {
-        return organisationalUnitRepository.findById(id);
     }
 }
