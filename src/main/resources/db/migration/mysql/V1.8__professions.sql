@@ -79,13 +79,3 @@ RENAME TABLE `profession_new` TO `profession`;
 RENAME TABLE `civil_servant_new` TO `civil_servant`;
 
 SET FOREIGN_KEY_CHECKS=1;
-
-
-
-
-
-
-
-
-
-
