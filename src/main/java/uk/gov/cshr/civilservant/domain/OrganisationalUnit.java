@@ -2,7 +2,8 @@ package uk.gov.cshr.civilservant.domain;
 
 import org.springframework.beans.factory.annotation.Configurable;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

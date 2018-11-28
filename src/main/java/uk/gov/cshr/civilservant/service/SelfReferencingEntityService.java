@@ -2,7 +2,6 @@ package uk.gov.cshr.civilservant.service;
 
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.domain.SelfReferencingEntity;
 import uk.gov.cshr.civilservant.repository.SelfReferencingEntityRepository;
 
