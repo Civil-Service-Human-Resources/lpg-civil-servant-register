@@ -4,8 +4,6 @@ import uk.gov.cshr.civilservant.domain.*;
 
 import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 public class CivilServantResource {
 
     private String fullName;

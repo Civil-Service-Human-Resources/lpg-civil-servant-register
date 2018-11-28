@@ -2,7 +2,6 @@ package uk.gov.cshr.civilservant.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
@@ -26,8 +25,6 @@ import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 
 import java.util.ArrayList;
 import java.util.Optional;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 @RepositoryRestController
 @RequestMapping("/civilServants")
