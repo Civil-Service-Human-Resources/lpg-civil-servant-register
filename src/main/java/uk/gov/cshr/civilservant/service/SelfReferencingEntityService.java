@@ -52,9 +52,9 @@ public abstract class SelfReferencingEntityService<T extends SelfReferencingEnti
     }
 
     /**
-     * Format the name of an organisationalUnit to be prefixed with parental hierarchy.
+     * Format the name of an Entity to be prefixed with parental hierarchy.
      * <p>
-     * e.g. Cabinet Office (CO) | Child (C) | Subchild (SC)
+     * e.g. Parent | Child | Subchild
      */
-    abstract String formatName(T t);
+    abstract String formatName(T entity);
 }
