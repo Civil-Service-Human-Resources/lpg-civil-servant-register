@@ -124,8 +124,6 @@ dependencies {
     // https://github.com/alphagov/notifications-java-client
     compile('uk.gov.service.notify:notifications-java-client:3.9.1-RELEASE')
 
-    compile('com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.9.7')
-
     testCompile 'com.google.code.gson:gson:2.8.2'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.springframework.security:spring-security-test'
