@@ -13,7 +13,7 @@ public class RepositoryEntityService<T extends RegistryEntity> {
         this.repositoryEntityLinks = repositoryEntityLinks;
     }
 
-    public String getUri(Class<T> type, T entity) {
-        return repositoryEntityLinks.linkFor(type).slash(entity.getId()).toUri().toString();
+    public String getUri(T entity) {
+        return repositoryEntityLinks.linkFor(entity.getClass()).slash(entity.getId()).toUri().toString();
     }
 }

@@ -11,37 +11,11 @@ import java.util.Collections;
 import java.util.List;
 
 @Entity
-public class Profession implements RegistryEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String name;
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JsonBackReference
-    private Profession parent;
-
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private List<Profession> children = new ArrayList<>();
-
+public class Profession extends SelfReferencingEntity<Profession> {
     public Profession() {
     }
 
     public Profession(String name) {
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
     }
 

@@ -40,7 +40,7 @@ public class RepositoryEntityServiceTest {
         when(repositoryEntityLinks.linkFor(OrganisationalUnit.class)).thenReturn(linkBuilder);
         when(linkBuilder.slash(1L).toUri()).thenReturn(new URI("PT1"));
 
-        String uriFromOrganisationalUnit = repositoryEntityService.getUri(OrganisationalUnit.class, parentOrganisationalUnit1);
+        String uriFromOrganisationalUnit = repositoryEntityService.getUri(parentOrganisationalUnit1);
         assertThat(uriFromOrganisationalUnit, equalTo("PT1"));
     }
 

@@ -1,14 +1,58 @@
 package uk.gov.cshr.civilservant.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-public interface SelfReferencingEntity<T> extends RegistryEntity {
-    Optional<T> getParent();
+@MappedSuperclass
+public abstract class SelfReferencingEntity<T> implements RegistryEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
-    boolean hasParent();
+    @Column(unique = true, nullable = false)
+    String name;
 
-    List<T> getChildren();
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JsonBackReference
+    T parent;
 
-    boolean hasChildren();
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.PERSIST)
+    List<T> children = new ArrayList<>();
+
+    public abstract T getParent();
+
+    public abstract void setParent(T parent);
+
+    public abstract void setChildren(List<T> children);
+
+    public abstract List<T> getChildren();
+
+    public boolean hasParent() {
+        return parent != null;
+    }
+
+    public boolean hasChildren() {
+        return !children.isEmpty();
+    }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }

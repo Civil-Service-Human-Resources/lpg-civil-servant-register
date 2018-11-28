@@ -51,34 +51,25 @@ public class OrganisationalUnitRepositoryTest {
     }
 
     @Test
-    public void shouldReturnSubOrgs() {
-        OrganisationalUnit parent = new OrganisationalUnit();
-        parent.setCode("a");
-        parent.setName("Parent");
-
-        OrganisationalUnit savedParent = repository.save(parent);
-
+    public void shouldReturnChildren() {
         OrganisationalUnit child1 = new OrganisationalUnit();
         child1.setCode("b");
         child1.setName("Child 1");
-        child1.setParent(parent);
-
-        OrganisationalUnit savedChild1 = repository.save(child1);
-        savedParent.addtoSubOrgs(savedChild1);
 
         OrganisationalUnit child2 = new OrganisationalUnit();
         child2.setCode("c");
         child2.setName("Child 2");
-        child2.setParent(parent);
 
-        OrganisationalUnit savedChild2 = repository.save(child2);
-        savedParent.addtoSubOrgs(savedChild2);
+        OrganisationalUnit parent = new OrganisationalUnit();
+        parent.setCode("a");
+        parent.setName("Parent");
+        parent.setChildren(Arrays.asList(child1, child2));
 
-        repository.save(savedParent);
+        repository.save(parent);
 
         OrganisationalUnit foundParent = repository.findByCode("a");
 
-        List<OrganisationalUnit> subOrgs = new ArrayList<>(foundParent.getSubOrgs());
+        List<OrganisationalUnit> subOrgs = new ArrayList<>(foundParent.getChildren());
 
         assertThat(subOrgs.size(), is(2));
         assertThat(subOrgs.get(0).getCode(), is("b"));
@@ -94,7 +85,6 @@ public class OrganisationalUnitRepositoryTest {
         organisationalUnit.setCode("xx");
 
         repository.save(organisationalUnit);
-
 
         OrganisationalUnit result = repository.findByCode("xx");
 

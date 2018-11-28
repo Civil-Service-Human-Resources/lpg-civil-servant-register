@@ -75,7 +75,7 @@ public class OrganisationalUnitServiceTest {
     public void shouldReturnParentOrganisationalUnits() {
         when(organisationalUnitRepository.findAllByOrderByNameAsc()).thenReturn(organisationalUnits);
 
-        List<OrganisationalUnit> parentOrganisationalUnits = organisationalUnitService.getParentOrganisationalUnits();
+        List<OrganisationalUnit> parentOrganisationalUnits = organisationalUnitService.getParents();
 
         assertThat(parentOrganisationalUnits.size(), equalTo(2));
 
@@ -88,12 +88,12 @@ public class OrganisationalUnitServiceTest {
     @Test
     public void shouldReturnOrganisationalUnitsAsMap() {
         when(organisationalUnitRepository.findAll()).thenReturn(organisationalUnits);
-        when(repositoryEntityService.getUri(OrganisationalUnit.class, parentOrganisationalUnit1)).thenReturn("PT1");
-        when(repositoryEntityService.getUri(OrganisationalUnit.class, parentOrganisationalUnit2)).thenReturn("PT2");
-        when(repositoryEntityService.getUri(OrganisationalUnit.class, childOrganisationalUnit)).thenReturn("CT1");
-        when(repositoryEntityService.getUri(OrganisationalUnit.class, grandchildOrganisationalUnit)).thenReturn("GCT1");
+        when(repositoryEntityService.getUri(parentOrganisationalUnit1)).thenReturn("PT1");
+        when(repositoryEntityService.getUri(parentOrganisationalUnit2)).thenReturn("PT2");
+        when(repositoryEntityService.getUri(childOrganisationalUnit)).thenReturn("CT1");
+        when(repositoryEntityService.getUri(grandchildOrganisationalUnit)).thenReturn("GCT1");
 
-        Map<String, String> organisationalUnitsMap = organisationalUnitService.getOrganisationalUnitsMapSortedByValue();
+        Map<String, String> organisationalUnitsMap = organisationalUnitService.getMapSortedByValue();
 
         assertThat(organisationalUnitsMap.size(), equalTo(4));
         assertThat(organisationalUnitsMap.get("PT1"), equalTo("ParentTest1 (PT1)"));

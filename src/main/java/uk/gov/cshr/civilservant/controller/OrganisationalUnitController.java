@@ -22,14 +22,14 @@ public class OrganisationalUnitController {
 
     @GetMapping("/tree")
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
-        List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParentOrganisationalUnits();
+        List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParents();
 
         return ResponseEntity.ok(organisationalUnits);
     }
 
     @GetMapping("/flat")
     public ResponseEntity<Map<String, String>> listOrganisationalUnitsAsFlatStructure() {
-        Map<String, String> organisationalUnitsMap = organisationalUnitService.getOrganisationalUnitsMapSortedByValue();
+        Map<String, String> organisationalUnitsMap = organisationalUnitService.getMapSortedByValue();
 
         return ResponseEntity.ok(organisationalUnitsMap);
     }

@@ -42,7 +42,7 @@ public class ProfessionControllerTest {
         parent1.setChildren(Arrays.asList(child1, child2));
         Profession parent2 = new Profession("Parent Two");
 
-        when(professionService.getParentProfessions()).thenReturn(Arrays.asList(parent1, parent2));
+        when(professionService.getParents()).thenReturn(Arrays.asList(parent1, parent2));
 
         mockMvc.perform(
                 get("/professions/tree")
@@ -62,7 +62,7 @@ public class ProfessionControllerTest {
                 "url3", "Parent One | Child One | Child Two"
         );
 
-        when(professionService.getProfessionsMapSortedByValue()).thenReturn(professionsMap);
+        when(professionService.getMapSortedByValue()).thenReturn(professionsMap);
 
         mockMvc.perform(
                 get("/professions/flat")

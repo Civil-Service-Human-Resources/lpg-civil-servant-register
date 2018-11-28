@@ -21,14 +21,14 @@ public class ProfessionController {
 
     @GetMapping("/tree")
     public ResponseEntity<List<Profession>> listProfessionsAsTreeStructure() {
-        List<Profession> professions = professionService.getParentProfessions();
+        List<Profession> professions = professionService.getParents();
 
         return ResponseEntity.ok(professions);
     }
 
     @GetMapping("/flat")
     public ResponseEntity<Map<String, String>> listProfessionsAsFlatStructure() {
-        Map<String, String> professionsMap = professionService.getProfessionsMapSortedByValue();
+        Map<String, String> professionsMap = professionService.getMapSortedByValue();
 
         return ResponseEntity.ok(professionsMap);
     }

@@ -40,7 +40,7 @@ public class ProfessionServiceTest {
 
         when(professionRepository.findAllByOrderByNameAsc()).thenReturn(Arrays.asList(parent1, child1, child2, parent2));
 
-        List<Profession> result = professionService.getParentProfessions();
+        List<Profession> result = professionService.getParents();
 
         assertEquals(Arrays.asList(parent1, parent2), result);
     }
@@ -57,12 +57,12 @@ public class ProfessionServiceTest {
 
         when(professionRepository.findAll()).thenReturn(Arrays.asList(parent1, child1, child2, parent2));
 
-        when(repositoryEntityService.getUri(Profession.class, parent1)).thenReturn("parent1");
-        when(repositoryEntityService.getUri(Profession.class, child1)).thenReturn("child1");
-        when(repositoryEntityService.getUri(Profession.class, child2)).thenReturn("child2");
-        when(repositoryEntityService.getUri(Profession.class, parent2)).thenReturn("parent2");
+        when(repositoryEntityService.getUri(parent1)).thenReturn("parent1");
+        when(repositoryEntityService.getUri(child1)).thenReturn("child1");
+        when(repositoryEntityService.getUri(child2)).thenReturn("child2");
+        when(repositoryEntityService.getUri(parent2)).thenReturn("parent2");
 
-        Map<String, String> professionsMap = professionService.getProfessionsMapSortedByValue();
+        Map<String, String> professionsMap = professionService.getMapSortedByValue();
 
         assertThat(professionsMap.size(), equalTo(4));
         assertThat(professionsMap.get("parent1"), equalTo("Parent One"));

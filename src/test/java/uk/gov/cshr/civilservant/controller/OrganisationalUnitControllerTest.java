@@ -42,7 +42,7 @@ public class OrganisationalUnitControllerTest {
     public void shouldReturnOkIfRequestingOrganisationalUnitTree() throws Exception {
         ArrayList<OrganisationalUnit> organisationalUnits = new ArrayList<>();
 
-        when(organisationalUnitService.getParentOrganisationalUnits()).thenReturn(organisationalUnits);
+        when(organisationalUnitService.getParents()).thenReturn(organisationalUnits);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/tree")
@@ -55,7 +55,7 @@ public class OrganisationalUnitControllerTest {
     public void shouldReturnOkIfRequestingOrganisationalUnitFlat() throws Exception {
         Map<String, String> organisationalUnitsMap = new LinkedHashMap<>();
 
-        when(organisationalUnitService.getOrganisationalUnitsMapSortedByValue()).thenReturn(organisationalUnitsMap);
+        when(organisationalUnitService.getMapSortedByValue()).thenReturn(organisationalUnitsMap);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat")
