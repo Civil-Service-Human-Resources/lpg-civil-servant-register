@@ -2,10 +2,10 @@ package uk.gov.cshr.civilservant.service;
 
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.stereotype.Service;
-import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.domain.RegistryEntity;
 
 @Service
-public class RepositoryEntityService {
+public class RepositoryEntityService<T extends RegistryEntity> {
 
     private RepositoryEntityLinks repositoryEntityLinks;
 
@@ -13,7 +13,7 @@ public class RepositoryEntityService {
         this.repositoryEntityLinks = repositoryEntityLinks;
     }
 
-    public String getUriFromOrganisationalUnit(OrganisationalUnit org) {
-        return repositoryEntityLinks.linkFor(OrganisationalUnit.class).slash(org.getId()).toUri().toString();
+    public String getUri(Class<T> type, T entity) {
+        return repositoryEntityLinks.linkFor(type).slash(entity.getId()).toUri().toString();
     }
 }

@@ -24,8 +24,7 @@ public class CivilServantResource {
 
     private String lineManagerEmailAddress;
 
-    public CivilServantResource(CivilServant civilServant) {
-        checkArgument(civilServant != null);
+    public CivilServantResource(CivilServant civilServant, String lineManagerEmailAddress) {
         this.fullName = civilServant.getFullName();
         this.grade = civilServant.getGrade();
         this.organisationalUnit = civilServant.getOrganisationalUnit();
@@ -33,7 +32,7 @@ public class CivilServantResource {
         this.interests = civilServant.getInterests();
         this.otherAreasOfWork = civilServant.getOtherAreasOfWork();
         this.lineManagerName = civilServant.getLineManagerName();
-        this.lineManagerEmailAddress = civilServant.getLineManagerEmailAddress();
+        this.lineManagerEmailAddress = lineManagerEmailAddress;
     }
 
     public String getFullName() {

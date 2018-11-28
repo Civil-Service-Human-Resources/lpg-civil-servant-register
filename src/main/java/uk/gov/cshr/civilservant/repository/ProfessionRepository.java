@@ -8,9 +8,11 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Repository;
 import uk.gov.cshr.civilservant.domain.Profession;
 
+import java.util.BitSet;
 import java.util.List;
 
 @Repository
 @RepositoryRestResource
 public interface ProfessionRepository extends JpaRepository<Profession, Long> {
+    List<Profession> findAllByOrderByNameAsc();
 }

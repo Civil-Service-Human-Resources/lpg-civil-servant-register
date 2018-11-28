@@ -18,9 +18,9 @@ public class OrganisationalUnitService {
 
     private OrganisationalUnitRepository organisationalUnitRepository;
 
-    private RepositoryEntityService repositoryEntityService;
+    private RepositoryEntityService<OrganisationalUnit> repositoryEntityService;
 
-    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository, RepositoryEntityService repositoryEntityService) {
+    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository, RepositoryEntityService<OrganisationalUnit> repositoryEntityService) {
         this.organisationalUnitRepository = organisationalUnitRepository;
         this.repositoryEntityService = repositoryEntityService;
     }
@@ -43,7 +43,7 @@ public class OrganisationalUnitService {
      */
     public Map<String, String> getOrganisationalUnitsMapSortedByValue() {
         return organisationalUnitRepository.findAll().stream()
-                .collect(Collectors.toMap(org -> repositoryEntityService.getUriFromOrganisationalUnit(org), this::formatName))
+                .collect(Collectors.toMap(org -> repositoryEntityService.getUri(OrganisationalUnit.class, org), this::formatName))
                 .entrySet()
                 .stream()
                 .sorted(Comparator.comparing(Map.Entry::getValue))

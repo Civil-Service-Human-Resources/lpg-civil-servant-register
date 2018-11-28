@@ -25,7 +25,7 @@ public class RepositoryEntityServiceTest {
     private RepositoryEntityLinks repositoryEntityLinks;
 
     @InjectMocks
-    private RepositoryEntityService repositoryEntityService;
+    private RepositoryEntityService<OrganisationalUnit> repositoryEntityService;
 
     @Test
     public void shouldReturnUriStringFromOrg() throws URISyntaxException {
@@ -40,7 +40,7 @@ public class RepositoryEntityServiceTest {
         when(repositoryEntityLinks.linkFor(OrganisationalUnit.class)).thenReturn(linkBuilder);
         when(linkBuilder.slash(1L).toUri()).thenReturn(new URI("PT1"));
 
-        String uriFromOrganisationalUnit = repositoryEntityService.getUriFromOrganisationalUnit(parentOrganisationalUnit1);
+        String uriFromOrganisationalUnit = repositoryEntityService.getUri(OrganisationalUnit.class, parentOrganisationalUnit1);
         assertThat(uriFromOrganisationalUnit, equalTo("PT1"));
     }
 

@@ -26,7 +26,7 @@ public class OrganisationalUnitServiceTest {
     private OrganisationalUnitRepository organisationalUnitRepository;
 
     @Mock
-    private RepositoryEntityService repositoryEntityService;
+    private RepositoryEntityService<OrganisationalUnit> repositoryEntityService;
 
     @InjectMocks
     private OrganisationalUnitService organisationalUnitService;
@@ -88,10 +88,10 @@ public class OrganisationalUnitServiceTest {
     @Test
     public void shouldReturnOrganisationalUnitsAsMap() {
         when(organisationalUnitRepository.findAll()).thenReturn(organisationalUnits);
-        when(repositoryEntityService.getUriFromOrganisationalUnit(parentOrganisationalUnit1)).thenReturn("PT1");
-        when(repositoryEntityService.getUriFromOrganisationalUnit(parentOrganisationalUnit2)).thenReturn("PT2");
-        when(repositoryEntityService.getUriFromOrganisationalUnit(childOrganisationalUnit)).thenReturn("CT1");
-        when(repositoryEntityService.getUriFromOrganisationalUnit(grandchildOrganisationalUnit)).thenReturn("GCT1");
+        when(repositoryEntityService.getUri(OrganisationalUnit.class, parentOrganisationalUnit1)).thenReturn("PT1");
+        when(repositoryEntityService.getUri(OrganisationalUnit.class, parentOrganisationalUnit2)).thenReturn("PT2");
+        when(repositoryEntityService.getUri(OrganisationalUnit.class, childOrganisationalUnit)).thenReturn("CT1");
+        when(repositoryEntityService.getUri(OrganisationalUnit.class, grandchildOrganisationalUnit)).thenReturn("GCT1");
 
         Map<String, String> organisationalUnitsMap = organisationalUnitService.getOrganisationalUnitsMapSortedByValue();
 

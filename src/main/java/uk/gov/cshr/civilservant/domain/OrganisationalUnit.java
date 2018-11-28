@@ -11,7 +11,7 @@ import java.util.List;
 
 @Configurable
 @Entity
-public class OrganisationalUnit {
+public class OrganisationalUnit implements RegistryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

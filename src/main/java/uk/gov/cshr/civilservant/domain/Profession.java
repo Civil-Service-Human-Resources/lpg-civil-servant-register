@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -8,10 +9,10 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
-public class Profession {
-
+public class Profession implements RegistryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,6 +21,7 @@ public class Profession {
     private String name;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @JsonBackReference
     private Profession parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
@@ -58,6 +60,14 @@ public class Profession {
 
     public List<Profession> getChildren() {
         return Collections.unmodifiableList(children);
+    }
+
+    public boolean hasParent() {
+        return parent != null;
+    }
+
+    public boolean hasChildren() {
+        return !children.isEmpty();
     }
 
     @Override
