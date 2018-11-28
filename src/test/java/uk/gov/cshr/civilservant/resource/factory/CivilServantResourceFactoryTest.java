@@ -22,10 +22,6 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CivilServantResourceFactoryTest {
-
-    @Mock
-    private RepositoryEntityLinks repositoryEntityLinks;
-
     @Mock
     private IdentityService identityService;
 

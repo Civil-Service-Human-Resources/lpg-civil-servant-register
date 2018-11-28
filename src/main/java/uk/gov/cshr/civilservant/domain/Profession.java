@@ -17,26 +17,32 @@ public class Profession extends SelfReferencingEntity<Profession> {
         this.name = name;
     }
 
+    @Override
     public Profession getParent() {
         return parent;
     }
 
+    @Override
     public void setParent(Profession parent) {
         this.parent = parent;
     }
 
+    @Override
     public void setChildren(List<Profession> children) {
         this.children = Collections.unmodifiableList(children);
     }
 
+    @Override
     public List<Profession> getChildren() {
         return Collections.unmodifiableList(children);
     }
 
+    @Override
     public boolean hasParent() {
         return parent != null;
     }
 
+    @Override
     public boolean hasChildren() {
         return !children.isEmpty();
     }

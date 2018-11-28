@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.service.exception.UserNotFoundException;
 
 @Service
 public class IdentityService {
@@ -62,7 +63,7 @@ public class IdentityService {
             if (e.getStatusCode() == HttpStatus.NOT_FOUND) {
                 return null;
             }
-            throw new RuntimeException(e);
+            throw new UserNotFoundException(e);
         }
 
         if (identity != null) {

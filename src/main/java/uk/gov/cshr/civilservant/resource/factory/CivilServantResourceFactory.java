@@ -1,6 +1,5 @@
 package uk.gov.cshr.civilservant.resource.factory;
 
-import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 import uk.gov.cshr.civilservant.domain.CivilServant;
@@ -9,13 +8,10 @@ import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
 @Component
 public class CivilServantResourceFactory {
-
-    private final RepositoryEntityLinks repositoryEntityLinks;
     private final IdentityService identityService;
     private final LinkFactory linkFactory;
 
-    public CivilServantResourceFactory(RepositoryEntityLinks repositoryEntityLinks, IdentityService identityService, LinkFactory linkFactory) {
-        this.repositoryEntityLinks = repositoryEntityLinks;
+    public CivilServantResourceFactory(IdentityService identityService, LinkFactory linkFactory) {
         this.identityService = identityService;
         this.linkFactory = linkFactory;
     }

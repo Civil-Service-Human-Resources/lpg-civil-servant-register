@@ -41,18 +41,22 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
         this.code = code;
     }
 
+    @Override
     public OrganisationalUnit getParent() {
         return parent;
     }
 
+    @Override
     public void setParent(OrganisationalUnit parent) {
         this.parent = parent;
     }
 
+    @Override
     public List<OrganisationalUnit> getChildren() {
         return Collections.unmodifiableList(children);
     }
 
+    @Override
     public void setChildren(List<OrganisationalUnit> children) {
         this.children = Collections.unmodifiableList(children);
     }
@@ -68,10 +72,6 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
         this.paymentMethods = String.join(",", paymentMethods);
     }
 
-    public void addtoSubOrgs(OrganisationalUnit organisationalUnit) {
-        this.children.add(new OrganisationalUnit(organisationalUnit));
-    }
-
     public String getAbbreviation() {
         return abbreviation;
     }
@@ -80,10 +80,12 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
         this.abbreviation = abbreviation;
     }
 
+    @Override
     public boolean hasParent() {
         return getParent() != null;
     }
 
+    @Override
     public boolean hasChildren() {
         return !getChildren().isEmpty();
     }
