@@ -5,6 +5,8 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 
+import static org.junit.Assert.assertEquals;
+
 public class ErrorDtoFactoryTest {
     private final ErrorDtoFactory factory = new ErrorDtoFactory();
 
