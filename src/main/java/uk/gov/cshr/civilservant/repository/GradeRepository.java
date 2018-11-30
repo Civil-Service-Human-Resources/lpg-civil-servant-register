@@ -10,5 +10,5 @@ import uk.gov.cshr.civilservant.domain.Grade;
 public interface GradeRepository extends CrudRepository<Grade, Long> {
 
 
-    Iterable<Grade> findByOrganisationIsNull();
+    Iterable<Grade> findByOrganisationalUnitIsNull();
 }

@@ -34,7 +34,7 @@ public class IdentityServiceTest {
 
         IdentityFromService identity = new IdentityFromService();
         identity.setUid("uid");
-        identity.setUsername("test@domain.com");
+        identity.setUsername("shouldReturnUriStringFromOrg@domain.com");
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(FIND_BY_EMAIL_URL)
                 .queryParam("emailAddress", identity.getUsername());
@@ -42,7 +42,7 @@ public class IdentityServiceTest {
         when(restOperations.getForObject(builder.toUriString(), IdentityFromService.class)).thenReturn(identity);
 
         IdentityFromService foundIdentity = identityService.findByEmail(identity.getUsername());
-        assertThat(foundIdentity.getUsername(), equalTo("test@domain.com"));
+        assertThat(foundIdentity.getUsername(), equalTo("shouldReturnUriStringFromOrg@domain.com"));
     }
 
     @Test
@@ -50,7 +50,7 @@ public class IdentityServiceTest {
 
         IdentityFromService identity = new IdentityFromService();
         identity.setUid("uid");
-        identity.setUsername("test@domain.com");
+        identity.setUsername("shouldReturnUriStringFromOrg@domain.com");
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(FIND_BY_EMAIL_URL)
                 .queryParam("emailAddress", identity.getUsername());

@@ -28,7 +28,7 @@ public class CivilServant {
     private String fullName;
 
     @ManyToOne
-    private Organisation organisation;
+    private OrganisationalUnit organisationalUnit;
 
     @ManyToOne
     private Grade grade;
@@ -80,12 +80,12 @@ public class CivilServant {
         this.fullName = fullName;
     }
 
-    public Organisation getOrganisation() {
-        return organisation;
+    public OrganisationalUnit getOrganisationalUnit() {
+        return organisationalUnit;
     }
 
-    public void setOrganisation(Organisation organisation) {
-        this.organisation = organisation;
+    public void setOrganisationalUnit(OrganisationalUnit organisationalUnit) {
+        this.organisationalUnit = organisationalUnit;
     }
 
     public Grade getGrade() {
@@ -182,7 +182,7 @@ public class CivilServant {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .append("fullName", fullName)
-                .append("organisation", organisation)
+                .append("organisationalUnit", organisationalUnit)
                 .append("grade", grade)
                 .append("profession", profession)
                 .append("jobRole", jobRole)
