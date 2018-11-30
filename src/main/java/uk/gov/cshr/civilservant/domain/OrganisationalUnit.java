@@ -1,14 +1,11 @@
 package uk.gov.cshr.civilservant.domain;
 
-import org.springframework.beans.factory.annotation.Configurable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-@Configurable
 @Entity
 public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit> {
     @Column(unique = true, nullable = false, length = 10)
