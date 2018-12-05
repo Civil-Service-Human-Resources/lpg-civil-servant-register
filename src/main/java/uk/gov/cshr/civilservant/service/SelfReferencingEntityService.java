@@ -3,7 +3,7 @@ package uk.gov.cshr.civilservant.service;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.SelfReferencingEntity;
-import uk.gov.cshr.civilservant.dto.DtoFactory;
+import uk.gov.cshr.civilservant.dto.factory.DtoFactory;
 import uk.gov.cshr.civilservant.repository.SelfReferencingEntityRepository;
 
 import java.util.List;
@@ -39,8 +39,10 @@ public abstract class SelfReferencingEntityService<T extends SelfReferencingEnti
      */
     @Transactional(readOnly = true)
     public List<K> getListSortedByValue() {
-        return repository.findAll().stream()
-                .map(o -> dtoFactory.create(o)).collect(Collectors.toList());
+        return repository.findAll()
+                .stream()
+                .map(o -> dtoFactory.create(o))
+                .collect(Collectors.toList());
 //                .collect(Collectors.toMap(entity -> dtoFactory.create(entity), this::formatName))
 //                .entrySet()
 //                .stream()
@@ -51,11 +53,4 @@ public abstract class SelfReferencingEntityService<T extends SelfReferencingEnti
 //                        },
 //                        LinkedHashMap::new));
     }
-
-    /**
-     * Format the name of an Entity to be prefixed with parental hierarchy.
-     * <p>
-     * e.g. Parent | Child | Subchild
-     */
-    abstract String formatName(T entity);
 }

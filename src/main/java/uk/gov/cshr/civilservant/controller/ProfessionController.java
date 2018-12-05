@@ -5,10 +5,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cshr.civilservant.domain.Profession;
+import uk.gov.cshr.civilservant.dto.ProfessionDto;
 import uk.gov.cshr.civilservant.service.ProfessionService;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/professions")
@@ -27,8 +27,8 @@ public class ProfessionController {
     }
 
     @GetMapping("/flat")
-    public ResponseEntity<Map<Object, String>> listProfessionsAsFlatStructure() {
-        Map<Object, String> professionsMap = professionService.getMapSortedByValue();
+    public ResponseEntity<List<ProfessionDto>> listProfessionsAsFlatStructure() {
+        List<ProfessionDto> professionsMap = professionService.getListSortedByValue();
 
         return ResponseEntity.ok(professionsMap);
     }
