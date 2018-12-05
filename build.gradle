@@ -121,6 +121,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.guava/guava
     compile group: 'com.google.guava', name: 'guava', version: '25.0-jre'
 
+    compile 'org.projectlombok:lombok:1.18.4'
+
     // https://github.com/alphagov/notifications-java-client
     compile('uk.gov.service.notify:notifications-java-client:3.9.1-RELEASE')
 

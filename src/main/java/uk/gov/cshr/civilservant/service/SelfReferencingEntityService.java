@@ -3,21 +3,21 @@ package uk.gov.cshr.civilservant.service;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.SelfReferencingEntity;
+import uk.gov.cshr.civilservant.dto.DtoFactory;
 import uk.gov.cshr.civilservant.repository.SelfReferencingEntityRepository;
 
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class SelfReferencingEntityService<T extends SelfReferencingEntity> {
+public abstract class SelfReferencingEntityService<T extends SelfReferencingEntity, K> {
+    private final DtoFactory<K, T> dtoFactory;
     private SelfReferencingEntityRepository<T> repository;
     private RepositoryEntityService<T> repositoryEntityService;
 
-    SelfReferencingEntityService(SelfReferencingEntityRepository<T> repository, RepositoryEntityService<T> repositoryEntityService) {
+    SelfReferencingEntityService(SelfReferencingEntityRepository<T> repository, RepositoryEntityService<T> repositoryEntityService, DtoFactory<K, T> dtoFactory) {
         this.repository = repository;
         this.repositoryEntityService = repositoryEntityService;
+        this.dtoFactory = dtoFactory;
     }
 
     /**
@@ -38,17 +38,18 @@ public abstract class SelfReferencingEntityService<T extends SelfReferencingEnti
      * Finally, this is map is sorted by value into a LinkedHashMap
      */
     @Transactional(readOnly = true)
-    public Map<String, String> getMapSortedByValue() {
+    public List<K> getListSortedByValue() {
         return repository.findAll().stream()
-                .collect(Collectors.toMap(entity -> repositoryEntityService.getUri(entity), this::formatName))
-                .entrySet()
-                .stream()
-                .sorted(Comparator.comparing(Map.Entry::getValue))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (u, v) -> {
-                            throw new IllegalStateException(String.format("Duplicate key %s", u));
-                        },
-                        LinkedHashMap::new));
+                .map(o -> dtoFactory.create(o)).collect(Collectors.toList());
+//                .collect(Collectors.toMap(entity -> dtoFactory.create(entity), this::formatName))
+//                .entrySet()
+//                .stream()
+//                .sorted(Comparator.comparing(Map.Entry::getValue))
+//                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+//                        (u, v) -> {
+//                            throw new IllegalStateException(String.format("Duplicate key %s", u));
+//                        },
+//                        LinkedHashMap::new));
     }
 
     /**

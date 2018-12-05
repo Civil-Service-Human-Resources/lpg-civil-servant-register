@@ -27,8 +27,8 @@ public class ProfessionController {
     }
 
     @GetMapping("/flat")
-    public ResponseEntity<Map<String, String>> listProfessionsAsFlatStructure() {
-        Map<String, String> professionsMap = professionService.getMapSortedByValue();
+    public ResponseEntity<Map<Object, String>> listProfessionsAsFlatStructure() {
+        Map<Object, String> professionsMap = professionService.getMapSortedByValue();
 
         return ResponseEntity.ok(professionsMap);
     }
