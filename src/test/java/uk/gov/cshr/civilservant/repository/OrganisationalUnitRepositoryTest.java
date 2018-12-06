@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertThat;
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @Transactional
+@WithMockUser(username = "user", roles = {"ORGANISATION_MANAGER"})
 public class OrganisationalUnitRepositoryTest {
 
     @Autowired

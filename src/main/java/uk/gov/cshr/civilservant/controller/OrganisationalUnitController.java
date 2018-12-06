@@ -5,10 +5,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import java.util.List;
-import java.util.Map;
 
 @RepositoryRestController
 @RequestMapping("/organisationalUnits")
@@ -28,8 +28,8 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping("/flat")
-    public ResponseEntity<Map<String, String>> listOrganisationalUnitsAsFlatStructure() {
-        Map<String, String> organisationalUnitsMap = organisationalUnitService.getMapSortedByValue();
+    public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
+        List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
 
         return ResponseEntity.ok(organisationalUnitsMap);
     }

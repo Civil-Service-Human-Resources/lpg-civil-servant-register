@@ -8,7 +8,6 @@ import uk.gov.cshr.civilservant.domain.Profession;
 import uk.gov.cshr.civilservant.service.ProfessionService;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/professions")
@@ -24,12 +23,5 @@ public class ProfessionController {
         List<Profession> professions = professionService.getParents();
 
         return ResponseEntity.ok(professions);
-    }
-
-    @GetMapping("/flat")
-    public ResponseEntity<Map<String, String>> listProfessionsAsFlatStructure() {
-        Map<String, String> professionsMap = professionService.getMapSortedByValue();
-
-        return ResponseEntity.ok(professionsMap);
     }
 }

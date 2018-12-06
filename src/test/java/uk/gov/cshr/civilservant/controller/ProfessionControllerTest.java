@@ -13,7 +13,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.cshr.civilservant.domain.Profession;
-import uk.gov.cshr.civilservant.repository.ProfessionRepository;
 import uk.gov.cshr.civilservant.service.ProfessionService;
 
 import java.util.Arrays;
@@ -58,26 +57,6 @@ public class ProfessionControllerTest {
                 .andExpect(jsonPath("$[0].children[0].name", equalTo("Child One")))
                 .andExpect(jsonPath("$[0].children[1].name", equalTo("Child Two")))
                 .andExpect(jsonPath("$[1].name", equalTo("Parent Two")));
-    }
-
-    @Test
-    public void shouldReturnProfessionsAsFlatMap() throws Exception {
-        Map<String, String> professionsMap =ImmutableMap.of(
-                "url1", "Parent One",
-                "url2", "Parent One | Child One",
-                "url3", "Parent One | Child One | Child Two"
-        );
-
-        when(professionService.getMapSortedByValue()).thenReturn(professionsMap);
-
-        mockMvc.perform(
-                get("/professions/flat")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.url1", equalTo("Parent One")))
-                .andExpect(jsonPath("$.url2", equalTo("Parent One | Child One")))
-                .andExpect(jsonPath("$.url3", equalTo("Parent One | Child One | Child Two")));
     }
 
     @Test
