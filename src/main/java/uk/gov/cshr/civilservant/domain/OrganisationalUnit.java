@@ -1,6 +1,7 @@
 package uk.gov.cshr.civilservant.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.springframework.beans.factory.annotation.Configurable;
 
 import javax.persistence.*;
@@ -26,7 +27,7 @@ public class OrganisationalUnit {
     private String name;
 
     @ManyToOne
-    @JsonBackReference
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
     private OrganisationalUnit parent;
 
     @OneToMany(mappedBy = "parent")
