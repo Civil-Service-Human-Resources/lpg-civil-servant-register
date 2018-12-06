@@ -11,7 +11,6 @@ import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 public interface OrganisationalUnitRepository extends SelfReferencingEntityRepository<OrganisationalUnit> {
     OrganisationalUnit findByCode(@Param("code") String code);
 
-    @PreAuthorize("hasRole('ORGANISATION_MANAGER')")
     @Override
     OrganisationalUnit save(OrganisationalUnit organisationalUnit);
 }
