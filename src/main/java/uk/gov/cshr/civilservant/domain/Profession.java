@@ -6,11 +6,8 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Collections.unmodifiableList;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 @Entity
 public class Profession {
@@ -22,14 +19,17 @@ public class Profession {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "profession")
-    private List<JobRole> jobRoles = new ArrayList<>();
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    private Profession parent;
 
-    protected Profession() {
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    private List<Profession> children = new ArrayList<>();
+
+    public Profession() {
     }
 
     public Profession(String name) {
-        setName(name);
+        this.name = name;
     }
 
     public Long getId() {
@@ -41,19 +41,23 @@ public class Profession {
     }
 
     public void setName(String name) {
-        checkArgument(isNotBlank(name));
         this.name = name;
     }
 
-    public List<JobRole> getJobRoles() {
-        return unmodifiableList(jobRoles);
+    public Profession getParent() {
+        return parent;
     }
 
-    public void setJobRoles(List<JobRole> jobRoles) {
-        this.jobRoles.clear();
-        if (jobRoles != null) {
-            this.jobRoles.addAll(jobRoles);
-        }
+    public void setParent(Profession parent) {
+        this.parent = parent;
+    }
+
+    public void setChildren(List<Profession> children) {
+        this.children = Collections.unmodifiableList(children);
+    }
+
+    public List<Profession> getChildren() {
+        return Collections.unmodifiableList(children);
     }
 
     @Override
@@ -81,7 +85,7 @@ public class Profession {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .append("name", name)
-                .append("jobRoles", jobRoles)
+                .append("parent", parent)
                 .toString();
     }
 }

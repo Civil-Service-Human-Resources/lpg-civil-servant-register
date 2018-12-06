@@ -39,9 +39,6 @@ public class CivilServant {
     @ManyToMany
     private Set<Interest> interests = new HashSet<>();
 
-    @ManyToOne
-    private JobRole jobRole;
-
     @OneToOne
     @JsonIgnore
     private Identity identity;
@@ -114,14 +111,6 @@ public class CivilServant {
         }
     }
 
-    public JobRole getJobRole() {
-        return jobRole;
-    }
-
-    public void setJobRole(JobRole jobRole) {
-        this.jobRole = jobRole;
-    }
-
     public Set<Profession> getOtherAreasOfWork() {
         return unmodifiableSet(otherAreasOfWork);
     }
@@ -185,7 +174,6 @@ public class CivilServant {
                 .append("organisationalUnit", organisationalUnit)
                 .append("grade", grade)
                 .append("profession", profession)
-                .append("jobRole", jobRole)
                 .append("otherAreasOfWork", otherAreasOfWork)
                 .append("interests", interests)
                 .append("identity", identity)
