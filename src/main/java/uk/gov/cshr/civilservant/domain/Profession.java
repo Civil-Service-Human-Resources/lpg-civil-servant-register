@@ -4,27 +4,12 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import javax.persistence.*;
-import java.util.ArrayList;
+import javax.persistence.Entity;
 import java.util.Collections;
 import java.util.List;
 
 @Entity
-public class Profession {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String name;
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    private Profession parent;
-
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private List<Profession> children = new ArrayList<>();
-
+public class Profession extends SelfReferencingEntity<Profession> {
     public Profession() {
     }
 
@@ -32,32 +17,34 @@ public class Profession {
         this.name = name;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
+    @Override
     public Profession getParent() {
         return parent;
     }
 
+    @Override
     public void setParent(Profession parent) {
         this.parent = parent;
     }
 
+    @Override
     public void setChildren(List<Profession> children) {
         this.children = Collections.unmodifiableList(children);
     }
 
+    @Override
     public List<Profession> getChildren() {
         return Collections.unmodifiableList(children);
+    }
+
+    @Override
+    public boolean hasParent() {
+        return parent != null;
+    }
+
+    @Override
+    public boolean hasChildren() {
+        return !children.isEmpty();
     }
 
     @Override

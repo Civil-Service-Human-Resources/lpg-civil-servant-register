@@ -1,37 +1,18 @@
 package uk.gov.cshr.civilservant.domain;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import org.springframework.beans.factory.annotation.Configurable;
-
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-@Configurable
 @Entity
-public class OrganisationalUnit {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit> {
     @Column(unique = true, nullable = false, length = 10)
     private String code;
 
     @Column(unique = true, nullable = false, length = 20)
     private String abbreviation;
-
-    @Column(unique = true, nullable = false)
-    private String name;
-
-    @ManyToOne
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    private OrganisationalUnit parent;
-
-    @OneToMany(mappedBy = "parent")
-    private Collection<OrganisationalUnit> subOrgs = Collections.emptySet();
 
     @Column(name = "payment_methods")
     private String paymentMethods;
@@ -41,19 +22,12 @@ public class OrganisationalUnit {
         this.code = organisationalUnit.getCode();
         this.name = organisationalUnit.getName();
         this.parent = organisationalUnit.getParent();
-        this.subOrgs = organisationalUnit.getSubOrgs();
+        this.children = organisationalUnit.getChildren();
+        this.abbreviation = organisationalUnit.getAbbreviation();
         this.setPaymentMethods(organisationalUnit.getPaymentMethods());
     }
 
     public OrganisationalUnit() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getCode() {
@@ -64,28 +38,24 @@ public class OrganisationalUnit {
         this.code = code;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
+    @Override
     public OrganisationalUnit getParent() {
         return parent;
     }
 
+    @Override
     public void setParent(OrganisationalUnit parent) {
         this.parent = parent;
     }
 
-    public Collection<OrganisationalUnit> getSubOrgs() {
-        return Collections.unmodifiableCollection(subOrgs);
+    @Override
+    public List<OrganisationalUnit> getChildren() {
+        return Collections.unmodifiableList(children);
     }
 
-    public void setSubOrgs(Collection<OrganisationalUnit> subOrgs) {
-        this.subOrgs = Collections.unmodifiableCollection(subOrgs);
+    @Override
+    public void setChildren(List<OrganisationalUnit> children) {
+        this.children = Collections.unmodifiableList(children);
     }
 
     public List<String> getPaymentMethods() {
@@ -99,10 +69,6 @@ public class OrganisationalUnit {
         this.paymentMethods = String.join(",", paymentMethods);
     }
 
-    public void addtoSubOrgs(OrganisationalUnit organisationalUnit) {
-        this.subOrgs.add(new OrganisationalUnit(organisationalUnit));
-    }
-
     public String getAbbreviation() {
         return abbreviation;
     }
@@ -111,12 +77,13 @@ public class OrganisationalUnit {
         this.abbreviation = abbreviation;
     }
 
+    @Override
     public boolean hasParent() {
         return getParent() != null;
     }
 
-    public boolean hasSubOrgs() {
-        return !getSubOrgs().isEmpty();
+    @Override
+    public boolean hasChildren() {
+        return !getChildren().isEmpty();
     }
-
 }

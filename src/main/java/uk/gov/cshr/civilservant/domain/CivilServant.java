@@ -5,21 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
-import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
 import javax.persistence.*;
-
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.util.Collections.unmodifiableSet;
 
-@Configurable
 @Entity
-public class CivilServant {
+public class CivilServant implements RegistryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,19 +44,19 @@ public class CivilServant {
     @ManyToOne
     private CivilServant lineManager;
 
-    @Autowired
-    private transient IdentityService identityService;
-
-    protected CivilServant() {
+    public CivilServant() {
     }
 
     public CivilServant(Identity identity) {
-        checkArgument(identity != null);
         this.identity = identity;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Identity getIdentity() {
@@ -136,14 +130,6 @@ public class CivilServant {
            return lineManager.getFullName();
        }
        return null;
-    }
-
-    @JsonProperty
-    public String getLineManagerEmailAddress() {
-        if (identityService != null && lineManager != null) {
-            return identityService.getEmailAddress(lineManager);
-        }
-        return null;
     }
 
     @Override

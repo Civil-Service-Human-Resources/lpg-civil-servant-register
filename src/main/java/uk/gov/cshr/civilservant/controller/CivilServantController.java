@@ -2,7 +2,6 @@ package uk.gov.cshr.civilservant.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
@@ -20,13 +19,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
+import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 
 import java.util.ArrayList;
 import java.util.Optional;
-
-import static com.google.common.base.Preconditions.checkArgument;
 
 @RepositoryRestController
 @RequestMapping("/civilServants")
@@ -34,22 +32,21 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CivilServantController.class);
 
-    private LineManagerService lineManagerService;
+    private final LineManagerService lineManagerService;
 
-    private CivilServantRepository civilServantRepository;
+    private final CivilServantRepository civilServantRepository;
 
-    private RepositoryEntityLinks repositoryEntityLinks;
+    private final RepositoryEntityLinks repositoryEntityLinks;
 
-    @Autowired
-    public CivilServantController(CivilServantRepository civilServantRepository,
+    private final CivilServantResourceFactory civilServantResourceFactory;
+
+    public CivilServantController(LineManagerService lineManagerService, CivilServantRepository civilServantRepository,
                                   RepositoryEntityLinks repositoryEntityLinks,
-                                  LineManagerService lineManagerService) {
-        checkArgument(civilServantRepository != null);
-        checkArgument(repositoryEntityLinks != null);
-        checkArgument(lineManagerService != null);
+                                  CivilServantResourceFactory civilServantResourceFactory) {
+        this.lineManagerService = lineManagerService;
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
-        this.lineManagerService = lineManagerService;
+        this.civilServantResourceFactory = civilServantResourceFactory;
     }
 
     @GetMapping
@@ -66,9 +63,9 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     public ResponseEntity<Resource<CivilServantResource>> get() {
         LOGGER.debug("Getting civil servant details for logged in user");
 
-        Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
-
-        return getResourceResponseEntity(optionalCivilServant);
+        return civilServantRepository.findByPrincipal().map(
+                civilServant -> ResponseEntity.ok(civilServantResourceFactory.create(civilServant)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PatchMapping("/manager")
@@ -104,7 +101,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
             lineManagerService.notifyLineManager(civilServant, lineManager, email);
 
-            return getResourceResponseEntity(Optional.of(civilServant));
+            return ResponseEntity.ok(civilServantResourceFactory.create(civilServant));
         }
         return ResponseEntity.unprocessableEntity().build();
     }
@@ -113,19 +110,5 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
         resource.add(ControllerLinkBuilder.linkTo(CivilServantController.class).withRel("civilServants"));
         return resource;
-    }
-
-    private ResponseEntity<Resource<CivilServantResource>> getResourceResponseEntity(Optional<CivilServant> optionalCivilServant) {
-        return optionalCivilServant
-                .map(civilServant -> {
-                    Resource<CivilServantResource> resource = new Resource<>(new CivilServantResource(civilServant));
-                    resource.add(repositoryEntityLinks.linkToSingleResource(CivilServant.class, civilServant.getId()).withSelfRel());
-                    resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("organisationalUnit").withRel("organisationalUnit"));
-                    resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("grade").withRel("grade"));
-                    resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("profession").withRel("profession"));
-                    resource.add(repositoryEntityLinks.linkFor(CivilServant.class).slash(civilServant.getId()).slash("jobRole").withRel("jobRole"));
-                    return ResponseEntity.ok(resource);
-                })
-                .orElse(ResponseEntity.notFound().build());
     }
 }
