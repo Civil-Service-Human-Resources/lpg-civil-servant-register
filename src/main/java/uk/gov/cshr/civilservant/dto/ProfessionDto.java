@@ -1,10 +1,9 @@
 package uk.gov.cshr.civilservant.dto;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = false)
 @Data
-public class ProfessionDto {
-    private String name;
-    private String url;
-    private int id;
+public class ProfessionDto extends DtoEntity {
 }

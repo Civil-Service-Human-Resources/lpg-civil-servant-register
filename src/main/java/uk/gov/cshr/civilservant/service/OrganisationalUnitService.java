@@ -11,8 +11,7 @@ import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 @Transactional
 public class OrganisationalUnitService extends SelfReferencingEntityService<OrganisationalUnit, OrganisationalUnitDto> {
 
-    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository,
-                                     RepositoryEntityService<OrganisationalUnit> repositoryEntityService, OrganisationalUnitDtoFactory organisationalUnitDtoFactory) {
-        super(organisationalUnitRepository, repositoryEntityService, organisationalUnitDtoFactory);
+    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository, OrganisationalUnitDtoFactory organisationalUnitDtoFactory) {
+        super(organisationalUnitRepository, organisationalUnitDtoFactory);
     }
 }

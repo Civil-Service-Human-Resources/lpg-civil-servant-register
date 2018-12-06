@@ -18,8 +18,9 @@ public class OrganisationalUnitDtoFactory extends DtoFactory<OrganisationalUnitD
     public OrganisationalUnitDto create(OrganisationalUnit organisationalUnit) {
         OrganisationalUnitDto organisationalUnitDto = new OrganisationalUnitDto();
         organisationalUnitDto.setCode(organisationalUnit.getCode());
-        organisationalUnitDto.setName(formatName(organisationalUnit));
-        organisationalUnitDto.setUrl(repositoryEntityService.getUri(organisationalUnit));
+        organisationalUnitDto.setName(organisationalUnit.getName());
+        organisationalUnitDto.setFormattedName(formatName(organisationalUnit));
+        organisationalUnitDto.setHref(repositoryEntityService.getUri(organisationalUnit));
 
         return organisationalUnitDto;
     }
