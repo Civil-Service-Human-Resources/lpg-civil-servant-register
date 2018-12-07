@@ -5,6 +5,7 @@ CREATE TABLE `profession_new` (
   `parent_id` smallint(5) unsigned DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`),
+  KEY `FK_profession_profession` (`parent_id`),
   CONSTRAINT `FK_profession_profession` FOREIGN KEY (`parent_id`) REFERENCES `profession_new` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
