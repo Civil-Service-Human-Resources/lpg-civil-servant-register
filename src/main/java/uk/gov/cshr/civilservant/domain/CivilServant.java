@@ -22,6 +22,7 @@ public class CivilServant implements RegistryEntity {
     private String fullName;
 
     @ManyToOne
+    @OneToMany(cascade = CascadeType.DETACH)
     private OrganisationalUnit organisationalUnit;
 
     @ManyToOne
