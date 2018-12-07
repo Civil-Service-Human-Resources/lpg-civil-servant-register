@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS=0;
+
 ALTER TABLE `civil_servant` DROP FOREIGN KEY `civil_servant_ibfk_1`;
 ALTER TABLE `civil_servant` ADD CONSTRAINT `fk_grade_id` FOREIGN KEY (`grade_id`) REFERENCES `grade` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -9,3 +11,5 @@ ALTER TABLE `civil_servant` ADD CONSTRAINT `fk_organisational_unit_id` FOREIGN K
 
 ALTER TABLE `civil_servant` DROP FOREIGN KEY `civil_servant_ibfk_5`;
 ALTER TABLE `civil_servant` ADD CONSTRAINT `fk_profession_id` FOREIGN KEY (`profession_id`) REFERENCES `profession` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+SET FOREIGN_KEY_CHECKS=1;
