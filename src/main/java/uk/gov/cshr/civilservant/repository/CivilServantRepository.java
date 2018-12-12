@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.repository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
@@ -17,7 +18,7 @@ import java.util.Optional;
 @Repository
 @PreAuthorize("isAuthenticated()")
 @RepositoryRestResource(excerptProjection = AllCivilServantDetails.class)
-public interface CivilServantRepository extends org.springframework.data.repository.Repository<CivilServant, Long> {
+public interface CivilServantRepository extends JpaRepository<CivilServant, Long> {
 
     @RestResource(exported = false)
     @Query("select c from CivilServant c where c.identity.uid = ?#{principal}")

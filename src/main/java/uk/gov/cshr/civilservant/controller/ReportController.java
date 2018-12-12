@@ -25,13 +25,20 @@ public class ReportController {
 
     @RoleMapping("ORGANISATION_REPORTER")
     @GetMapping("/civilServants")
-    public ResponseEntity<List<Resource<CivilServantResource>>> listAllByOrganisation(Principal principal) {
+    public ResponseEntity<List<Resource<CivilServantResource>>> listAllCivilServantsByOrganisation(Principal principal) {
         return ResponseEntity.ok(reportService.listCivilServantsByUserOrganisation(principal.getName()));
     }
 
     @RoleMapping("PROFESSION_REPORTER")
     @GetMapping("/civilServants")
-    public ResponseEntity listAllByProfession(Principal principal) {
+    public ResponseEntity<List<Resource<CivilServantResource>>> listAllCivilServantsByProfession(Principal principal) {
         return ResponseEntity.ok(reportService.listCivilServantsByUserProfession(principal.getName()));
     }
+
+    @RoleMapping("CSHR_REPORTER")
+    @GetMapping("/civilServants")
+    public ResponseEntity<List<Resource<CivilServantResource>>> listAllCivilServants() {
+        return ResponseEntity.ok(reportService.listCivilServants());
+    }
+
 }

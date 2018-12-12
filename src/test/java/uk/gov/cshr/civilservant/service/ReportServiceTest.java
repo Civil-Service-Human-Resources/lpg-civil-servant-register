@@ -88,4 +88,25 @@ public class ReportServiceTest {
                 reportService.listCivilServantsByUserProfession(userId));
     }
 
+    @Test
+    public void shouldReturnListOfAllCivilServants() {
+        Identity identity1 = new Identity("1");
+        CivilServant civilServant1 = new CivilServant(identity1);
+
+        Identity identity2 = new Identity("2");
+        CivilServant civilServant2 = new CivilServant(identity2);
+
+        when(civilServantRepository.findAll())
+                .thenReturn(Arrays.asList(civilServant1, civilServant2));
+
+        Resource<CivilServantResource> civilServantResource1 = new Resource<>(new CivilServantResource(civilServant1));
+        Resource<CivilServantResource> civilServantResource2 = new Resource<>(new CivilServantResource(civilServant2));
+
+        when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantResource1);
+        when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantResource2);
+
+        assertEquals(Arrays.asList(civilServantResource1, civilServantResource2),
+                reportService.listCivilServants());
+    }
+
 }
