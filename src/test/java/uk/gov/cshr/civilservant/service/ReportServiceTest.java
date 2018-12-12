@@ -10,6 +10,7 @@ import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.domain.Profession;
+import uk.gov.cshr.civilservant.exception.UserNotFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
@@ -87,6 +88,35 @@ public class ReportServiceTest {
         assertEquals(Arrays.asList(civilServantResource1, civilServantResource2),
                 reportService.listCivilServantsByUserProfession(userId));
     }
+
+    @Test
+    public void shouldThrowUserNotFoundExceptionWhenListingByProfession() {
+        String userId = "user-id";
+
+        when(civilServantRepository.findByIdentity(userId)).thenReturn(Optional.empty());
+
+        try {
+            reportService.listCivilServantsByUserProfession(userId);
+            fail("Expected UserNotFoundException");
+        } catch (UserNotFoundException e) {
+            assertEquals("User not found: user-id", e.getMessage());
+        }
+    }
+
+    @Test
+    public void shouldThrowUserNotFoundExceptionWhenListingByOrganisationalUnit() {
+        String userId = "user-id";
+
+        when(civilServantRepository.findByIdentity(userId)).thenReturn(Optional.empty());
+
+        try {
+            reportService.listCivilServantsByUserOrganisation(userId);
+            fail("Expected UserNotFoundException");
+        } catch (UserNotFoundException e) {
+            assertEquals("User not found: user-id", e.getMessage());
+        }
+    }
+
 
     @Test
     public void shouldReturnListOfAllCivilServants() {
