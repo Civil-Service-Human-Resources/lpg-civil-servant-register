@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.service;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -18,7 +19,8 @@ import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -57,8 +59,8 @@ public class ReportServiceTest {
         when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantResource1);
         when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantResource2);
 
-        assertEquals(Arrays.asList(civilServantResource1, civilServantResource2),
-                reportService.listCivilServantsByUserOrganisation(userId));
+        assertEquals(ImmutableMap.of("1", civilServantResource1, "2", civilServantResource2),
+                reportService.getCivilServantMapByUserOrganisation(userId));
     }
 
     @Test
@@ -85,8 +87,8 @@ public class ReportServiceTest {
         when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantResource1);
         when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantResource2);
 
-        assertEquals(Arrays.asList(civilServantResource1, civilServantResource2),
-                reportService.listCivilServantsByUserProfession(userId));
+        assertEquals(ImmutableMap.of("1", civilServantResource1, "2", civilServantResource2),
+                reportService.getCivilServantMapByUserProfession(userId));
     }
 
     @Test
@@ -96,7 +98,7 @@ public class ReportServiceTest {
         when(civilServantRepository.findByIdentity(userId)).thenReturn(Optional.empty());
 
         try {
-            reportService.listCivilServantsByUserProfession(userId);
+            reportService.getCivilServantMapByUserProfession(userId);
             fail("Expected UserNotFoundException");
         } catch (UserNotFoundException e) {
             assertEquals("User not found: user-id", e.getMessage());
@@ -110,13 +112,12 @@ public class ReportServiceTest {
         when(civilServantRepository.findByIdentity(userId)).thenReturn(Optional.empty());
 
         try {
-            reportService.listCivilServantsByUserOrganisation(userId);
+            reportService.getCivilServantMapByUserOrganisation(userId);
             fail("Expected UserNotFoundException");
         } catch (UserNotFoundException e) {
             assertEquals("User not found: user-id", e.getMessage());
         }
     }
-
 
     @Test
     public void shouldReturnListOfAllCivilServants() {
@@ -135,8 +136,7 @@ public class ReportServiceTest {
         when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantResource1);
         when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantResource2);
 
-        assertEquals(Arrays.asList(civilServantResource1, civilServantResource2),
-                reportService.listCivilServants());
+        assertEquals(ImmutableMap.of("1", civilServantResource1, "2", civilServantResource2),
+                reportService.getCivilServantMap());
     }
-
 }

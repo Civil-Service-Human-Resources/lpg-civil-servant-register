@@ -10,7 +10,7 @@ import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.service.ReportService;
 
 import java.security.Principal;
-import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -25,20 +25,20 @@ public class ReportController {
 
     @RoleMapping("ORGANISATION_REPORTER")
     @GetMapping("/civilServants")
-    public ResponseEntity<List<Resource<CivilServantResource>>> listAllCivilServantsByOrganisation(Principal principal) {
-        return ResponseEntity.ok(reportService.listCivilServantsByUserOrganisation(principal.getName()));
+    public ResponseEntity<Map<String, Resource<CivilServantResource>>> listAllCivilServantsByOrganisation(Principal principal) {
+        return ResponseEntity.ok(reportService.getCivilServantMapByUserOrganisation(principal.getName()));
     }
 
     @RoleMapping("PROFESSION_REPORTER")
     @GetMapping("/civilServants")
-    public ResponseEntity<List<Resource<CivilServantResource>>> listAllCivilServantsByProfession(Principal principal) {
-        return ResponseEntity.ok(reportService.listCivilServantsByUserProfession(principal.getName()));
+    public ResponseEntity<Map<String, Resource<CivilServantResource>>> listAllCivilServantsByProfession(Principal principal) {
+        return ResponseEntity.ok(reportService.getCivilServantMapByUserProfession(principal.getName()));
     }
 
     @RoleMapping("CSHR_REPORTER")
     @GetMapping("/civilServants")
-    public ResponseEntity<List<Resource<CivilServantResource>>> listAllCivilServants() {
-        return ResponseEntity.ok(reportService.listCivilServants());
+    public ResponseEntity<Map<String, Resource<CivilServantResource>>> listAllCivilServants() {
+        return ResponseEntity.ok(reportService.getCivilServantMap());
     }
 
 }
