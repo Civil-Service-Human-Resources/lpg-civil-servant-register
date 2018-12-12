@@ -2,6 +2,7 @@ package uk.gov.cshr.civilservant.service;
 
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.exception.UserNotFoundException;
@@ -26,6 +27,7 @@ public class ReportService {
         this.civilServantResourceFactory = civilServantResourceFactory;
     }
 
+    @Transactional(readOnly = true)
     public List<Resource<CivilServantResource>> listCivilServantsByUserOrganisation(String userId) {
         CivilServant user = civilServantRepository.findByIdentity(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
@@ -35,11 +37,19 @@ public class ReportService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public List<Resource<CivilServantResource>> listCivilServantsByUserProfession(String userId) {
         CivilServant user = civilServantRepository.findByIdentity(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         return civilServantRepository.findAllByProfession(user.getProfession()).stream()
+                .map(civilServantResourceFactory::create)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<Resource<CivilServantResource>> listCivilServants() {
+        return civilServantRepository.findAll().stream()
                 .map(civilServantResourceFactory::create)
                 .collect(Collectors.toList());
     }
