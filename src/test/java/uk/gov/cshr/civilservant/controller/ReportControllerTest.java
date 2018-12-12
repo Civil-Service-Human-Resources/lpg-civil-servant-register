@@ -53,7 +53,27 @@ public class ReportControllerTest {
                         new Resource<>(new CivilServantResource(civilServant2))));
 
         mockMvc.perform(
-                get("/report/list").with(csrf())
+                get("/report/civilServants").with(csrf())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].fullName", equalTo("User 1")))
+                .andExpect(jsonPath("$[1].fullName", equalTo("User 2")));
+    }
+
+    @Test
+    @WithMockUser(username = "user", authorities = {"PROFESSION_REPORTER"})
+    public void shouldGetCivilServantsByUserProfessionWithCorrectRole() throws Exception {
+        CivilServant civilServant1 = new CivilServant(new Identity("1"));
+        civilServant1.setFullName("User 1");
+        CivilServant civilServant2 = new CivilServant(new Identity("2"));
+        civilServant2.setFullName("User 2");
+
+        when(reportService.listCivilServantsByUserProfession("user")).thenReturn(
+                Arrays.asList(new Resource<>(new CivilServantResource(civilServant1)),
+                        new Resource<>(new CivilServantResource(civilServant2))));
+
+        mockMvc.perform(
+                get("/report/civilServants").with(csrf())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].fullName", equalTo("User 1")))
@@ -73,9 +93,8 @@ public class ReportControllerTest {
                         new Resource<>(new CivilServantResource(civilServant2))));
 
         mockMvc.perform(
-                get("/report/list").with(csrf())
+                get("/report/civilServants").with(csrf())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
-
 }

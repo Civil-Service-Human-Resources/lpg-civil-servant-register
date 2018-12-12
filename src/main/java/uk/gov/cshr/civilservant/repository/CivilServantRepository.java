@@ -7,11 +7,9 @@ import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
-import uk.gov.cshr.civilservant.domain.AllCivilServantDetails;
-import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.domain.Identity;
-import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.domain.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,4 +37,6 @@ public interface CivilServantRepository extends org.springframework.data.reposit
     Optional<CivilServant> findByIdentity(Identity identity);
 
     List<CivilServant> findAllByOrganisationalUnit(OrganisationalUnit organisationalUnit);
+
+    List<CivilServant> findAllByProfession(Profession profession);
 }
