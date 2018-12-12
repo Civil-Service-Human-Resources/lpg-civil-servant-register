@@ -9,7 +9,7 @@ import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 
-import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,29 +24,26 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
-    public List<Resource<CivilServantResource>> listCivilServantsByUserOrganisation(String userId) {
+    public Map<String, Resource<CivilServantResource>> getCivilServantMapByUserOrganisation(String userId) {
         CivilServant user = civilServantRepository.findByIdentity(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         return civilServantRepository.findAllByOrganisationalUnit(user.getOrganisationalUnit()).stream()
-                .map(civilServantResourceFactory::create)
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(civilServant -> civilServant.getIdentity().getUid(), civilServantResourceFactory::create));
     }
 
     @Transactional(readOnly = true)
-    public List<Resource<CivilServantResource>> listCivilServantsByUserProfession(String userId) {
+    public Map<String, Resource<CivilServantResource>> getCivilServantMapByUserProfession(String userId) {
         CivilServant user = civilServantRepository.findByIdentity(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         return civilServantRepository.findAllByProfession(user.getProfession()).stream()
-                .map(civilServantResourceFactory::create)
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(civilServant -> civilServant.getIdentity().getUid(), civilServantResourceFactory::create));
     }
 
     @Transactional(readOnly = true)
-    public List<Resource<CivilServantResource>> listCivilServants() {
+    public Map<String, Resource<CivilServantResource>> getCivilServantMap() {
         return civilServantRepository.findAll().stream()
-                .map(civilServantResourceFactory::create)
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(civilServant -> civilServant.getIdentity().getUid(), civilServantResourceFactory::create));
     }
 }

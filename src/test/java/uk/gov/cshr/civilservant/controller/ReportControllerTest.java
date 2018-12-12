@@ -1,12 +1,12 @@
 package uk.gov.cshr.civilservant.controller;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.hateoas.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -16,9 +16,6 @@ import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.service.ReportService;
-
-import java.security.Principal;
-import java.util.Arrays;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
@@ -48,16 +45,17 @@ public class ReportControllerTest {
         CivilServant civilServant2 = new CivilServant(new Identity("2"));
         civilServant2.setFullName("User 2");
 
-        when(reportService.listCivilServantsByUserOrganisation("user")).thenReturn(
-                Arrays.asList(new Resource<>(new CivilServantResource(civilServant1)),
-                        new Resource<>(new CivilServantResource(civilServant2))));
+        when(reportService.getCivilServantMapByUserOrganisation("user")).thenReturn(
+                ImmutableMap.of("1", new Resource<>(new CivilServantResource(civilServant1)),
+                        "2", new Resource<>(new CivilServantResource(civilServant2))));
 
         mockMvc.perform(
                 get("/report/civilServants").with(csrf())
                         .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].fullName", equalTo("User 1")))
-                .andExpect(jsonPath("$[1].fullName", equalTo("User 2")));
+                .andExpect(jsonPath("$.1.fullName", equalTo("User 1")))
+                .andExpect(jsonPath("$.2.fullName", equalTo("User 2")));
     }
 
     @Test
@@ -68,16 +66,16 @@ public class ReportControllerTest {
         CivilServant civilServant2 = new CivilServant(new Identity("2"));
         civilServant2.setFullName("User 2");
 
-        when(reportService.listCivilServantsByUserProfession("user")).thenReturn(
-                Arrays.asList(new Resource<>(new CivilServantResource(civilServant1)),
-                        new Resource<>(new CivilServantResource(civilServant2))));
+        when(reportService.getCivilServantMapByUserProfession("user")).thenReturn(
+                ImmutableMap.of("1", new Resource<>(new CivilServantResource(civilServant1)),
+                        "2", new Resource<>(new CivilServantResource(civilServant2))));
 
         mockMvc.perform(
                 get("/report/civilServants").with(csrf())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].fullName", equalTo("User 1")))
-                .andExpect(jsonPath("$[1].fullName", equalTo("User 2")));
+                .andExpect(jsonPath("$.1.fullName", equalTo("User 1")))
+                .andExpect(jsonPath("$.2.fullName", equalTo("User 2")));
     }
 
     @Test
@@ -88,30 +86,21 @@ public class ReportControllerTest {
         CivilServant civilServant2 = new CivilServant(new Identity("2"));
         civilServant2.setFullName("User 2");
 
-        when(reportService.listCivilServants()).thenReturn(
-                Arrays.asList(new Resource<>(new CivilServantResource(civilServant1)),
-                        new Resource<>(new CivilServantResource(civilServant2))));
+        when(reportService.getCivilServantMap()).thenReturn(
+                ImmutableMap.of("1", new Resource<>(new CivilServantResource(civilServant1)),
+                        "2", new Resource<>(new CivilServantResource(civilServant2))));
 
         mockMvc.perform(
                 get("/report/civilServants").with(csrf())
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].fullName", equalTo("User 1")))
-                .andExpect(jsonPath("$[1].fullName", equalTo("User 2")));
+                .andExpect(jsonPath("$.1.fullName", equalTo("User 1")))
+                .andExpect(jsonPath("$.2.fullName", equalTo("User 2")));
     }
 
     @Test
     @WithMockUser(username = "user", authorities = {"INVALID_ROLE"})
     public void shouldReturn404WithIncorrectRole() throws Exception {
-        CivilServant civilServant1 = new CivilServant(new Identity("1"));
-        civilServant1.setFullName("User 1");
-        CivilServant civilServant2 = new CivilServant(new Identity("2"));
-        civilServant2.setFullName("User 2");
-
-        when(reportService.listCivilServantsByUserOrganisation("user")).thenReturn(
-                Arrays.asList(new Resource<>(new CivilServantResource(civilServant1)),
-                        new Resource<>(new CivilServantResource(civilServant2))));
-
         mockMvc.perform(
                 get("/report/civilServants").with(csrf())
                         .accept(MediaType.APPLICATION_JSON))
