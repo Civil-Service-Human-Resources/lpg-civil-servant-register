@@ -1,6 +1,5 @@
 package uk.gov.cshr.civilservant.repository;
 
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,6 @@ import static org.junit.Assert.*;
 @WithMockUser(authorities = "INTERNAL")
 public class CivilServantRepositoryTest {
 
-    public static final String INTERNAL_ROLE = "INTERNAL";
     @Autowired
     private CivilServantRepository civilServantRepository;
 
@@ -36,13 +34,6 @@ public class CivilServantRepositoryTest {
 
     @Autowired
     private ProfessionRepository professionRepository;
-
-//    @Before
-//    public void setUp() throws Exception {
-//        SecurityContext securityContext = SecurityContextHolder.getContext();
-//
-//        securityContext.setAuthentication(new RunAsUserToken(INTERNAL_ROLE, null, null, ImmutableSet.of(new SimpleGrantedAuthority(INTERNAL_ROLE)), null));
-//    }
 
     @Test
     public void shouldFindCivilServantByIdentity() {
