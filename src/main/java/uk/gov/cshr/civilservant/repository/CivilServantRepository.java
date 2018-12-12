@@ -10,7 +10,9 @@ import org.springframework.stereotype.Repository;
 import uk.gov.cshr.civilservant.domain.AllCivilServantDetails;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
+import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -35,4 +37,6 @@ public interface CivilServantRepository extends org.springframework.data.reposit
 
     @RestResource(exported = false)
     Optional<CivilServant> findByIdentity(Identity identity);
+
+    List<CivilServant> findAllByOrganisationalUnit(OrganisationalUnit organisationalUnit);
 }

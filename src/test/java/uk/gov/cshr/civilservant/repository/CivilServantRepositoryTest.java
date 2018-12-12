@@ -16,11 +16,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
+import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -33,6 +34,9 @@ public class CivilServantRepositoryTest {
 
     @Autowired
     private IdentityRepository identityRepository;
+
+    @Autowired
+    private OrganisationalUnitRepository organisationalUnitRepository;
 
     @Before
     public void setUp() throws Exception {
@@ -64,5 +68,45 @@ public class CivilServantRepositoryTest {
 
         Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(identity);
         assertFalse(civilServant.isPresent());
+    }
+
+
+    @Test
+    public void shouldReturnCivilServantsByOrganisationalUnit() {
+        OrganisationalUnit organisationalUnit1 = new OrganisationalUnit();
+        organisationalUnit1.setName("Organisation1");
+        organisationalUnit1.setCode("abc");
+
+        organisationalUnitRepository.save(organisationalUnit1);
+
+        OrganisationalUnit organisationalUnit2 = new OrganisationalUnit();
+        organisationalUnit2.setName("Organisation2");
+        organisationalUnit2.setCode("bcd");
+
+        organisationalUnitRepository.save(organisationalUnit2);
+
+        Identity identity1 = new Identity("1");
+        CivilServant civilServant1 = new CivilServant(identity1);
+        civilServant1.setOrganisationalUnit(organisationalUnit1);
+        identityRepository.save(identity1);
+        civilServantRepository.save(civilServant1);
+
+        Identity identity2 = new Identity("2");
+        CivilServant civilServant2 = new CivilServant(identity2);
+        civilServant2.setOrganisationalUnit(organisationalUnit2);
+        identityRepository.save(identity2);
+        civilServantRepository.save(civilServant2);
+
+        Identity identity3 = new Identity("3");
+        CivilServant civilServant3 = new CivilServant(identity3);
+        civilServant3.setOrganisationalUnit(organisationalUnit1);
+        identityRepository.save(identity3);
+        civilServantRepository.save(civilServant3);
+
+        List<CivilServant> result = civilServantRepository.findAllByOrganisationalUnit(organisationalUnit1);
+
+        assertEquals(2, result.size());
+        assertEquals(civilServant1, result.get(0));
+        assertEquals(civilServant3, result.get(1));
     }
 }
