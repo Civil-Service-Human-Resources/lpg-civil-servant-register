@@ -4,16 +4,12 @@ import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.exception.UserNotFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
-import uk.gov.cshr.civilservant.repository.IdentityRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
