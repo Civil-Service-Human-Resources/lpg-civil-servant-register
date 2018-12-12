@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.domain.Profession;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +38,9 @@ public class CivilServantRepositoryTest {
 
     @Autowired
     private OrganisationalUnitRepository organisationalUnitRepository;
+
+    @Autowired
+    private ProfessionRepository professionRepository;
 
     @Before
     public void setUp() throws Exception {
@@ -104,6 +108,39 @@ public class CivilServantRepositoryTest {
         civilServantRepository.save(civilServant3);
 
         List<CivilServant> result = civilServantRepository.findAllByOrganisationalUnit(organisationalUnit1);
+
+        assertEquals(2, result.size());
+        assertEquals(civilServant1, result.get(0));
+        assertEquals(civilServant3, result.get(1));
+    }
+
+    @Test
+    public void shouldReturnCivilServantsByProfession() {
+        Profession profession1 = new Profession("profession1");
+        professionRepository.save(profession1);
+
+        Profession profession2 = new Profession("profession2");
+        professionRepository.save(profession2);
+
+        Identity identity1 = new Identity("1");
+        CivilServant civilServant1 = new CivilServant(identity1);
+        civilServant1.setProfession(profession1);
+        identityRepository.save(identity1);
+        civilServantRepository.save(civilServant1);
+
+        Identity identity2 = new Identity("2");
+        CivilServant civilServant2 = new CivilServant(identity2);
+        civilServant2.setProfession(profession2);
+        identityRepository.save(identity2);
+        civilServantRepository.save(civilServant2);
+
+        Identity identity3 = new Identity("3");
+        CivilServant civilServant3 = new CivilServant(identity3);
+        civilServant3.setProfession(profession1);
+        identityRepository.save(identity3);
+        civilServantRepository.save(civilServant3);
+
+        List<CivilServant> result = civilServantRepository.findAllByProfession(profession1);
 
         assertEquals(2, result.size());
         assertEquals(civilServant1, result.get(0));

@@ -34,4 +34,13 @@ public class ReportService {
                 .map(civilServantResourceFactory::create)
                 .collect(Collectors.toList());
     }
+
+    public List<Resource<CivilServantResource>> listCivilServantsByUserProfession(String userId) {
+        CivilServant user = civilServantRepository.findByIdentity(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        return civilServantRepository.findAllByProfession(user.getProfession()).stream()
+                .map(civilServantResourceFactory::create)
+                .collect(Collectors.toList());
+    }
 }
