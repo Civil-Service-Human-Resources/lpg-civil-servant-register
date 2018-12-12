@@ -2,6 +2,7 @@ package uk.gov.cshr.civilservant.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
@@ -28,6 +29,7 @@ import java.util.Optional;
 
 @RepositoryRestController
 @RequestMapping("/civilServants")
+@RestResource(exported = false)
 public class CivilServantController implements ResourceProcessor<RepositoryLinksResource> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CivilServantController.class);
