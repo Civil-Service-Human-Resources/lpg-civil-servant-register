@@ -26,6 +26,9 @@ logging:
     root: ${ROOT_LOGGING_LEVEL:INFO}
     com.zaxxer.hikari: ERROR
     org.apache.http: WARN
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.hibernate.type: TRACE
 
 oauth:
   clientId: ${CLIENT_ID:9fbd4ae2-2db3-44c7-9544-88e80255b56e}

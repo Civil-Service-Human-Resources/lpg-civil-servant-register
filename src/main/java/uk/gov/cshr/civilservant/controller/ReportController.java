@@ -11,7 +11,6 @@ import uk.gov.cshr.civilservant.service.ReportService;
 import java.security.Principal;
 import java.util.Map;
 
-
 @RestController
 @RequestMapping("/report")
 public class ReportController {
