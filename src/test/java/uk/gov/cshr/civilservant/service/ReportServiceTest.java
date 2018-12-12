@@ -6,7 +6,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.hateoas.Resource;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
@@ -15,8 +14,6 @@ import uk.gov.cshr.civilservant.dto.CivilServantDto;
 import uk.gov.cshr.civilservant.dto.factory.CivilServantDtoFactory;
 import uk.gov.cshr.civilservant.exception.UserNotFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
-import uk.gov.cshr.civilservant.resource.CivilServantResource;
-import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -93,6 +90,7 @@ public class ReportServiceTest {
                 reportService.getCivilServantMapByUserProfession(userId));
     }
 
+
     @Test
     public void shouldThrowUserNotFoundExceptionWhenListingByProfession() {
         String userId = "user-id";
@@ -120,6 +118,7 @@ public class ReportServiceTest {
             assertEquals("User not found: user-id", e.getMessage());
         }
     }
+
 
     @Test
     public void shouldReturnListOfAllCivilServants() {
