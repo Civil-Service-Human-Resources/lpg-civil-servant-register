@@ -1,48 +1,44 @@
 package uk.gov.cshr.civilservant.controller;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.List;
 
 import static org.mockito.Mockito.when;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
+@SpringBootTest
+@AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
+@WithMockUser(username = "user")
 public class OrganisationalUnitControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
-
-    private OrganisationalUnitController organisationalUnitController;
 
     @Mock
     private OrganisationalUnitService organisationalUnitService;
-
-    @Before
-    public void setup() {
-        initMocks(this);
-        organisationalUnitController = new OrganisationalUnitController(organisationalUnitService);
-        mockMvc = standaloneSetup(organisationalUnitController).build();
-    }
 
     @Test
     public void shouldReturnOkIfRequestingOrganisationalUnitTree() throws Exception {
         ArrayList<OrganisationalUnit> organisationalUnits = new ArrayList<>();
 
-        when(organisationalUnitService.getParentOrganisationalUnits()).thenReturn(organisationalUnits);
+        when(organisationalUnitService.getParents()).thenReturn(organisationalUnits);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/tree")
@@ -53,9 +49,9 @@ public class OrganisationalUnitControllerTest {
 
     @Test
     public void shouldReturnOkIfRequestingOrganisationalUnitFlat() throws Exception {
-        Map<String, String> organisationalUnitsMap = new LinkedHashMap<>();
+        List<OrganisationalUnitDto> organisationalUnitsList = new ArrayList<>();
 
-        when(organisationalUnitService.getOrganisationalUnitsMapSortedByValue()).thenReturn(organisationalUnitsMap);
+        when(organisationalUnitService.getListSortedByValue()).thenReturn(organisationalUnitsList);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat")

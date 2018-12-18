@@ -4,8 +4,6 @@ import uk.gov.cshr.civilservant.domain.*;
 
 import java.util.Set;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 public class CivilServantResource {
 
     private String fullName;
@@ -16,8 +14,6 @@ public class CivilServantResource {
 
     private Profession profession;
 
-    private JobRole jobRole;
-
     private Set<Profession> otherAreasOfWork;
 
     private Set<Interest> interests;
@@ -26,17 +22,15 @@ public class CivilServantResource {
 
     private String lineManagerEmailAddress;
 
-    public CivilServantResource(CivilServant civilServant) {
-        checkArgument(civilServant != null);
+    public CivilServantResource(CivilServant civilServant, String lineManagerEmailAddress) {
         this.fullName = civilServant.getFullName();
         this.grade = civilServant.getGrade();
         this.organisationalUnit = civilServant.getOrganisationalUnit();
         this.profession = civilServant.getProfession();
-        this.jobRole = civilServant.getJobRole();
         this.interests = civilServant.getInterests();
         this.otherAreasOfWork = civilServant.getOtherAreasOfWork();
         this.lineManagerName = civilServant.getLineManagerName();
-        this.lineManagerEmailAddress = civilServant.getLineManagerEmailAddress();
+        this.lineManagerEmailAddress = lineManagerEmailAddress;
     }
 
     public String getFullName() {
@@ -61,10 +55,6 @@ public class CivilServantResource {
 
     public Profession getProfession() {
         return profession;
-    }
-
-    public JobRole getJobRole() {
-        return jobRole;
     }
 
     public Set<Profession> getOtherAreasOfWork() {

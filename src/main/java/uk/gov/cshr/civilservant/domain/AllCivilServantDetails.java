@@ -15,8 +15,6 @@ public interface AllCivilServantDetails {
 
     Profession getProfession();
 
-    JobRole getJobRole();
-
     Set<Profession> getOtherAreasOfWork();
 
     String getLineManagerName();

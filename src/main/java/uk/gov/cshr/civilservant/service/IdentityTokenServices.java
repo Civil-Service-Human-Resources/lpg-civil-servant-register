@@ -45,7 +45,7 @@ public class IdentityTokenServices extends RemoteTokenServices {
     }
 
     @Override
-    public OAuth2Authentication loadAuthentication(String accessToken) throws AuthenticationException, InvalidTokenException {
+    public OAuth2Authentication loadAuthentication(String accessToken) {
         configureInternalUser();
 
         OAuth2Authentication authentication = super.loadAuthentication(accessToken);

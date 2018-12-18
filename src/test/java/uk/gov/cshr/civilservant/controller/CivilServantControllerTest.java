@@ -1,22 +1,23 @@
 package uk.gov.cshr.civilservant.controller;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
+import org.springframework.hateoas.Resource;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
+import uk.gov.cshr.civilservant.resource.CivilServantResource;
+import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
@@ -25,45 +26,36 @@ import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.mockito.MockitoAnnotations.initMocks;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
+@AutoConfigureMockMvc
+@RunWith(SpringRunner.class)
+@WithMockUser(username = "user")
 public class CivilServantControllerTest {
 
+    @Autowired
     private MockMvc mockMvc;
 
-    private CivilServantController controller;
-
-    @Mock
+    @MockBean
     private LineManagerService lineManagerService;
 
-    @Mock
+    @MockBean
     private CivilServantRepository civilServantRepository;
 
-    @Autowired
-    private IdentityService identityService;
-
-    @Autowired
-    private RepositoryEntityLinks repositoryEntityLinks;
-
-    @Before
-    public void setup() {
-        initMocks(this);
-        controller = new CivilServantController(civilServantRepository, repositoryEntityLinks, lineManagerService);
-        mockMvc = standaloneSetup(controller).build();
-    }
+    @MockBean
+    private CivilServantResourceFactory civilServantResourceFactory;
 
     @Test
     public void shouldReturnNotFoundIfNoLineManager() throws Exception {
         when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(createCivilServant("uid")));
         mockMvc.perform(
-                MockMvcRequestBuilders.patch("/civilServants/manager?email=bogus@domain.com")
+                patch("/civilServants/manager?email=bogus@domain.com").with(csrf())
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -75,7 +67,7 @@ public class CivilServantControllerTest {
         when(lineManagerService.checkLineManager("learner@domain.com")).thenReturn(new IdentityFromService());
 
         mockMvc.perform(
-                MockMvcRequestBuilders.patch("/civilServants/manager?email=learner@domain.com")
+                patch("/civilServants/manager?email=learner@domain.com").with(csrf())
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().is(422));
@@ -95,7 +87,7 @@ public class CivilServantControllerTest {
         when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
 
         mockMvc.perform(
-                MockMvcRequestBuilders.patch("/civilServants/manager?email=learner@domain.com")
+                patch("/civilServants/manager?email=learner@domain.com").with(csrf())
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isBadRequest());
@@ -104,23 +96,28 @@ public class CivilServantControllerTest {
     @Test
     public void shouldReturnOkAndUpdateCivilServant() throws Exception {
 
+        String lineManagerEmail = "manager@domain.com";
+
         IdentityFromService lineManagerIdentity = new IdentityFromService();
         lineManagerIdentity.setUid("mid");
-        lineManagerIdentity.setUsername("manager@domain.com");
+        lineManagerIdentity.setUsername(lineManagerEmail);
 
         when(lineManagerService.checkLineManager("learner@domain.com")).thenReturn(lineManagerIdentity);
 
         CivilServant lineManager = createCivilServant("mid");
         CivilServant civilServant = createCivilServant("uid");
 
-        ReflectionTestUtils.setField(civilServant, "id", 1L);
+        CivilServantResource civilServantResource = new CivilServantResource(civilServant, lineManagerEmail);
+
+        civilServant.setId(1L);
 
         when(civilServantRepository.findByIdentity("mid")).thenReturn(Optional.of(lineManager));
         when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
-        when(identityService.getEmailAddress(lineManager)).thenReturn(lineManagerIdentity.getUsername());
+
+        when(civilServantResourceFactory.create(civilServant)).thenReturn(new Resource<>(civilServantResource));
 
         mockMvc.perform(
-                MockMvcRequestBuilders.patch("/civilServants/manager?email=learner@domain.com")
+                patch("/civilServants/manager?email=learner@domain.com").with(csrf())
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())

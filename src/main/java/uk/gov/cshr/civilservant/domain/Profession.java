@@ -4,56 +4,47 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import javax.persistence.*;
-import java.util.ArrayList;
+import javax.persistence.Entity;
+import java.util.Collections;
 import java.util.List;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static java.util.Collections.unmodifiableList;
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 @Entity
-public class Profession {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
-    private String name;
-
-    @OneToMany(mappedBy = "profession")
-    private List<JobRole> jobRoles = new ArrayList<>();
-
-    protected Profession() {
+public class Profession extends SelfReferencingEntity<Profession> {
+    public Profession() {
     }
 
     public Profession(String name) {
-        setName(name);
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        checkArgument(isNotBlank(name));
         this.name = name;
     }
 
-    public List<JobRole> getJobRoles() {
-        return unmodifiableList(jobRoles);
+    @Override
+    public Profession getParent() {
+        return parent;
     }
 
-    public void setJobRoles(List<JobRole> jobRoles) {
-        this.jobRoles.clear();
-        if (jobRoles != null) {
-            this.jobRoles.addAll(jobRoles);
-        }
+    @Override
+    public void setParent(Profession parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public void setChildren(List<Profession> children) {
+        this.children = Collections.unmodifiableList(children);
+    }
+
+    @Override
+    public List<Profession> getChildren() {
+        return Collections.unmodifiableList(children);
+    }
+
+    @Override
+    public boolean hasParent() {
+        return parent != null;
+    }
+
+    @Override
+    public boolean hasChildren() {
+        return !children.isEmpty();
     }
 
     @Override
@@ -81,7 +72,7 @@ public class Profession {
         return new ToStringBuilder(this)
                 .append("id", id)
                 .append("name", name)
-                .append("jobRoles", jobRoles)
+                .append("parent", parent)
                 .toString();
     }
 }
