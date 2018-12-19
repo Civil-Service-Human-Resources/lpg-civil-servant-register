@@ -1,14 +1,14 @@
 package uk.gov.cshr.civilservant.service;
 
-import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.dto.CivilServantDto;
+import uk.gov.cshr.civilservant.dto.factory.CivilServantDtoFactory;
 import uk.gov.cshr.civilservant.exception.UserNotFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
-import uk.gov.cshr.civilservant.resource.CivilServantResource;
-import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -16,34 +16,41 @@ import java.util.stream.Collectors;
 public class ReportService {
 
     private final CivilServantRepository civilServantRepository;
-    private final CivilServantResourceFactory civilServantResourceFactory;
+    private final CivilServantDtoFactory civilServantDtoFactory;
 
-    public ReportService(CivilServantRepository civilServantRepository, CivilServantResourceFactory civilServantResourceFactory) {
+    public ReportService(CivilServantRepository civilServantRepository, CivilServantDtoFactory civilServantDtoFactory) {
         this.civilServantRepository = civilServantRepository;
-        this.civilServantResourceFactory = civilServantResourceFactory;
+        this.civilServantDtoFactory = civilServantDtoFactory;
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Resource<CivilServantResource>> getCivilServantMapByUserOrganisation(String userId) {
+    public Map<String, CivilServantDto> getCivilServantMapByUserOrganisation(String userId) {
         CivilServant user = civilServantRepository.findByIdentity(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        return civilServantRepository.findAllByOrganisationalUnit(user.getOrganisationalUnit()).stream()
-                .collect(Collectors.toMap(civilServant -> civilServant.getIdentity().getUid(), civilServantResourceFactory::create));
+        if (user.getOrganisationalUnit().isPresent()) {
+            return civilServantRepository.findAllByOrganisationalUnit(user.getOrganisationalUnit().get()).stream()
+                    .collect(Collectors.toMap(civilServant -> civilServant.getIdentity().getUid(), civilServantDtoFactory::create));
+        }
+        return Collections.emptyMap();
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Resource<CivilServantResource>> getCivilServantMapByUserProfession(String userId) {
+    public Map<String, CivilServantDto> getCivilServantMapByUserProfession(String userId) {
         CivilServant user = civilServantRepository.findByIdentity(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        return civilServantRepository.findAllByProfession(user.getProfession()).stream()
-                .collect(Collectors.toMap(civilServant -> civilServant.getIdentity().getUid(), civilServantResourceFactory::create));
+        if (user.getProfession().isPresent()) {
+            return civilServantRepository.findAllByProfession(user.getProfession().get()).stream()
+                    .collect(Collectors.toMap(civilServant -> civilServant.getIdentity().getUid(), civilServantDtoFactory::create));
+        }
+
+        return Collections.emptyMap();
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Resource<CivilServantResource>> getCivilServantMap() {
+    public Map<String, CivilServantDto> getCivilServantMap() {
         return civilServantRepository.findAll().stream()
-                .collect(Collectors.toMap(civilServant -> civilServant.getIdentity().getUid(), civilServantResourceFactory::create));
+                .collect(Collectors.toMap(civilServant -> civilServant.getIdentity().getUid(), civilServantDtoFactory::create));
     }
 }

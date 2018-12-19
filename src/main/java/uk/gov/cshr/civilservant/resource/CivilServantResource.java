@@ -24,13 +24,22 @@ public class CivilServantResource {
 
     public CivilServantResource(CivilServant civilServant, String lineManagerEmailAddress) {
         this.fullName = civilServant.getFullName();
-        this.grade = civilServant.getGrade();
-        this.organisationalUnit = civilServant.getOrganisationalUnit();
-        this.profession = civilServant.getProfession();
+
+        if (civilServant.getGrade().isPresent()) {
+            this.grade = civilServant.getGrade().get();
+        }
+
+        if (civilServant.getOrganisationalUnit().isPresent()) {
+            this.organisationalUnit = civilServant.getOrganisationalUnit().get();
+        }
+
+        if (civilServant.getProfession().isPresent()) {
+            this.profession = civilServant.getProfession().get();
+        }
+
         this.interests = civilServant.getInterests();
         this.otherAreasOfWork = civilServant.getOtherAreasOfWork();
         this.lineManagerName = civilServant.getLineManagerName();
-        this.lineManagerEmailAddress = lineManagerEmailAddress;
     }
 
     public String getFullName() {
