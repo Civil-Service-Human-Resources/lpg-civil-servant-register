@@ -18,13 +18,8 @@ public class CivilServantResourceFactory {
 
     public Resource<CivilServantResource> create(CivilServant civilServant) {
 
-        String lineManagerEmail = null;
-        if (civilServant.getLineManager() != null) {
-            lineManagerEmail = identityService.getEmailAddress(civilServant.getLineManager());
-        }
-
         Resource<CivilServantResource> resource =
-                new Resource<>(new CivilServantResource(civilServant, lineManagerEmail));
+                new Resource<>(new CivilServantResource(civilServant));
 
         resource.add(linkFactory.createSelfLink(civilServant));
         resource.add(linkFactory.createRelationshipLink(civilServant, "organisationalUnit"));

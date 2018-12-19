@@ -6,15 +6,14 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.hateoas.Resource;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.domain.Profession;
+import uk.gov.cshr.civilservant.dto.CivilServantDto;
+import uk.gov.cshr.civilservant.dto.factory.CivilServantDtoFactory;
 import uk.gov.cshr.civilservant.exception.UserNotFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
-import uk.gov.cshr.civilservant.resource.CivilServantResource;
-import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -30,7 +29,7 @@ public class ReportServiceTest {
     private CivilServantRepository civilServantRepository;
 
     @Mock
-    private CivilServantResourceFactory civilServantResourceFactory;
+    private CivilServantDtoFactory civilServantResourceFactory;
 
     @InjectMocks
     private ReportService reportService;
@@ -53,13 +52,13 @@ public class ReportServiceTest {
         when(civilServantRepository.findAllByOrganisationalUnit(organisationalUnit))
                 .thenReturn(Arrays.asList(civilServant1, civilServant2));
 
-        Resource<CivilServantResource> civilServantResource1 = new Resource<>(new CivilServantResource(civilServant1));
-        Resource<CivilServantResource> civilServantResource2 = new Resource<>(new CivilServantResource(civilServant2));
+        CivilServantDto civilServantDto1 = new CivilServantDto();
+        CivilServantDto civilServantDto2 = new CivilServantDto();
 
-        when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantResource1);
-        when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantResource2);
+        when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantDto1);
+        when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantDto2);
 
-        assertEquals(ImmutableMap.of("1", civilServantResource1, "2", civilServantResource2),
+        assertEquals(ImmutableMap.of("1", civilServantDto1, "2", civilServantDto2),
                 reportService.getCivilServantMapByUserOrganisation(userId));
     }
 
@@ -81,13 +80,13 @@ public class ReportServiceTest {
         when(civilServantRepository.findAllByProfession(profession))
                 .thenReturn(Arrays.asList(civilServant1, civilServant2));
 
-        Resource<CivilServantResource> civilServantResource1 = new Resource<>(new CivilServantResource(civilServant1));
-        Resource<CivilServantResource> civilServantResource2 = new Resource<>(new CivilServantResource(civilServant2));
+        CivilServantDto civilServantDto1 = new CivilServantDto();
+        CivilServantDto civilServantDto2 = new CivilServantDto();
 
-        when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantResource1);
-        when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantResource2);
+        when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantDto1);
+        when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantDto2);
 
-        assertEquals(ImmutableMap.of("1", civilServantResource1, "2", civilServantResource2),
+        assertEquals(ImmutableMap.of("1", civilServantDto1, "2", civilServantDto2),
                 reportService.getCivilServantMapByUserProfession(userId));
     }
 
@@ -130,13 +129,13 @@ public class ReportServiceTest {
         when(civilServantRepository.findAll())
                 .thenReturn(Arrays.asList(civilServant1, civilServant2));
 
-        Resource<CivilServantResource> civilServantResource1 = new Resource<>(new CivilServantResource(civilServant1));
-        Resource<CivilServantResource> civilServantResource2 = new Resource<>(new CivilServantResource(civilServant2));
+        CivilServantDto civilServantDto1 = new CivilServantDto();
+        CivilServantDto civilServantDto2 = new CivilServantDto();
 
-        when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantResource1);
-        when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantResource2);
+        when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantDto1);
+        when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantDto2);
 
-        assertEquals(ImmutableMap.of("1", civilServantResource1, "2", civilServantResource2),
+        assertEquals(ImmutableMap.of("1", civilServantDto1, "2", civilServantDto2),
                 reportService.getCivilServantMap());
     }
 }

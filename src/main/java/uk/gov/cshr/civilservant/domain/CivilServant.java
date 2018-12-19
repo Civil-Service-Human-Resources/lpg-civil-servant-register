@@ -8,6 +8,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Collections.unmodifiableSet;
@@ -72,24 +73,24 @@ public class CivilServant implements RegistryEntity {
         this.fullName = fullName;
     }
 
-    public OrganisationalUnit getOrganisationalUnit() {
-        return organisationalUnit;
+    public Optional<OrganisationalUnit> getOrganisationalUnit() {
+        return Optional.ofNullable(organisationalUnit);
     }
 
     public void setOrganisationalUnit(OrganisationalUnit organisationalUnit) {
         this.organisationalUnit = organisationalUnit;
     }
 
-    public Grade getGrade() {
-        return grade;
+    public Optional<Grade> getGrade() {
+        return Optional.ofNullable(grade);
     }
 
     public void setGrade(Grade grade) {
         this.grade = grade;
     }
 
-    public Profession getProfession() {
-        return profession;
+    public Optional<Profession> getProfession() {
+        return Optional.ofNullable(profession);
     }
 
     public void setProfession(Profession profession) {
@@ -107,7 +108,7 @@ public class CivilServant implements RegistryEntity {
     }
 
     public Set<Profession> getOtherAreasOfWork() {
-        return unmodifiableSet(otherAreasOfWork);
+        return otherAreasOfWork;
     }
 
     public void setOtherAreasOfWork(Set<Profession> otherAreasOfWork) {
@@ -117,8 +118,8 @@ public class CivilServant implements RegistryEntity {
         }
     }
 
-    public CivilServant getLineManager() {
-        return lineManager;
+    public Optional<CivilServant> getLineManager() {
+        return Optional.ofNullable(lineManager);
     }
 
     public void setLineManager(CivilServant lineManager) {
