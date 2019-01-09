@@ -1,5 +1,8 @@
 package uk.gov.cshr.civilservant.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +17,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/report")
 public class ReportController {
+    private static final Logger LOG = LoggerFactory.getLogger(ReportController.class);
 
     private final ReportService reportService;
 
@@ -37,5 +41,12 @@ public class ReportController {
     @GetMapping("/civilServants")
     public ResponseEntity<Map<String, CivilServantDto>> listAllCivilServants() {
         return ResponseEntity.ok(reportService.getCivilServantMap());
+    }
+
+    @GetMapping("/civilServants")
+    public ResponseEntity<Map<String, CivilServantDto>> unauthorised(Principal principal) {
+        // default to returning a 403 if none of the above roles are found.
+        LOG.debug(String.format("Unauthorised. Required role not found in %s", principal));
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }

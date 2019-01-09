@@ -100,6 +100,6 @@ public class ReportControllerTest {
         mockMvc.perform(
                 get("/report/civilServants").with(csrf())
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isForbidden());
     }
 }
