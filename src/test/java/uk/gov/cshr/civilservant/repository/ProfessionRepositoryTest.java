@@ -13,12 +13,13 @@ import uk.gov.cshr.civilservant.domain.Profession;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @Transactional
-@WithMockUser(username = "user",  roles = {"PROFESSION_MANAGER"})
+@WithMockUser(authorities = {"PROFESSION_MANAGER"})
 public class ProfessionRepositoryTest {
 
     @Autowired

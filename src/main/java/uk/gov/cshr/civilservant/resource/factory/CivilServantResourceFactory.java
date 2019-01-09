@@ -18,8 +18,33 @@ public class CivilServantResourceFactory {
 
     public Resource<CivilServantResource> create(CivilServant civilServant) {
 
-        Resource<CivilServantResource> resource =
-                new Resource<>(new CivilServantResource(civilServant));
+        CivilServantResource civilServantResource = new CivilServantResource();
+
+        civilServantResource.setFullName(civilServant.getFullName());
+
+        if (civilServant.getGrade().isPresent()) {
+            civilServantResource.setGrade(civilServant.getGrade().get());
+        }
+
+        if (civilServant.getOrganisationalUnit().isPresent()) {
+            civilServantResource.setOrganisationalUnit(civilServant.getOrganisationalUnit().get());
+        }
+
+        if (civilServant.getProfession().isPresent()) {
+            civilServantResource.setProfession(civilServant.getProfession().get());
+        }
+
+        if (civilServant.getLineManager().isPresent()) {
+            CivilServant lineManager = civilServant.getLineManager().get();
+
+            civilServantResource.setLineManagerName(lineManager.getFullName());
+            civilServantResource.setLineManagerEmailAddress(identityService.getEmailAddress(lineManager));
+        }
+
+        civilServantResource.setInterests(civilServant.getInterests());
+        civilServantResource.setOtherAreasOfWork(civilServant.getOtherAreasOfWork());
+
+        Resource<CivilServantResource> resource = new Resource<>(civilServantResource);
 
         resource.add(linkFactory.createSelfLink(civilServant));
         resource.add(linkFactory.createRelationshipLink(civilServant, "organisationalUnit"));
