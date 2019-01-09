@@ -74,7 +74,7 @@ public class ProfessionControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "user", roles = "PROFESSION_MANAGER")
+    @WithMockUser(username = "user", authorities = "PROFESSION_MANAGER")
     public void shouldSaveProfessionProfessionManager() throws Exception {
         Map<String, String> profession = ImmutableMap.of("name", "new profession");
 

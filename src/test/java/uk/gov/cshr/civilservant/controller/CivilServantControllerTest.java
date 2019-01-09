@@ -107,7 +107,8 @@ public class CivilServantControllerTest {
         CivilServant lineManager = createCivilServant("mid");
         CivilServant civilServant = createCivilServant("uid");
 
-        CivilServantResource civilServantResource = new CivilServantResource(civilServant, lineManagerEmail);
+        CivilServantResource civilServantResource = new CivilServantResource();
+        civilServantResource.setLineManagerEmailAddress(lineManagerEmail);
 
         civilServant.setId(1L);
 
