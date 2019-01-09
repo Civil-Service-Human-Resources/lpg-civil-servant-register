@@ -30,7 +30,3 @@ The application uses HAL and self exploring.
 ## Requirements
 
 A Backing storage solution is required. 
-
-Currently MySQL is chosen for the small footprint and Free plans. 
-
-For setting up and linking the storage solution please see - https://docs.cloud.service.gov.uk/#set-up-a-mysql-service
