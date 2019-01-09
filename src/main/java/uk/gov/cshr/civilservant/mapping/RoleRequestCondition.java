@@ -1,6 +1,8 @@
 package uk.gov.cshr.civilservant.mapping;
 
 import lombok.EqualsAndHashCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.mvc.condition.RequestCondition;
@@ -13,6 +15,7 @@ import java.util.stream.Collectors;
 
 @EqualsAndHashCode
 public class RoleRequestCondition implements RequestCondition<RoleRequestCondition> {
+    private static final Logger LOG = LoggerFactory.getLogger(RoleRequestCondition.class);
 
     private Set<String> roles;
 
@@ -46,6 +49,8 @@ public class RoleRequestCondition implements RequestCondition<RoleRequestConditi
             }
         }
 
+        LOG.debug(String.format("Required role not found. Required roles: %s. User roles %s",
+                String.join(", ", roles), String.join(", ", userRoles)));
         return null;
     }
 
