@@ -52,16 +52,16 @@ CREATE TABLE IF NOT EXISTS `civil_servant_new` (
   `full_name` varchar(255) DEFAULT NULL,
   `line_manager_id` mediumint(8) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FK_civil_servant_identity` (`identity_id`),
-  KEY `FK_civil_servant_grade` (`grade_id`),
-  KEY `FK_civil_servant_profession` (`profession_id`),
-  KEY `FK_civil_servant_line_manager` (`line_manager_id`),
-  KEY `FK_civil_servant_organisational_unit_id` (`organisational_unit_id`),
-  CONSTRAINT `FK_civil_servant_identity` FOREIGN KEY (`identity_id`) REFERENCES `identity` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_civil_servant_grade` FOREIGN KEY (`grade_id`) REFERENCES `grade` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `FK_civil_servant_profession` FOREIGN KEY (`profession_id`) REFERENCES `profession_new` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `FK_civil_servant_line_manager` FOREIGN KEY (`line_manager_id`) REFERENCES `civil_servant` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `FK_civil_servant_organisational_unit_id` FOREIGN KEY (`organisational_unit_id`) REFERENCES `organisational_unit` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  KEY `FK_1_civil_servant_identity` (`identity_id`),
+  KEY `FK_1_civil_servant_grade` (`grade_id`),
+  KEY `FK_1_civil_servant_profession` (`profession_id`),
+  KEY `FK_1_civil_servant_line_manager` (`line_manager_id`),
+  KEY `FK_1_civil_servant_organisational_unit_id` (`organisational_unit_id`),
+  CONSTRAINT `FK_1_civil_servant_identity` FOREIGN KEY (`identity_id`) REFERENCES `identity` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_1_civil_servant_grade` FOREIGN KEY (`grade_id`) REFERENCES `grade` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `FK_1_civil_servant_profession` FOREIGN KEY (`profession_id`) REFERENCES `profession_new` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `FK_1_civil_servant_line_manager` FOREIGN KEY (`line_manager_id`) REFERENCES `civil_servant_new` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `FK_1_civil_servant_organisational_unit_id` FOREIGN KEY (`organisational_unit_id`) REFERENCES `organisational_unit` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `civil_servant_new` (`id`, `identity_id`, `organisational_unit_id`, `grade_id`, `profession_id`, `full_name`, `line_manager_id`)
