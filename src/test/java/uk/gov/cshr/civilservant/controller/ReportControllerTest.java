@@ -25,7 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
-@WithMockUser(username = "user")
 public class ReportControllerTest {
 
     @Autowired
@@ -95,8 +94,29 @@ public class ReportControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "user", authorities = {"DOWNLOAD_BOOKING_FEED"})
+    public void shouldGetAllCivilServantsForLearningProvider() throws Exception {
+        CivilServantDto civilServant1 = new CivilServantDto();
+        civilServant1.setName("User 1");
+
+        CivilServantDto civilServant2 = new CivilServantDto();
+        civilServant2.setName("User 2");
+
+        when(reportService.getCivilServantMap()).thenReturn(
+                ImmutableMap.of("1", civilServant1,
+                        "2", civilServant2));
+
+        mockMvc.perform(
+                get("/report/civilServants").with(csrf())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.1.name", equalTo("User 1")))
+                .andExpect(jsonPath("$.2.name", equalTo("User 2")));
+    }
+
+    @Test
     @WithMockUser(username = "user", authorities = {"INVALID_ROLE"})
-    public void shouldReturn404WithIncorrectRole() throws Exception {
+    public void shouldReturn403WithIncorrectRole() throws Exception {
         mockMvc.perform(
                 get("/report/civilServants").with(csrf())
                         .accept(MediaType.APPLICATION_JSON))
