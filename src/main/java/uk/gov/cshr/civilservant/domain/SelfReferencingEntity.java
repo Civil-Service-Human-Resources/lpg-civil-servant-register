@@ -1,6 +1,8 @@
 package uk.gov.cshr.civilservant.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -20,15 +22,16 @@ public abstract class SelfReferencingEntity<T> implements RegistryEntity {
     T parent;
 
     @OneToMany(mappedBy = "parent", cascade = CascadeType.PERSIST)
+    @LazyCollection(LazyCollectionOption.FALSE)
     List<T> children = new ArrayList<>();
 
     public abstract T getParent();
 
     public abstract void setParent(T parent);
 
-    public abstract void setChildren(List<T> children);
-
     public abstract List<T> getChildren();
+
+    public abstract void setChildren(List<T> children);
 
     public boolean hasParent() {
         return parent != null;
