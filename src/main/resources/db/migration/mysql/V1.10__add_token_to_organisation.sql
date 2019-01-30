@@ -1,0 +1,1 @@
+ALTER TABLE `organisational_unit` ADD `token` VARCHAR(10) UNIQUE;

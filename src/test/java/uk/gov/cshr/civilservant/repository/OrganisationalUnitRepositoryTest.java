@@ -119,4 +119,17 @@ public class OrganisationalUnitRepositoryTest {
         assertThat(result.get(1).getName(), equalTo(organisationalUnit3.getName()));
         assertThat(result.get(2).getName(), equalTo(organisationalUnit1.getName()));
     }
+
+    @Test
+    public void shouldFindByToken() {
+        OrganisationalUnit organisationalUnit1 = new OrganisationalUnit();
+        organisationalUnit1.setName("Dep of Health");
+        organisationalUnit1.setCode("5");
+        organisationalUnit1.setToken("ABC123");
+
+        repository.save(organisationalUnit1);
+
+        OrganisationalUnit organisationalUnit = repository.findByToken("ABC123");
+        assertThat(organisationalUnit.getName(), is("Dep of Health"));
+    }
 }

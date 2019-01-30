@@ -17,6 +17,9 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
     @Column(name = "payment_methods")
     private String paymentMethods;
 
+    @Column(name = "token", unique = true, length = 10)
+    private String token;
+
     public OrganisationalUnit(OrganisationalUnit organisationalUnit) {
         this.id = organisationalUnit.getId();
         this.code = organisationalUnit.getCode();
@@ -25,6 +28,7 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
         this.children = organisationalUnit.getChildren();
         this.abbreviation = organisationalUnit.getAbbreviation();
         this.setPaymentMethods(organisationalUnit.getPaymentMethods());
+        this.setToken(organisationalUnit.getToken());
     }
 
     public OrganisationalUnit() {
@@ -85,5 +89,13 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
     @Override
     public boolean hasChildren() {
         return !getChildren().isEmpty();
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

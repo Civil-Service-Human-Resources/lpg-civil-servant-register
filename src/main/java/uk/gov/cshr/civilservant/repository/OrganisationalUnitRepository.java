@@ -10,4 +10,6 @@ import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 public interface OrganisationalUnitRepository extends SelfReferencingEntityRepository<OrganisationalUnit> {
 
     OrganisationalUnit findByCode(@Param("code") String code);
+
+    OrganisationalUnit findByToken(@Param("token") String toke);
 }
