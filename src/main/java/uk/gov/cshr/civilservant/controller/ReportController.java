@@ -37,7 +37,7 @@ public class ReportController {
         return ResponseEntity.ok(reportService.getCivilServantMapByUserProfession(principal.getName()));
     }
 
-    @RoleMapping({"CSHR_REPORTER", "DOWNLOAD_BOOKING_FEED"})
+    @RoleMapping({"CSHR_REPORTER", "KPMG_SUPPLIER_REPORTER", "KORNFERRY_SUPPLIER_REPORTER", "KNOWLEDGEPOOL_SUPPLIER_REPORTER"})
     @GetMapping("/civilServants")
     public ResponseEntity<Map<String, CivilServantDto>> listAllCivilServants() {
         return ResponseEntity.ok(reportService.getCivilServantMap());
