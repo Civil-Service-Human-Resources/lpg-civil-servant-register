@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -126,6 +127,22 @@ public class CivilServantControllerTest {
 
         verify(civilServantRepository).save(any());
         verify(lineManagerService).notifyLineManager(any(), any(), any());
+    }
+
+    @Test
+    public void shouldReturnNoContentAndDeleteCivilServant() throws Exception {
+        String uid = "civil-servant-uid";
+        CivilServant civilServant = new CivilServant();
+
+        when(civilServantRepository.findByIdentity(uid)).thenReturn(Optional.of(civilServant));
+
+        mockMvc.perform(delete("/civilServants/" + uid).with(csrf())
+                .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        verify(civilServantRepository).findByIdentity(uid);
+        verify(civilServantRepository).delete(civilServant);
     }
 
     private CivilServant createCivilServant(String uid) {
