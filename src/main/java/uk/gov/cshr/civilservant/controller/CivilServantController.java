@@ -106,7 +106,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     }
 
     @DeleteMapping("/{uid}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyAuthority('IDENTITY_DELETE')")
     @Transactional
     public ResponseEntity deleteCivilServant(@PathVariable String uid) {
         civilServantRepository.findByIdentity(uid).ifPresent(civilServant -> civilServantRepository.delete(civilServant));
