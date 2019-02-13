@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
-@WithMockUser(username = "user")
+@WithMockUser(username = "user", authorities = "IDENTITY_DELETE")
 public class CivilServantControllerTest {
 
     @Autowired
