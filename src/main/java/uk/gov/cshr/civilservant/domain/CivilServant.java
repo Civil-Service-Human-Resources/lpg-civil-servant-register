@@ -46,6 +46,7 @@ public class CivilServant implements RegistryEntity {
     @ManyToOne
     private CivilServant lineManager;
 
+    @Column
     private String supplier;
 
 
