@@ -1,0 +1,1 @@
+ALTER TABLE `civil_servant` ADD COLUMN `supplier` varchar(50);
