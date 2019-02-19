@@ -43,6 +43,13 @@ public class ReportController {
         return ResponseEntity.ok(reportService.getCivilServantMap());
     }
 
+    @RoleMapping("KPMG_SUPPLIER_REPORTER")
+    @GetMapping("/civilServants")
+    public ResponseEntity<Map<String, CivilServantDto>> listAllCivilServantsBySupplier(Principal principal) {
+        return ResponseEntity.ok(reportService.getCivilServantMapByUserSupplier(principal.getName()));
+    }
+
+
     @GetMapping("/civilServants")
     public ResponseEntity<Map<String, CivilServantDto>> unauthorised(Principal principal) {
         // default to returning a 403 if none of the above roles are found.

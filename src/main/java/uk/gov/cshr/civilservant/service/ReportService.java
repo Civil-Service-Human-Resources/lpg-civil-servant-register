@@ -49,6 +49,19 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
+    public Map<String, CivilServantDto> getCivilServantMapByUserSupplier(String userId) {
+        CivilServant user = civilServantRepository.findByIdentity(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        if (user.getSupplier().isPresent()) {
+            return civilServantRepository.findAllBySupplier(user.getSupplier().get()).stream()
+                    .collect(Collectors.toMap(civilServant -> civilServant.getIdentity().getUid(), civilServantDtoFactory::create));
+        }
+
+        return Collections.emptyMap();
+    }
+
+    @Transactional(readOnly = true)
     public Map<String, CivilServantDto> getCivilServantMap() {
         return civilServantRepository.findAll().stream()
                 .collect(Collectors.toMap(civilServant -> civilServant.getIdentity().getUid(), civilServantDtoFactory::create));

@@ -46,6 +46,9 @@ public class CivilServant implements RegistryEntity {
     @ManyToOne
     private CivilServant lineManager;
 
+    private String supplier;
+
+
     public CivilServant() {
     }
 
@@ -124,6 +127,14 @@ public class CivilServant implements RegistryEntity {
 
     public void setLineManager(CivilServant lineManager) {
         this.lineManager = lineManager;
+    }
+
+    public Optional<String> getSupplier() {
+        return Optional.of(supplier);
+    }
+
+    public void setSupplier(String supplier) {
+        this.supplier = supplier;
     }
 
     @JsonProperty

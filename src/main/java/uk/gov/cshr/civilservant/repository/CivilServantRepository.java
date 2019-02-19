@@ -9,10 +9,6 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 import uk.gov.cshr.civilservant.domain.*;
-import uk.gov.cshr.civilservant.domain.AllCivilServantDetails;
-import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.domain.Identity;
-import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,4 +39,6 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
     List<CivilServant> findAllByOrganisationalUnit(OrganisationalUnit organisationalUnit);
 
     List<CivilServant> findAllByProfession(Profession profession);
+
+    List<CivilServant> findAllBySupplier(String supplier);
 }
