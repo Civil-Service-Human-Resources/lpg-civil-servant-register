@@ -32,14 +32,14 @@ public class CivilServant implements RegistryEntity {
     @ManyToOne
     private Profession profession;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<Interest> interests = new HashSet<>();
 
     @OneToOne
     @JsonIgnore
     private Identity identity;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<Profession> otherAreasOfWork = new HashSet<>();
 
     @JsonIgnore
