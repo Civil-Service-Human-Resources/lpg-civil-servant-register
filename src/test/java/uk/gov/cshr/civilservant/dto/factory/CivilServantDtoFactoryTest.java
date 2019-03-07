@@ -47,7 +47,7 @@ public class CivilServantDtoFactoryTest {
         civilServant.setOtherAreasOfWork(new HashSet<>(Arrays.asList(
                 new Profession(otherAreaOfWork1), new Profession(otherAreaOfWork2))));
 
-        when(identityService.getEmailAddress(civilServant)).thenReturn(email);
+//        when(identityService.getEmailAddress(civilServant)).thenReturn(email);
 
         CivilServantDto dto = dtoFactory.create(civilServant);
 
