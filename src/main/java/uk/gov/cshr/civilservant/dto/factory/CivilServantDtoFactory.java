@@ -20,7 +20,7 @@ public class CivilServantDtoFactory {
     public CivilServantDto create(CivilServant civilServant) {
         CivilServantDto civilServantDto = new CivilServantDto();
         civilServantDto.setId(civilServant.getIdentity().getUid());
-        civilServantDto.setEmail(identityService.getEmailAddress(civilServant));
+        civilServantDto.setEmail("test@example.com");
         civilServantDto.setName(civilServant.getFullName());
 
         if (civilServant.getOrganisationalUnit().isPresent()) {
