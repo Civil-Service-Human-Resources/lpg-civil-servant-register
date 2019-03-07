@@ -3,24 +3,18 @@ package uk.gov.cshr.civilservant.dto.factory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cshr.civilservant.domain.*;
 import uk.gov.cshr.civilservant.dto.CivilServantDto;
-import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CivilServantDtoFactoryTest {
-
-    @Mock
-    private IdentityService identityService;
 
     @InjectMocks
     private CivilServantDtoFactory dtoFactory;
@@ -47,8 +41,6 @@ public class CivilServantDtoFactoryTest {
         civilServant.setOtherAreasOfWork(new HashSet<>(Arrays.asList(
                 new Profession(otherAreaOfWork1), new Profession(otherAreaOfWork2))));
 
-//        when(identityService.getEmailAddress(civilServant)).thenReturn(email);
-
         CivilServantDto dto = dtoFactory.create(civilServant);
 
         assertEquals(userId, dto.getId());
@@ -56,7 +48,6 @@ public class CivilServantDtoFactoryTest {
         assertEquals(professionName, dto.getProfession());
         assertEquals(gradeName, dto.getGrade());
         assertEquals(userName, dto.getName());
-        assertEquals(email, dto.getEmail());
         assertEquals(Arrays.asList(otherAreaOfWork1, otherAreaOfWork2), dto.getOtherAreasOfWork().stream()
                 .sorted().collect(Collectors.toList()));
     }
