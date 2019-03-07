@@ -32,7 +32,7 @@ public class CivilServantDtoFactoryTest {
         String professionName = "test-profession";
         String gradeName = "test-grade";
         String userName = "test-user";
-        String email = "user@example.org";
+        String email = "test@example.come";
         String otherAreaOfWork1 = "other-profession-1";
         String otherAreaOfWork2 = "other-profession-2";
 
