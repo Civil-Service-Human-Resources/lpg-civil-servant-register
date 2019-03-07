@@ -48,6 +48,7 @@ public class ReportService {
         return Collections.emptyMap();
     }
 
+    @Transactional(readOnly = true)
     public Map<String, CivilServantDto> getCivilServantMap() {
         return civilServantRepository.findAll().stream()
                 .collect(Collectors.toMap(civilServant -> civilServant.getIdentity().getUid(), civilServantDtoFactory::create));
