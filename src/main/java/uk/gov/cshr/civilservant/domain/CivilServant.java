@@ -23,23 +23,23 @@ public class CivilServant implements RegistryEntity {
     private String fullName;
 
     @ManyToOne
-    @OneToMany(cascade = CascadeType.DETACH)
+    @OneToMany(cascade = CascadeType.DETACH, fetch = FetchType.LAZY)
     private OrganisationalUnit organisationalUnit;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Grade grade;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Profession profession;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     private Set<Interest> interests = new HashSet<>();
 
     @OneToOne
     @JsonIgnore
     private Identity identity;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     private Set<Profession> otherAreasOfWork = new HashSet<>();
 
     @JsonIgnore
