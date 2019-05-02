@@ -43,6 +43,13 @@ public class ReportController {
         return ResponseEntity.ok(reportService.getCivilServantMap());
     }
 
+    @RoleMapping("CSHR_REPORTER")
+    @GetMapping("/civilServants/normalised")
+    public ResponseEntity<Map<String, CivilServantDto>> listAllCivilServantsNormalised() {
+        Map<String, CivilServantDto> civilServantMapNormalised = reportService.getCivilServantMapNormalised();
+        return ResponseEntity.ok(civilServantMapNormalised);
+    }
+
     @GetMapping("/civilServants")
     public ResponseEntity<Map<String, CivilServantDto>> unauthorised(Principal principal) {
         // default to returning a 403 if none of the above roles are found.
