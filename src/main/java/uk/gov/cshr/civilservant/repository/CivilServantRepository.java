@@ -45,7 +45,7 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
             "from CivilServant c " +
             "left join OrganisationalUnit ou on ou.id = c.organisationalUnit.id " +
             "left join Profession p on p.id = c.profession.id " +
-            "left join Identity i on i.id = c.identity.id" +
+            "left join Identity i on i.id = c.identity.id " +
             "left join Grade g on g.id = c.grade.id")
     List<CivilServantDto> findAllNormalised();
 }
