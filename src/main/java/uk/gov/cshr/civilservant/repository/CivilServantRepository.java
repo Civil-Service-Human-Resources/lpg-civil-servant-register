@@ -48,4 +48,22 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
             "left join Identity i on i.id = c.identity.id " +
             "left join Grade g on g.id = c.grade.id")
     List<CivilServantDto> findAllNormalised();
+
+    @Query("select new uk.gov.cshr.civilservant.dto.CivilServantDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name) " +
+            "from CivilServant c " +
+            "left join OrganisationalUnit ou on ou.id = c.organisationalUnit.id " +
+            "left join Profession p on p.id = c.profession.id " +
+            "left join Identity i on i.id = c.identity.id " +
+            "left join Grade g on g.id = c.grade.id " +
+            "where ou = ?1")
+    List<CivilServantDto> findAllByOrganisationNormalised(OrganisationalUnit organisationalUnit);
+
+    @Query("select new uk.gov.cshr.civilservant.dto.CivilServantDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name) " +
+            "from CivilServant c " +
+            "left join OrganisationalUnit ou on ou.id = c.organisationalUnit.id " +
+            "left join Profession p on p.id = c.profession.id " +
+            "left join Identity i on i.id = c.identity.id " +
+            "left join Grade g on g.id = c.grade.id " +
+            "where p = ?1")
+    List<CivilServantDto> findAllByProfessionNormalised(Profession profession);
 }

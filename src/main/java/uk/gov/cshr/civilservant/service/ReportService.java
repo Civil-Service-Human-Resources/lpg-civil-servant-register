@@ -59,4 +59,30 @@ public class ReportService {
         return civilServantRepository.findAllNormalised().stream()
                 .collect(Collectors.toMap(CivilServantDto::getUid, civilServantDto -> civilServantDto));
     }
+
+    @Transactional(readOnly = true)
+    public Map<String, CivilServantDto> getCivilServantMapByUserOrganisationNormalised(String userId) {
+        CivilServant user = civilServantRepository.findByIdentity(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        if (user.getOrganisationalUnit().isPresent()) {
+            return civilServantRepository.findAllByOrganisationNormalised(user.getOrganisationalUnit().get()).stream()
+                    .collect(Collectors.toMap(CivilServantDto::getUid, civilServant -> civilServant));
+        }
+        return Collections.emptyMap();
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, CivilServantDto> getCivilServantMapByUserProfessionNormalised(String userId) {
+        CivilServant user = civilServantRepository.findByIdentity(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        if (user.getProfession().isPresent()) {
+            return civilServantRepository.findAllByProfessionNormalised(user.getProfession().get()).stream()
+                    .collect(Collectors.toMap(CivilServantDto::getUid, civilServant -> civilServant));
+        }
+
+        return Collections.emptyMap();
+    }
+
 }
