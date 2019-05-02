@@ -42,7 +42,7 @@ public class ReportControllerTest {
         CivilServantDto civilServant2 = new CivilServantDto();
         civilServant2.setName("User 2");
 
-        when(reportService.getCivilServantMapByUserOrganisation("user")).thenReturn(
+        when(reportService.getCivilServantMapByUserOrganisationNormalised("user")).thenReturn(
                 ImmutableMap.of("1", civilServant1, "2", civilServant2));
 
         mockMvc.perform(
@@ -62,7 +62,7 @@ public class ReportControllerTest {
         CivilServantDto civilServant2 = new CivilServantDto();
         civilServant2.setName("User 2");
 
-        when(reportService.getCivilServantMapByUserProfession("user")).thenReturn(
+        when(reportService.getCivilServantMapByUserProfessionNormalised("user")).thenReturn(
                 ImmutableMap.of("1", civilServant1,"2", civilServant2));
 
         mockMvc.perform(
@@ -82,7 +82,7 @@ public class ReportControllerTest {
         CivilServantDto civilServant2 = new CivilServantDto();
         civilServant2.setName("User 2");
 
-        when(reportService.getCivilServantMap()).thenReturn(
+        when(reportService.getCivilServantMapNormalised()).thenReturn(
                 ImmutableMap.of("1", civilServant1,
                         "2", civilServant2));
 
