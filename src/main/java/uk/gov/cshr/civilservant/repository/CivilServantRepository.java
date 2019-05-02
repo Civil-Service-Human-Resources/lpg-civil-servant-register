@@ -9,10 +9,7 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 import uk.gov.cshr.civilservant.domain.*;
-import uk.gov.cshr.civilservant.domain.AllCivilServantDetails;
-import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.domain.Identity;
-import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.dto.CivilServantDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,4 +40,12 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
     List<CivilServant> findAllByOrganisationalUnit(OrganisationalUnit organisationalUnit);
 
     List<CivilServant> findAllByProfession(Profession profession);
+
+    @Query("select new uk.gov.cshr.civilservant.dto.CivilServantDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name) " +
+            "from CivilServant c " +
+            "left join OrganisationalUnit ou on ou.id = c.organisationalUnit.id " +
+            "left join Profession p on p.id = c.profession.id " +
+            "left join Identity i on i.id = c.identity.id" +
+            "left join Grade g on g.id = c.grade.id")
+    List<CivilServantDto> findAllNormalised();
 }
