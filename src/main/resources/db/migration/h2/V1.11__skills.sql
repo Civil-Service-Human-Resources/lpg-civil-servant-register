@@ -55,28 +55,6 @@ CREATE TABLE IF NOT EXISTS `quiz_questions`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
-INSERT INTO quiz(profession_id)
-VALUES (1);
 
-INSERT INTO question(type, value)
-VALUES ('SINGLE', 'Hello this is question 1');
-
-INSERT INTO quiz_questions
-VALUES (1, 1);
-
-INSERT INTO choice(value)
-VALUES ('choice A'),
-       ('Choice B'),
-       ('Choice C'),
-       ('Choice D');
-
-INSERT INTO question_choices
-VALUES (1, 1),
-       (1, 2),
-       (1, 3),
-       (1, 4);
-
-INSERT INTO question_answers
-VALUES (1, 2);
 
 
