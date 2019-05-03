@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -12,6 +13,7 @@ public class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -20,9 +22,9 @@ public class Question {
     @Column(nullable = false)
     private String value;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     private Set<Choice> choices = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     private Set<Choice> answers = new HashSet<>();
 }
