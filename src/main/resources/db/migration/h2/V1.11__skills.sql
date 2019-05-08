@@ -8,9 +8,11 @@ CREATE TABLE IF NOT EXISTS `choice`
 
 CREATE TABLE IF NOT EXISTS `question`
 (
-    `id`    SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT,
-    `type`  VARCHAR(8)           NOT NULL,
-    `value` TEXT                 NOT NULL,
+    `id`                 SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `type`               VARCHAR(8),
+    `learning_name`      VARCHAR(500)         NOT NULL,
+    `learning_reference` VARCHAR(500)         NOT NULL,
+    `value`              TEXT                 NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
