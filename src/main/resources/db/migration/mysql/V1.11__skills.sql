@@ -57,6 +57,15 @@ CREATE TABLE IF NOT EXISTS `quiz_questions`
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
+CREATE TABLE IF NOT EXISTS `purchase_order`
+(
+    `id`   SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `code` VARCHAR(20),
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `unique_po_code` (code)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
+
 UPDATE `organisational_unit`
 SET `payment_methods` = 'PURCHASE_ORDER';
 ALTER TABLE `organisational_unit`
