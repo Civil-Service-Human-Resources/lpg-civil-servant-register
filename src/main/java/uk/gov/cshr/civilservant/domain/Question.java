@@ -19,6 +19,12 @@ public class Question {
     @Enumerated(EnumType.STRING)
     private QuestionType type;
 
+    @Column(nullable = false, length = 500)
+    private String learningName;
+
+    @Column(nullable = false, length = 500)
+    private String learningReference;
+
     @Column(nullable = false)
     private String value;
 
