@@ -11,7 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.cshr.civilservant.dto.CivilServantDto;
+import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
 import uk.gov.cshr.civilservant.service.ReportService;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -37,9 +37,9 @@ public class ReportControllerTest {
     @Test
     @WithMockUser(username = "user", authorities = {"ORGANISATION_REPORTER"})
     public void shouldGetCivilServantsByUserOrganisationWithCorrectRole() throws Exception {
-        CivilServantDto civilServant1 = new CivilServantDto();
+        CivilServantReportDto civilServant1 = new CivilServantReportDto();
         civilServant1.setName("User 1");
-        CivilServantDto civilServant2 = new CivilServantDto();
+        CivilServantReportDto civilServant2 = new CivilServantReportDto();
         civilServant2.setName("User 2");
 
         when(reportService.getCivilServantMapByUserOrganisationNormalised("user")).thenReturn(
@@ -57,9 +57,9 @@ public class ReportControllerTest {
     @Test
     @WithMockUser(username = "user", authorities = {"PROFESSION_REPORTER"})
     public void shouldGetCivilServantsByUserProfessionWithCorrectRole() throws Exception {
-        CivilServantDto civilServant1 = new CivilServantDto();
+        CivilServantReportDto civilServant1 = new CivilServantReportDto();
         civilServant1.setName("User 1");
-        CivilServantDto civilServant2 = new CivilServantDto();
+        CivilServantReportDto civilServant2 = new CivilServantReportDto();
         civilServant2.setName("User 2");
 
         when(reportService.getCivilServantMapByUserProfessionNormalised("user")).thenReturn(
@@ -76,10 +76,10 @@ public class ReportControllerTest {
     @Test
     @WithMockUser(username = "user", authorities = {"CSHR_REPORTER"})
     public void shouldGetAllCivilServants() throws Exception {
-        CivilServantDto civilServant1 = new CivilServantDto();
+        CivilServantReportDto civilServant1 = new CivilServantReportDto();
         civilServant1.setName("User 1");
 
-        CivilServantDto civilServant2 = new CivilServantDto();
+        CivilServantReportDto civilServant2 = new CivilServantReportDto();
         civilServant2.setName("User 2");
 
         when(reportService.getCivilServantMapNormalised()).thenReturn(
