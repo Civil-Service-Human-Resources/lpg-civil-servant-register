@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.dto.CivilServantDto;
+import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
 import uk.gov.cshr.civilservant.dto.factory.CivilServantDtoFactory;
 import uk.gov.cshr.civilservant.exception.UserNotFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
@@ -55,31 +56,31 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, CivilServantDto> getCivilServantMapNormalised() {
+    public Map<String, CivilServantReportDto> getCivilServantMapNormalised() {
         return civilServantRepository.findAllNormalised().stream()
-                .collect(Collectors.toMap(CivilServantDto::getUid, civilServantDto -> civilServantDto));
+                .collect(Collectors.toMap(CivilServantReportDto::getUid, civilServantDto -> civilServantDto));
     }
 
     @Transactional(readOnly = true)
-    public Map<String, CivilServantDto> getCivilServantMapByUserOrganisationNormalised(String userId) {
+    public Map<String, CivilServantReportDto> getCivilServantMapByUserOrganisationNormalised(String userId) {
         CivilServant user = civilServantRepository.findByIdentity(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         if (user.getOrganisationalUnit().isPresent()) {
             return civilServantRepository.findAllByOrganisationNormalised(user.getOrganisationalUnit().get()).stream()
-                    .collect(Collectors.toMap(CivilServantDto::getUid, civilServant -> civilServant));
+                    .collect(Collectors.toMap(CivilServantReportDto::getUid, civilServant -> civilServant));
         }
         return Collections.emptyMap();
     }
 
     @Transactional(readOnly = true)
-    public Map<String, CivilServantDto> getCivilServantMapByUserProfessionNormalised(String userId) {
+    public Map<String, CivilServantReportDto> getCivilServantMapByUserProfessionNormalised(String userId) {
         CivilServant user = civilServantRepository.findByIdentity(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         if (user.getProfession().isPresent()) {
             return civilServantRepository.findAllByProfessionNormalised(user.getProfession().get()).stream()
-                    .collect(Collectors.toMap(CivilServantDto::getUid, civilServant -> civilServant));
+                    .collect(Collectors.toMap(CivilServantReportDto::getUid, civilServant -> civilServant));
         }
 
         return Collections.emptyMap();
