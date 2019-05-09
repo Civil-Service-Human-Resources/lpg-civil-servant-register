@@ -9,7 +9,7 @@ import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 import uk.gov.cshr.civilservant.domain.*;
-import uk.gov.cshr.civilservant.dto.CivilServantDto;
+import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,29 +41,35 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
 
     List<CivilServant> findAllByProfession(Profession profession);
 
-    @Query("select new uk.gov.cshr.civilservant.dto.CivilServantDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name) " +
-            "from CivilServant c " +
-            "left join OrganisationalUnit ou on ou.id = c.organisationalUnit.id " +
-            "left join Profession p on p.id = c.profession.id " +
-            "left join Identity i on i.id = c.identity.id " +
-            "left join Grade g on g.id = c.grade.id")
-    List<CivilServantDto> findAllNormalised();
-
-    @Query("select new uk.gov.cshr.civilservant.dto.CivilServantDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name) " +
+    @Query("select new uk.gov.cshr.civilservant.dto.CivilServantReportDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name, group_concat(oaw.name)) " +
             "from CivilServant c " +
             "left join OrganisationalUnit ou on ou.id = c.organisationalUnit.id " +
             "left join Profession p on p.id = c.profession.id " +
             "left join Identity i on i.id = c.identity.id " +
             "left join Grade g on g.id = c.grade.id " +
-            "where ou = ?1")
-    List<CivilServantDto> findAllByOrganisationNormalised(OrganisationalUnit organisationalUnit);
+            "join c.otherAreasOfWork oaw " +
+            "group by c.id ")
+    List<CivilServantReportDto> findAllNormalised();
 
-    @Query("select new uk.gov.cshr.civilservant.dto.CivilServantDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name) " +
+    @Query("select new uk.gov.cshr.civilservant.dto.CivilServantReportDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name, group_concat(oaw.name)) " +
             "from CivilServant c " +
             "left join OrganisationalUnit ou on ou.id = c.organisationalUnit.id " +
             "left join Profession p on p.id = c.profession.id " +
             "left join Identity i on i.id = c.identity.id " +
             "left join Grade g on g.id = c.grade.id " +
-            "where p = ?1")
-    List<CivilServantDto> findAllByProfessionNormalised(Profession profession);
+            "join c.otherAreasOfWork oaw " +
+            "where ou = ?1 " +
+            "group by c.id ")
+    List<CivilServantReportDto> findAllByOrganisationNormalised(OrganisationalUnit organisationalUnit);
+
+    @Query("select new uk.gov.cshr.civilservant.dto.CivilServantReportDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name, group_concat(oaw.name)) " +
+            "from CivilServant c " +
+            "left join OrganisationalUnit ou on ou.id = c.organisationalUnit.id " +
+            "left join Profession p on p.id = c.profession.id " +
+            "left join Identity i on i.id = c.identity.id " +
+            "left join Grade g on g.id = c.grade.id " +
+            "join c.otherAreasOfWork oaw " +
+            "where p = ?1 " +
+            "group by c.id ")
+    List<CivilServantReportDto> findAllByProfessionNormalised(Profession profession);
 }
