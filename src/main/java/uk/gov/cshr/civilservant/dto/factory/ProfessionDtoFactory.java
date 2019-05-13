@@ -18,9 +18,27 @@ public class ProfessionDtoFactory extends DtoFactory<ProfessionDto, Profession> 
     public ProfessionDto create(Profession profession) {
         ProfessionDto professionDto = new ProfessionDto();
         professionDto.setName(profession.getName());
-        professionDto.setFormattedName(profession.getName());
+        professionDto.setFormattedName(formatName(profession));
         professionDto.setHref(repositoryEntityService.getUri(profession));
 
         return professionDto;
+    }
+
+    String formatName(Profession profession) {
+        Profession currentNode = profession;
+
+        String name = currentNode.getName();
+
+        while (currentNode.hasParent()) {
+            currentNode = currentNode.getParent();
+
+            StringBuilder sb = new StringBuilder();
+            name = sb.append(currentNode.getName())
+                    .append(" | ")
+                    .append(name)
+                    .toString();
+        }
+
+        return name;
     }
 }
