@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cshr.civilservant.dto.CivilServantDto;
+import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
 import uk.gov.cshr.civilservant.mapping.RoleMapping;
 import uk.gov.cshr.civilservant.service.ReportService;
 
@@ -27,19 +28,19 @@ public class ReportController {
 
     @RoleMapping("ORGANISATION_REPORTER")
     @GetMapping("/civilServants")
-    public ResponseEntity<Map<String, CivilServantDto>> listAllCivilServantsByOrganisation(Principal principal) {
+    public ResponseEntity<Map<String, CivilServantReportDto>> listAllCivilServantsByOrganisation(Principal principal) {
         return ResponseEntity.ok(reportService.getCivilServantMapByUserOrganisationNormalised(principal.getName()));
     }
 
     @RoleMapping("PROFESSION_REPORTER")
     @GetMapping("/civilServants")
-    public ResponseEntity<Map<String, CivilServantDto>> listAllCivilServantsByProfession(Principal principal) {
+    public ResponseEntity<Map<String, CivilServantReportDto>> listAllCivilServantsByProfession(Principal principal) {
         return ResponseEntity.ok(reportService.getCivilServantMapByUserProfessionNormalised(principal.getName()));
     }
 
     @RoleMapping("CSHR_REPORTER")
     @GetMapping("/civilServants")
-    public ResponseEntity<Map<String, CivilServantDto>> listAllCivilServants() {
+    public ResponseEntity<Map<String, CivilServantReportDto>> listAllCivilServants() {
         return ResponseEntity.ok(reportService.getCivilServantMapNormalised());
     }
 
