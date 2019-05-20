@@ -13,10 +13,7 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
@@ -107,6 +104,16 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         }
         return ResponseEntity.unprocessableEntity().build();
     }
+
+    @DeleteMapping("/{uid}/delete")
+//    @PreAuthorize("hasAnyAuthority('IDENTITY_DELETE')")
+    @Transactional
+    public ResponseEntity deleteCivilServant(@PathVariable String uid) {
+        civilServantRepository.findByIdentity(uid).ifPresent(civilServant -> civilServantRepository.delete(civilServant));
+
+        return ResponseEntity.noContent().build();
+    }
+
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
