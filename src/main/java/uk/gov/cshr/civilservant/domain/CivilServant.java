@@ -35,7 +35,7 @@ public class CivilServant implements RegistryEntity {
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Interest> interests = new HashSet<>();
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     @JsonIgnore
     private Identity identity;
 
