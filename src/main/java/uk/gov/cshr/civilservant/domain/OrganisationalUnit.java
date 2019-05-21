@@ -15,7 +15,7 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
     private String abbreviation;
 
     @Column(name = "payment_methods")
-    private String paymentMethods;
+    private String paymentMethods = PaymentMethod.PURCHASE_ORDER.toString();
 
     public OrganisationalUnit(OrganisationalUnit organisationalUnit) {
         this.id = organisationalUnit.getId();
