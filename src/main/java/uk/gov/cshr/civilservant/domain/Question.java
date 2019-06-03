@@ -19,14 +19,20 @@ public class Question {
     @Enumerated(EnumType.STRING)
     private QuestionType type;
 
-    @Column(nullable = false, length = 500)
+    @Column(length = 500)
+    private String theme;
+
+    @Column(length = 500)
     private String learningName;
 
-    @Column(nullable = false, length = 500)
+    @Column(length = 500)
     private String learningReference;
 
-    @Column(nullable = false)
+    @Column(length = 500)
     private String value;
+
+    @Column(length = 500)
+    private String why;
 
     @ManyToMany(cascade = CascadeType.ALL)
     private Set<Choice> choices = new HashSet<>();
