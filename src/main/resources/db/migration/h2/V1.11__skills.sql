@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS `question`
 (
     `id`                 SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT,
     `type`               VARCHAR(8),
-    `learning_name`      VARCHAR(500)         NOT NULL,
-    `learning_reference` VARCHAR(500)         NOT NULL,
+    `learning_name`      VARCHAR(500),
+    `learning_reference` VARCHAR(500),
     `value`              TEXT                 NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
@@ -74,5 +74,11 @@ UPDATE `organisational_unit`
 SET `payment_methods` = 'PURCHASE_ORDER';
 ALTER TABLE `organisational_unit`
     ALTER `payment_methods` SET DEFAULT 'PURCHASE_ORDER';
+
+ALTER TABLE `question`
+ADD COLUMN `theme` VARCHAR (500);
+
+ALTER TABLE `question`
+ADD COLUMN `why` VARCHAR (500);
 
 

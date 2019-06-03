@@ -1,0 +1,5 @@
+ALTER TABLE `question`
+ADD COLUMN `theme` VARCHAR (500);
+
+ALTER TABLE `question`
+ADD COLUMN `why` VARCHAR (500);
