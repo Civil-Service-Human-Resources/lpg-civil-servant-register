@@ -9,7 +9,6 @@ import uk.gov.cshr.civilservant.repository.QuizRepository;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +41,10 @@ public class QuizController {
     @PostMapping
     @Transactional
     public ResponseEntity createQuiz(@Valid @RequestBody Quiz quiz) {
-        quizRepository.deleteAllByProfessionId(quiz.getProfession().getId());
+        if (quiz.getProfession() != null && quiz.getProfession().getId() != null) {
+            quizRepository.deleteAllByProfessionId(quiz.getProfession().getId());
+        }
+
         quizRepository.save(quiz);
         return ResponseEntity.noContent().build();
     }

@@ -12,4 +12,6 @@ public interface ProfessionRepository extends SelfReferencingEntityRepository<Pr
     @PreAuthorize("hasAuthority('PROFESSION_MANAGER')")
     @Override
     Profession save(Profession profession);
+
+    Profession findByName(String name);
 }

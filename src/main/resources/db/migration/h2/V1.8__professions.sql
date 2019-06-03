@@ -21,6 +21,7 @@ INSERT INTO `profession_new` (`parent_id`,`name`) VALUES
 (NULL,'Operational delivery'),
 (NULL,'Project delivery'),
 (NULL,'Property'),
+(NULL,'Policy'),
 (NULL,'I don''t know'),
 (2,'Strategy and Policy Development'),
 (2,'Business Needs and Sourcing'),
