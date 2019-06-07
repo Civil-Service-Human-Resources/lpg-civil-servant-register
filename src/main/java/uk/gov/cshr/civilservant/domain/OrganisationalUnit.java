@@ -14,6 +14,12 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
     @Column(unique = true, nullable = false, length = 20)
     private String abbreviation;
 
+    @Column(unique = true, nullable = false, length = 20)
+    private String token;
+
+    @Column(unique = true, nullable = false, length = 20)
+    private String quota;
+
     @Column(name = "payment_methods")
     private String paymentMethods = PaymentMethod.PURCHASE_ORDER.toString();
 
@@ -25,6 +31,8 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
         this.children = organisationalUnit.getChildren();
         this.abbreviation = organisationalUnit.getAbbreviation();
         this.setPaymentMethods(organisationalUnit.getPaymentMethods());
+        this.token = organisationalUnit.getToken();
+        this.quota = organisationalUnit.getQuota();
     }
 
     public OrganisationalUnit() {
@@ -36,6 +44,23 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+
+    public String getAbbreviation() {
+        return abbreviation;
+    }
+
+    public void setAbbreviation(String abbreviation) {
+        this.abbreviation = abbreviation;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public String getQuota() {
+        return quota;
     }
 
     @Override
@@ -67,14 +92,6 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
 
     public void setPaymentMethods(List<String> paymentMethods) {
         this.paymentMethods = String.join(",", paymentMethods);
-    }
-
-    public String getAbbreviation() {
-        return abbreviation;
-    }
-
-    public void setAbbreviation(String abbreviation) {
-        this.abbreviation = abbreviation;
     }
 
     @Override
