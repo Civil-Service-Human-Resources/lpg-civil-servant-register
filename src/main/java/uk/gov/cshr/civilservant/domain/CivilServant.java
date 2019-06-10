@@ -128,10 +128,18 @@ public class CivilServant implements RegistryEntity {
 
     @JsonProperty
     public String getLineManagerName() {
-       if (lineManager != null) {
-           return lineManager.getFullName();
-       }
-       return null;
+        if (lineManager != null) {
+            return lineManager.getFullName();
+        }
+        return null;
+    }
+
+    @JsonProperty
+    public String getLineManagerUid() {
+        if (lineManager != null) {
+            return lineManager.getIdentity().getUid();
+        }
+        return null;
     }
 
     @Override
