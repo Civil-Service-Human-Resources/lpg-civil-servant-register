@@ -10,7 +10,7 @@ CREATE TABLE `organisational_unit` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unique_name` (`name`),
   UNIQUE KEY `unique_code` (`code`),
-  CONSTRAINT `FK_organisational_unit_parent_id` FOREIGN KEY (`parent_id`) REFERENCES `organisational_unit` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_organisational_unit_parent_id` FOREIGN KEY (`parent_id`) REFERENCES `organisational_unit` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `organisational_unit` (`id`, `code`, `name`, `payment_methods`)

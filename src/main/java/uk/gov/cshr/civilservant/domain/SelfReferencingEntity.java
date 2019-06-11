@@ -15,11 +15,11 @@ public abstract class SelfReferencingEntity<T> implements RegistryEntity {
     @Column(unique = true, nullable = false)
     String name;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JsonBackReference
     T parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
     List<T> children = new ArrayList<>();
 
     public abstract T getParent();
