@@ -17,6 +17,11 @@ spring:
     properties:
       hibernate:
         dialect: uk.gov.cshr.civilservant.config.CustomMySqlDialect
+  datasource:
+    hikari:
+          connection-timeout: 30000
+          idle-timeout: 600000
+          max-lifetime: 1800000
   h2:
     console:
       enabled: true
@@ -55,6 +60,10 @@ spring:
     url: ${DATASOURCE:jdbc:mysql://localhost:3306/civil_servant_register?user=root&password=password&useSSL=false}
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
   jpa:
     properties:
       hibernate:

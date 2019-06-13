@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -91,32 +90,5 @@ public class OrganisationalUnitRepositoryTest {
         OrganisationalUnit result = repository.findByCode("xx");
 
         assertThat(result.getPaymentMethods(), is(Arrays.asList("method1", "method2", "method3")));
-    }
-
-    @Test
-    public void shouldReturnOrderedList() {
-        repository.deleteAll();
-
-        OrganisationalUnit organisationalUnit1 = new OrganisationalUnit();
-        organisationalUnit1.setName("HMRC");
-        organisationalUnit1.setCode("1");
-
-        OrganisationalUnit organisationalUnit2 = new OrganisationalUnit();
-        organisationalUnit2.setName("Cab Office");
-        organisationalUnit2.setCode("2");
-
-        OrganisationalUnit organisationalUnit3 = new OrganisationalUnit();
-        organisationalUnit3.setName("Dep of Health");
-        organisationalUnit3.setCode("3");
-
-        repository.save(organisationalUnit1);
-        repository.save(organisationalUnit2);
-        repository.save(organisationalUnit3);
-
-        List<OrganisationalUnit> result = repository.findAllByOrderByNameAsc();
-
-        assertThat(result.get(0).getName(), equalTo(organisationalUnit2.getName()));
-        assertThat(result.get(1).getName(), equalTo(organisationalUnit3.getName()));
-        assertThat(result.get(2).getName(), equalTo(organisationalUnit1.getName()));
     }
 }
