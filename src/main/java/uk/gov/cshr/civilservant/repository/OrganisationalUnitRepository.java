@@ -5,9 +5,11 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 
+import java.util.Optional;
+
 @Repository
 @RepositoryRestResource
 public interface OrganisationalUnitRepository extends SelfReferencingEntityRepository<OrganisationalUnit> {
 
-    OrganisationalUnit findByCode(@Param("code") String code);
+    Optional<OrganisationalUnit> findByCode(@Param("code") String code);
 }

@@ -3,6 +3,7 @@ package uk.gov.cshr.civilservant.controller;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
@@ -32,5 +33,10 @@ public class OrganisationalUnitController {
         List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
 
         return ResponseEntity.ok(organisationalUnitsMap);
+    }
+
+    @GetMapping("/parent/{code}")
+    public ResponseEntity<List<OrganisationalUnit>> getOrganisationWithParents(@PathVariable String code) {
+        return ResponseEntity.ok(organisationalUnitService.getOrganisationWithParents(code));
     }
 }
