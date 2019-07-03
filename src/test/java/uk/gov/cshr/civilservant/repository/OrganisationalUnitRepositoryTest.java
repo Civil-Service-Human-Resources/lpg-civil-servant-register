@@ -12,6 +12,7 @@ import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -27,8 +28,8 @@ public class OrganisationalUnitRepositoryTest {
 
     @Test
     public void shouldFindOrganisationsWhereNameStartsWith() {
-        OrganisationalUnit organisationalUnit = repository.findByCode("co");
-        assertThat(organisationalUnit.getName(), is("Cabinet Office"));
+        Optional<OrganisationalUnit> organisationalUnit = repository.findByCode("co");
+        assertThat(organisationalUnit.get().getName(), is("Cabinet Office"));
     }
 
     @Test
@@ -46,9 +47,9 @@ public class OrganisationalUnitRepositoryTest {
 
         repository.save(child);
 
-        OrganisationalUnit savedChild = repository.findByCode("b");
+        Optional<OrganisationalUnit> savedChild = repository.findByCode("b");
 
-        assertThat(savedChild.getParent().getCode(), is("a"));
+        assertThat(savedChild.get().getParent().getCode(), is("a"));
     }
 
     @Test
@@ -68,9 +69,9 @@ public class OrganisationalUnitRepositoryTest {
 
         repository.save(parent);
 
-        OrganisationalUnit foundParent = repository.findByCode("a");
+        Optional<OrganisationalUnit> foundParent = repository.findByCode("a");
 
-        List<OrganisationalUnit> subOrgs = new ArrayList<>(foundParent.getChildren());
+        List<OrganisationalUnit> subOrgs = new ArrayList<>(foundParent.get().getChildren());
 
         assertThat(subOrgs.size(), is(2));
         assertThat(subOrgs.get(0).getCode(), is("b"));
@@ -87,8 +88,8 @@ public class OrganisationalUnitRepositoryTest {
 
         repository.save(organisationalUnit);
 
-        OrganisationalUnit result = repository.findByCode("xx");
+        Optional<OrganisationalUnit> result = repository.findByCode("xx");
 
-        assertThat(result.getPaymentMethods(), is(Arrays.asList("method1", "method2", "method3")));
+        assertThat(result.get().getPaymentMethods(), is(Arrays.asList("method1", "method2", "method3")));
     }
 }
