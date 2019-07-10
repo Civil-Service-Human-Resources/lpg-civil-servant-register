@@ -1,6 +1,5 @@
 package uk.gov.cshr.civilservant.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -26,7 +25,6 @@ public class AgencyToken implements RegistryEntity {
     @Column(nullable = false)
     private int tokensUsed;
 
-    @ManyToOne
-    @JsonBackReference
+    @OneToOne
     private OrganisationalUnit organisationalUnit;
 }
