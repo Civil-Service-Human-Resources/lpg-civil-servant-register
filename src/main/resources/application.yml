@@ -19,6 +19,7 @@ spring:
         show_sql: false
         format_sql: false
   datasource:
+#    url: ${DATASOURCE:jdbc:mysql://127.0.0.1:3306/civil_servant_register?user=root&password=example&useSSL=false}
     hikari:
       connection-timeout: 30000
       idle-timeout: 600000
