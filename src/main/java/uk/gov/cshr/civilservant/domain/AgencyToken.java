@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -13,15 +15,12 @@ public class AgencyToken implements RegistryEntity {
     @JsonIgnore
     private Long id;
 
-    @Column(nullable = false)
-    private String domain;
-
     @Column(nullable = false, length = 20, unique = true)
     private String token;
 
     @Column(nullable = false)
     private int capacity;
 
-    @Column(nullable = false)
-    private int tokensUsed;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<AgencyDomain> agencyDomains = new HashSet<>();
 }
