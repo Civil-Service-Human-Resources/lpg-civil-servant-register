@@ -12,7 +12,9 @@ CREATE TABLE IF NOT EXISTS `agency_token`
 SET FOREIGN_KEY_CHECKS=0;
 
 ALTER TABLE `organisational_unit`
-ADD COLUMN agency_token_id SMALLINT(5) UNSIGNED,
+ADD COLUMN agency_token_id SMALLINT(5) UNSIGNED;
+
+ALTER TABLE `organisational_unit`
 ADD CONSTRAINT `FK_organisational_unit_agency_token` FOREIGN KEY (`agency_token_id`) REFERENCES `agency_token` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 SET FOREIGN_KEY_CHECKS=1;
