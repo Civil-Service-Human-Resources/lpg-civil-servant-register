@@ -18,3 +18,6 @@ ALTER TABLE `organisational_unit`
 ADD CONSTRAINT `FK_organisational_unit_agency_token` FOREIGN KEY (`agency_token_id`) REFERENCES `agency_token` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 SET FOREIGN_KEY_CHECKS=1;
+
+INSERT INTO `agency_token` values (1, 'token', 'domain.com', 10, 100);
+UPDATE `organisational_unit` SET agency_token_id = 1 WHERE id = 1;
