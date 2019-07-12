@@ -24,7 +24,4 @@ public class AgencyToken implements RegistryEntity {
 
     @Column(nullable = false)
     private int tokensUsed;
-
-    @OneToOne
-    private OrganisationalUnit organisationalUnit;
 }
