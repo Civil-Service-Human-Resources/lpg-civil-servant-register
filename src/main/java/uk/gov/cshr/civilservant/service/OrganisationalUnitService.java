@@ -42,4 +42,9 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         Optional<OrganisationalUnit> parent = Optional.ofNullable(organisationalUnit.getParent());
         parent.ifPresent(parentOrganisationalUnit -> getOrganisationalUnit(parentOrganisationalUnit.getCode(), organisationalUnits));
     }
+
+    public List<OrganisationalUnit> getOrganisationsNormalised() {
+        return repository.findAllNormalised();
+    }
+
 }

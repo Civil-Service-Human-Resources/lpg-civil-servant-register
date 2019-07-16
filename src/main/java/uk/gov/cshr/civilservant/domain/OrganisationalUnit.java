@@ -30,6 +30,12 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
     public OrganisationalUnit() {
     }
 
+    public OrganisationalUnit(String name, String code, String abbreviation) {
+        this.name = name;
+        this.code = code;
+        this.abbreviation = abbreviation;
+    }
+
     public String getCode() {
         return code;
     }
