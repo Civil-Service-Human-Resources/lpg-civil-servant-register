@@ -39,4 +39,10 @@ public class OrganisationalUnitController {
     public ResponseEntity<List<OrganisationalUnit>> getOrganisationWithParents(@PathVariable String code) {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationWithParents(code));
     }
+
+    @GetMapping("/normalised")
+    public ResponseEntity<List<OrganisationalUnit>> getOrganisationNormalised() {
+        return ResponseEntity.ok(organisationalUnitService.getOrganisationsNormalised());
+    }
+
 }
