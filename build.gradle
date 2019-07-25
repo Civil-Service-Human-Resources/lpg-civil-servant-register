@@ -124,7 +124,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
     compile group: 'org.projectlombok', name: 'lombok', version: '1.18.4'
 
-    compile 'org.springframework.boot:spring-boot-starter-cache'
     compile 'com.github.ben-manes.caffeine:caffeine:2.6.2'
 
     // https://github.com/alphagov/notifications-java-client
