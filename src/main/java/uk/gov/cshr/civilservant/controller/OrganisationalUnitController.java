@@ -2,7 +2,6 @@ package uk.gov.cshr.civilservant.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
@@ -17,7 +16,6 @@ import java.util.List;
 
 @RepositoryRestController
 @RequestMapping("/organisationalUnits")
-@CacheConfig(cacheNames = {"organisationalUnits"})
 public class OrganisationalUnitController {
     private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationalUnitController.class);
 
@@ -28,7 +26,7 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping("/tree")
-    @Cacheable
+    @Cacheable("organisationalUnitsTree")
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
         LOGGER.info("Getting org tree");
         List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParents();
@@ -37,7 +35,7 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping("/flat")
-    @Cacheable
+    @Cacheable("organisationalUnitsFlat")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
         LOGGER.info("Getting org flat");
         List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
@@ -56,7 +54,7 @@ public class OrganisationalUnitController {
     }
 
     @PostMapping
-    @CacheEvict(value = "organisationalUnits", allEntries = true)
+    @CacheEvict(value = {"organisationalUnitsTree", "organisationalUnitsFlat"}, allEntries = true)
     public ResponseEntity<Void> save(@RequestBody OrganisationalUnit organisationalUnit, UriComponentsBuilder builder) {
         LOGGER.info("Saving org {}", organisationalUnit.toString());
 
