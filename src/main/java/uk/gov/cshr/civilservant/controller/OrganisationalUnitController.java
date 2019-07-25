@@ -27,8 +27,8 @@ public class OrganisationalUnitController {
         this.organisationalUnitService = organisationalUnitService;
     }
 
-    @Cacheable
     @GetMapping("/tree")
+    @Cacheable
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
         LOGGER.info("Getting org tree");
         List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParents();
@@ -36,8 +36,8 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(organisationalUnits);
     }
 
-    @Cacheable
     @GetMapping("/flat")
+    @Cacheable
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
         LOGGER.info("Getting org flat");
         List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
