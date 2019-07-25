@@ -1,5 +1,7 @@
 package uk.gov.cshr.civilservant.controller;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +13,7 @@ import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import java.util.List;
 
+@CacheConfig(cacheNames = {"organisationalUnitsTree"})
 @RepositoryRestController
 @RequestMapping("/organisationalUnits")
 public class OrganisationalUnitController {
@@ -21,6 +24,7 @@ public class OrganisationalUnitController {
         this.organisationalUnitService = organisationalUnitService;
     }
 
+    @Cacheable
     @GetMapping("/tree")
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
         List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParents();
@@ -28,6 +32,7 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(organisationalUnits);
     }
 
+    @Cacheable
     @GetMapping("/flat")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
         List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
