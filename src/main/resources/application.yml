@@ -18,10 +18,10 @@ spring:
         dialect: uk.gov.cshr.civilservant.config.CustomMySqlDialect
         show_sql: false
         format_sql: false
-  cache:
-    cache-names: organisationalUnitsTree
-    caffeine:
-      spec: maximumSize=500, expireAfterWrite=1s
+#  cache:
+#    cache-names: organisationalUnitsTree
+#    caffeine:
+#      spec: maximumSize=500
   datasource:
     hikari:
       connection-timeout: 30000

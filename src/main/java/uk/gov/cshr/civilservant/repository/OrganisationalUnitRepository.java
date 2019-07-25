@@ -18,4 +18,6 @@ public interface OrganisationalUnitRepository extends SelfReferencingEntityRepos
     @Query(value = "select new uk.gov.cshr.civilservant.domain.OrganisationalUnit(o.name, o.code, o.abbreviation) " +
             "from OrganisationalUnit o")
     List<OrganisationalUnit> findAllNormalised();
+
+
 }
