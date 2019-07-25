@@ -2,12 +2,12 @@ package uk.gov.cshr.civilservant.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
@@ -51,16 +51,6 @@ public class OrganisationalUnitController {
     @GetMapping("/normalised")
     public ResponseEntity<List<OrganisationalUnit>> getOrganisationNormalised() {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationsNormalised());
-    }
-
-    @PostMapping
-    @CacheEvict(value = {"organisationalUnitsTree", "organisationalUnitsFlat"}, allEntries = true)
-    public ResponseEntity<Void> save(@RequestBody OrganisationalUnit organisationalUnit, UriComponentsBuilder builder) {
-        LOGGER.info("Saving org {}", organisationalUnit.toString());
-
-        OrganisationalUnit save = organisationalUnitService.save(organisationalUnit);
-
-        return ResponseEntity.created(builder.path("/organisationalUnits/{organisationalUnitId}").build(save.getId())).build();
     }
 }
 
