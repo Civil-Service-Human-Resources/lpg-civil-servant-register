@@ -2,6 +2,7 @@ package uk.gov.cshr.civilservant;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
 
 /**
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
  */
 @SpringBootApplication
 @EnableSpringConfigured
+@EnableCaching
 public class Application {
 
     public static void main(String[] args) {
