@@ -36,8 +36,7 @@ public class OrganisationalUnitController {
 
     public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService, OrganisationalUnitDtoFactory organisationalUnitDtoFactory, AgencyTokenFactory agencyTokenFactory) {
         this.organisationalUnitService = organisationalUnitService;
-        this.organisationalUnitDtoFactory = organisationalUnitDtoFactory;
-        this.agencyTokenFactory = agencyTokenFactory;
+        this.agencyTokenService = agencyTokenService;
     }
 
     @GetMapping("/tree")
@@ -82,6 +81,17 @@ public class OrganisationalUnitController {
     @GetMapping("/parent/{code}")
     public ResponseEntity<List<OrganisationalUnit>> getOrganisationWithParents(@PathVariable String code) {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationWithParents(code));
+    }
+
+    @PostMapping("/{id}/agencyToken")
+    public ResponseEntity<OrganisationalUnit> saveAgencyToken(@PathVariable Long id, @RequestBody AgencyToken agencyToken) {
+        return ResponseEntity.ok(organisationalUnitService.save(id, agencyToken));
+
+    }
+
+    @PatchMapping("/{id}/agencyToken/{tokenId}")
+    public ResponseEntity<OrganisationalUnit> updateAgencyToken(@PathVariable Long id, @RequestBody AgencyToken agencyToken) {
+        return ResponseEntity.ok(organisationalUnitService.save(id, agencyToken));
     }
 
     @GetMapping("/normalised")
