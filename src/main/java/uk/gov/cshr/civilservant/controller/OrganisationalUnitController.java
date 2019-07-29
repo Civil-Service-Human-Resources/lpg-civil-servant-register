@@ -24,6 +24,7 @@ public class OrganisationalUnitController {
         this.agencyTokenService = agencyTokenService;
     }
 
+
     @GetMapping("/tree")
     @Cacheable("organisationalUnitsTree")
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
@@ -47,9 +48,13 @@ public class OrganisationalUnitController {
 
     @PostMapping("/{id}/agencyToken")
     public ResponseEntity<OrganisationalUnit> saveAgencyToken(@PathVariable Long id, @RequestBody AgencyToken agencyToken) {
-        agencyTokenService.save(agencyToken);
         return ResponseEntity.ok(organisationalUnitService.save(id, agencyToken));
 
+    }
+
+    @PatchMapping("/{id}/agencyToken/{tokenId}")
+    public ResponseEntity<OrganisationalUnit> updateAgencyToken(@PathVariable Long id, @RequestBody AgencyToken agencyToken) {
+        return ResponseEntity.ok(organisationalUnitService.save(id, agencyToken));
     }
 
     @GetMapping("/normalised")
@@ -57,4 +62,3 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationsNormalised());
     }
 }
-
