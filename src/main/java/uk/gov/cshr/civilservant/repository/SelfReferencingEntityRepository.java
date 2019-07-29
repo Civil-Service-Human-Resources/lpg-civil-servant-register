@@ -13,7 +13,6 @@ public interface SelfReferencingEntityRepository<T extends SelfReferencingEntity
     List<T> findAllByOrderByNameAsc();
 
     @Override
-    @CacheEvict(value = {"organisationalUnitsTree", "organisationalUnitsFlat"}, allEntries = true)
     <S extends T> S save(S entity);
 
     @Override
