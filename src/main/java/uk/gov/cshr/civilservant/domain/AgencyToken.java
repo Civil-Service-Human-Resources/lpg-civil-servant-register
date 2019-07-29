@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -22,5 +21,5 @@ public class AgencyToken implements RegistryEntity {
     private int capacity;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
-    private Set<AgencyDomain> agencyDomains = new HashSet<>();
+    private Set<AgencyDomain> agencyDomains;
 }
