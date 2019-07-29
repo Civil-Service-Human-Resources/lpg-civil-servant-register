@@ -46,4 +46,10 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     public List<OrganisationalUnit> getOrganisationsNormalised() {
         return repository.findAllNormalised();
     }
+
+
+    public OrganisationalUnit save(OrganisationalUnit organisationalUnit){
+        repository.save(organisationalUnit);
+        return organisationalUnit;
+    }
 }
