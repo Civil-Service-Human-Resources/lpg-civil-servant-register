@@ -1,15 +1,13 @@
 package uk.gov.cshr.civilservant.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
+import uk.gov.cshr.civilservant.service.AgencyTokenService;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import java.util.List;
@@ -17,18 +15,18 @@ import java.util.List;
 @RepositoryRestController
 @RequestMapping("/organisationalUnits")
 public class OrganisationalUnitController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationalUnitController.class);
 
     private OrganisationalUnitService organisationalUnitService;
+    private AgencyTokenService agencyTokenService;
 
-    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService) {
+    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService, AgencyTokenService agencyTokenService) {
         this.organisationalUnitService = organisationalUnitService;
+        this.agencyTokenService = agencyTokenService;
     }
 
     @GetMapping("/tree")
     @Cacheable("organisationalUnitsTree")
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
-        LOGGER.info("Getting org tree");
         List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParents();
 
         return ResponseEntity.ok(organisationalUnits);
@@ -37,7 +35,6 @@ public class OrganisationalUnitController {
     @GetMapping("/flat")
     @Cacheable("organisationalUnitsFlat")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
-        LOGGER.info("Getting org flat");
         List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
 
         return ResponseEntity.ok(organisationalUnitsMap);
@@ -46,6 +43,13 @@ public class OrganisationalUnitController {
     @GetMapping("/parent/{code}")
     public ResponseEntity<List<OrganisationalUnit>> getOrganisationWithParents(@PathVariable String code) {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationWithParents(code));
+    }
+
+    @PostMapping("/{id}/agencyToken")
+    public ResponseEntity<OrganisationalUnit> saveAgencyToken(@PathVariable Long id, @RequestBody AgencyToken agencyToken) {
+        agencyTokenService.save(agencyToken);
+        return ResponseEntity.ok(organisationalUnitService.save(id, agencyToken));
+
     }
 
     @GetMapping("/normalised")
