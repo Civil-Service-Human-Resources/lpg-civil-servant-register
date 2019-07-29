@@ -2,6 +2,7 @@ package uk.gov.cshr.civilservant.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
@@ -41,6 +42,16 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     private void getParent(OrganisationalUnit organisationalUnit, List<OrganisationalUnit> organisationalUnits) {
         Optional<OrganisationalUnit> parent = Optional.ofNullable(organisationalUnit.getParent());
         parent.ifPresent(parentOrganisationalUnit -> getOrganisationalUnit(parentOrganisationalUnit.getCode(), organisationalUnits));
+    }
+
+    public Optional<OrganisationalUnit> getOrganisationalUnit(Long id) {
+        return repository.findById(id);
+    }
+
+    public OrganisationalUnit setAgencyToken(OrganisationalUnit organisationalUnit, AgencyToken agencyToken) {
+        organisationalUnit.setAgencyToken(agencyToken);
+
+        return repository.save(organisationalUnit);
     }
 
     public List<OrganisationalUnit> getOrganisationsNormalised() {
