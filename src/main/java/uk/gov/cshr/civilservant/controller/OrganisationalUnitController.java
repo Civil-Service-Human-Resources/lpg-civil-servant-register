@@ -48,6 +48,7 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationWithParents(code));
     }
 
+
     @PostMapping("/{organisationalUnitId}/agencyToken")
     public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody AgencyToken agencyToken) {
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
@@ -55,6 +56,7 @@ public class OrganisationalUnitController {
             return ResponseEntity.noContent().build();
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
+
 
     @GetMapping("/{organisationalUnitId}/agencyToken")
     public ResponseEntity getAgencyToken(@PathVariable Long organisationalUnitId, @PathVariable Long tokenId, @RequestBody AgencyToken agencyToken, UriComponentsBuilder builder) {
