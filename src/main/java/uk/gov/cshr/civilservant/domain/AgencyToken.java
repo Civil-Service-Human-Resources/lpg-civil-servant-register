@@ -21,6 +21,6 @@ public class AgencyToken implements RegistryEntity {
     @Column(nullable = false)
     private int capacity;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
     private Set<AgencyDomain> agencyDomains = new HashSet<>();
 }
