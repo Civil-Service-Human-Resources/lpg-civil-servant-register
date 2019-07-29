@@ -83,15 +83,29 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationWithParents(code));
     }
 
-    @PostMapping("/{id}/agencyToken")
-    public ResponseEntity<OrganisationalUnit> saveAgencyToken(@PathVariable Long id, @RequestBody AgencyToken agencyToken) {
-        return ResponseEntity.ok(organisationalUnitService.save(id, agencyToken));
-
+    @PostMapping("/{organisationalUnitId}/agencyToken")
+    public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody AgencyToken agencyToken) {
+        return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
+            organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
+            return ResponseEntity.noContent().build();
+        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 
-    @PatchMapping("/{id}/agencyToken/{tokenId}")
-    public ResponseEntity<OrganisationalUnit> updateAgencyToken(@PathVariable Long id, @RequestBody AgencyToken agencyToken) {
-        return ResponseEntity.ok(organisationalUnitService.save(id, agencyToken));
+    @GetMapping("/{organisationalUnitId}/agencyToken")
+    public ResponseEntity getAgencyToken(@PathVariable Long organisationalUnitId, @PathVariable Long tokenId, @RequestBody AgencyToken agencyToken, UriComponentsBuilder builder) {
+        return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
+            organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
+            return ResponseEntity.ok(agencyToken);
+        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+    }
+
+
+    @PatchMapping("/{organisationalUnitId}/agencyToken")
+    public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody AgencyToken agencyToken) {
+        return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
+            organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
+            return ResponseEntity.ok(agencyToken);
+        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 
     @GetMapping("/normalised")
