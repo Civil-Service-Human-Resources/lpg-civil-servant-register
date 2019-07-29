@@ -44,9 +44,13 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         parent.ifPresent(parentOrganisationalUnit -> getOrganisationalUnit(parentOrganisationalUnit.getCode(), organisationalUnits));
     }
 
-    public OrganisationalUnit save(Long id, AgencyToken agencyToken) {
-        OrganisationalUnit organisationalUnit = repository.getOne(id);
+    public Optional<OrganisationalUnit> getOrganisationalUnit(Long id) {
+        return repository.findById(id);
+    }
+
+    public OrganisationalUnit setAgencyToken(OrganisationalUnit organisationalUnit, AgencyToken agencyToken) {
         organisationalUnit.setAgencyToken(agencyToken);
+
         return repository.save(organisationalUnit);
     }
 
