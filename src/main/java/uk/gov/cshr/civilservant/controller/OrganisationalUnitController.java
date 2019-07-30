@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RepositoryRestController
 @RequestMapping("/organisationalUnits")
@@ -23,6 +25,14 @@ public class OrganisationalUnitController {
 
     public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService) {
         this.organisationalUnitService = organisationalUnitService;
+    }
+
+    @GetMapping("/cacheRefresh")
+    public ResponseEntity getAgencyToken() {
+        CompletableFuture.runAsync(this::listOrganisationalUnitsAsFlatStructure);
+        CompletableFuture.runAsync(this::listOrganisationalUnitsAsTreeStructure);
+
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/tree")
