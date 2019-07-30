@@ -5,7 +5,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
@@ -21,17 +23,6 @@ public class OrganisationalUnitController {
 
     public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService) {
         this.organisationalUnitService = organisationalUnitService;
-    }
-
-    @PostMapping
-    public ResponseEntity<OrganisationalUnit> saveOrgUnit(@RequestBody OrganisationalUnit organisationalUnit) {
-        LOGGER.info("Getting org tree");
-        OrganisationalUnit organisationalUnits = organisationalUnitService.save(organisationalUnit);
-
-        new Thread(this::listOrganisationalUnitsAsFlatStructure).start();
-        new Thread(this::listOrganisationalUnitsAsTreeStructure).start();
-
-        return ResponseEntity.ok(organisationalUnits);
     }
 
     @GetMapping("/tree")
