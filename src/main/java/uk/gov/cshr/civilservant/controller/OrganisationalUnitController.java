@@ -28,8 +28,8 @@ public class OrganisationalUnitController {
         LOGGER.info("Getting org tree");
         OrganisationalUnit organisationalUnits = organisationalUnitService.save(organisationalUnit);
 
-        listOrganisationalUnitsAsFlatStructure();
-        listOrganisationalUnitsAsTreeStructure();
+        new Thread(this::listOrganisationalUnitsAsFlatStructure).start();
+        new Thread(this::listOrganisationalUnitsAsTreeStructure).start();
 
         return ResponseEntity.ok(organisationalUnits);
     }

@@ -1,6 +1,5 @@
 package uk.gov.cshr.civilservant.repository;
 
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,7 +15,6 @@ public interface SelfReferencingEntityRepository<T extends SelfReferencingEntity
     <S extends T> S save(S entity);
 
     @Override
-    @CacheEvict(value = {"organisationalUnitsTree", "organisationalUnitsFlat"}, allEntries = true)
     @PreAuthorize("isAuthenticated()")
     void deleteById(Long aLong);
 }
