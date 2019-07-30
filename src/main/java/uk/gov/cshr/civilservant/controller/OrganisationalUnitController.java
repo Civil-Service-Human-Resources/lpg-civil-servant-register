@@ -28,8 +28,7 @@ public class OrganisationalUnitController {
 
     @GetMapping("/cacheRefresh")
     public ResponseEntity getAgencyToken() {
-        listOrganisationalUnitsAsFlatStructure();
-        listOrganisationalUnitsAsTreeStructure();
+        new Thread(this::listOrganisationalUnitsAsTreeStructure).start();
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
