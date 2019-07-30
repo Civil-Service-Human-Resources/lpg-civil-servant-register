@@ -48,8 +48,8 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     }
 
 
-    public OrganisationalUnit save(OrganisationalUnit organisationalUnit){
-        repository.save(organisationalUnit);
-        return organisationalUnit;
+    @Transactional
+    public Optional<OrganisationalUnit> get(Long id) {
+        return repository.findById(id);
     }
 }
