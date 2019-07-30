@@ -54,6 +54,12 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         return repository.save(organisationalUnit);
     }
 
+    public OrganisationalUnit deleteAgencyToken(OrganisationalUnit organisationalUnit) {
+        organisationalUnit.setAgencyToken(null);
+
+        return repository.save(organisationalUnit);
+    }
+
     public List<OrganisationalUnit> getOrganisationsNormalised() {
         return repository.findAllNormalised();
     }

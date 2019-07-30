@@ -23,7 +23,6 @@ public class OrganisationalUnitController {
         this.organisationalUnitService = organisationalUnitService;
     }
 
-
     @GetMapping("/tree")
     @Cacheable("organisationalUnitsTree")
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
@@ -45,12 +44,11 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationWithParents(code));
     }
 
-
     @PostMapping("/{organisationalUnitId}/agencyToken")
-    public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody AgencyToken agencyToken) {
+    public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody AgencyToken agencyToken, UriComponentsBuilder builder) {
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.created(builder.path("/organisationalUnits/{organisationalUnitId}/agencyToken").build(organisationalUnit.getId())).build();
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 
@@ -69,6 +67,14 @@ public class OrganisationalUnitController {
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.ok(agencyToken);
+        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+    }
+
+    @DeleteMapping("/{organisationalUnitId}/agencyToken")
+    public ResponseEntity deleteAgencyToken(@PathVariable Long organisationalUnitId) {
+        return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
+            organisationalUnitService.deleteAgencyToken(organisationalUnit);
+            return ResponseEntity.ok(organisationalUnit);
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 
