@@ -1,4 +1,3 @@
-
 spring:
   data:
     rest:
@@ -17,6 +16,8 @@ spring:
     properties:
       hibernate:
         dialect: uk.gov.cshr.civilservant.config.CustomMySqlDialect
+        show_sql: false
+        format_sql: false
   datasource:
     hikari:
       connection-timeout: 30000

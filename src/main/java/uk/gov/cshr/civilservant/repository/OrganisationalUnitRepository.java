@@ -1,8 +1,10 @@
 package uk.gov.cshr.civilservant.repository;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Repository;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 
@@ -18,4 +20,13 @@ public interface OrganisationalUnitRepository extends SelfReferencingEntityRepos
     @Query(value = "select new uk.gov.cshr.civilservant.domain.OrganisationalUnit(o.name, o.code, o.abbreviation) " +
             "from OrganisationalUnit o")
     List<OrganisationalUnit> findAllNormalised();
+
+    @Override
+    @CacheEvict(value = {"organisationalUnitsTree", "organisationalUnitsFlat"}, allEntries = true)
+    <S extends OrganisationalUnit> S save(S entity);
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    @CacheEvict(value = {"organisationalUnitsTree", "organisationalUnitsFlat"}, allEntries = true)
+    void deleteById(Long aLong);
 }
