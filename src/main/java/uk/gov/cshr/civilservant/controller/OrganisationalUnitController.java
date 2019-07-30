@@ -14,7 +14,6 @@ import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @RepositoryRestController
 @RequestMapping("/organisationalUnits")
@@ -29,8 +28,8 @@ public class OrganisationalUnitController {
 
     @GetMapping("/cacheRefresh")
     public ResponseEntity getAgencyToken() {
-        CompletableFuture.runAsync(this::listOrganisationalUnitsAsFlatStructure);
-        CompletableFuture.runAsync(this::listOrganisationalUnitsAsTreeStructure);
+        listOrganisationalUnitsAsFlatStructure();
+        listOrganisationalUnitsAsTreeStructure();
 
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
