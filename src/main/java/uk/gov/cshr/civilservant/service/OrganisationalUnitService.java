@@ -6,6 +6,8 @@ import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
+import uk.gov.cshr.civilservant.exception.TokenAlreadyExistsException;
+import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 
 import java.util.ArrayList;
@@ -49,7 +51,25 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     }
 
     public OrganisationalUnit setAgencyToken(OrganisationalUnit organisationalUnit, AgencyToken agencyToken) {
+        if (organisationalUnit.getAgencyToken() != null) {
+            throw new TokenAlreadyExistsException(organisationalUnit.getId().toString());
+        }
+
         organisationalUnit.setAgencyToken(agencyToken);
+
+        return repository.save(organisationalUnit);
+    }
+
+    public OrganisationalUnit updateAgencyToken(OrganisationalUnit organisationalUnit, AgencyToken newToken) {
+        AgencyToken currentToken = organisationalUnit.getAgencyToken();
+
+        if (currentToken == null) {
+             throw new TokenDoesNotExistException(organisationalUnit.getId().toString());
+        }
+
+        currentToken.setAgencyDomains(newToken.getAgencyDomains());
+        currentToken.setCapacity(newToken.getCapacity());
+        currentToken.setToken(newToken.getToken());
 
         return repository.save(organisationalUnit);
     }
