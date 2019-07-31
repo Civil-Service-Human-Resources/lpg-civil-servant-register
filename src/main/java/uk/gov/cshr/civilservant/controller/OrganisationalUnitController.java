@@ -65,7 +65,7 @@ public class OrganisationalUnitController {
     @PatchMapping("/{organisationalUnitId}/agencyToken")
     public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody AgencyToken agencyToken) {
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
-            organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
+            organisationalUnitService.updateAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.ok(agencyToken);
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
