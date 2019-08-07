@@ -2,6 +2,7 @@ package uk.gov.cshr.civilservant.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -83,27 +84,30 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationWithParents(code));
     }
 
+    @GetMapping("/normalised")
+    public ResponseEntity<List<OrganisationalUnit>> getOrganisationNormalised() {
+        return ResponseEntity.ok(organisationalUnitService.getOrganisationsNormalised());
+    }
+
     @PostMapping("/{organisationalUnitId}/agencyToken")
     public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody AgencyToken agencyToken) {
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.created(builder.path("/organisationalUnits/{organisationalUnitId}/agencyToken").build(organisationalUnit.getId())).build();
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 
     @GetMapping("/{organisationalUnitId}/agencyToken")
-    public ResponseEntity getAgencyToken(@PathVariable Long organisationalUnitId, @PathVariable Long tokenId, @RequestBody AgencyToken agencyToken, UriComponentsBuilder builder) {
-        return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
-            organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
-            return ResponseEntity.ok(agencyToken);
-        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+    public ResponseEntity getAgencyToken(@PathVariable Long organisationalUnitId) {
+        return organisationalUnitService.getOrganisationalUnit(organisationalUnitId)
+                .map(organisationalUnit -> ResponseEntity.ok(organisationalUnit.getAgencyToken()))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
 
     @PatchMapping("/{organisationalUnitId}/agencyToken")
     public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody AgencyToken agencyToken) {
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
-            organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
+            organisationalUnitService.updateAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.ok(agencyToken);
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
