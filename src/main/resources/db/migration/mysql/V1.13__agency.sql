@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `agency_domain`
     `id`    SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT,
     `token` VARCHAR (10) NOT NULL UNIQUE,
     `capacity` smallint(5) NOT NULL,
+    `capacity_used` smallint(5) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
