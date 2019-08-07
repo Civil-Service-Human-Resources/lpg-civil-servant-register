@@ -25,4 +25,13 @@ public class AgencyToken implements RegistryEntity {
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
     private Set<AgencyDomain> agencyDomains;
+
+    public AgencyToken() {
+    }
+
+    public AgencyToken(String token, int capacity, int capacityUsed) {
+        this.token = token;
+        this.capacity = capacity;
+        this.capacityUsed = capacityUsed;
+    }
 }
