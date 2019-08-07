@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS `agency_domain`
     `id`    SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT,
     `token` VARCHAR (10) NOT NULL UNIQUE,
     `capacity` smallint(5) NOT NULL,
+    `capacity_used` smallint(5) NOT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
@@ -37,8 +38,8 @@ ADD CONSTRAINT `FK_organisational_unit_agency_token` FOREIGN KEY (`agency_token_
 
 SET FOREIGN_KEY_CHECKS=1;
 
-INSERT INTO agency_token VALUES (1, 'token123', 100);
-INSERT INTO agency_token VALUES (2, 'token456', 200);
+INSERT INTO agency_token VALUES (1, 'token123', 100, 10);
+INSERT INTO agency_token VALUES (2, 'token456', 200, 24);
 INSERT INTO agency_domain VALUES (1, 'domain.com');
 INSERT INTO agency_domain VALUES (2, 'example.com');
 INSERT INTO agency_domain VALUES (3, 'test.com');
