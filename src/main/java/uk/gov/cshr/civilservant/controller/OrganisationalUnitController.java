@@ -83,11 +83,6 @@ public class OrganisationalUnitController {
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 
-    @GetMapping("/normalised")
-    public ResponseEntity<List<OrganisationalUnit>> getOrganisationNormalised() {
-        return ResponseEntity.ok(organisationalUnitService.getOrganisationsNormalised());
-    }
-
     @GetMapping("/allCodesMap")
     public ResponseEntity<Map<String, List<String>>> getAllCodes() {
         Map<String, List<String>> codeParentCodesMap = new HashMap<>();
