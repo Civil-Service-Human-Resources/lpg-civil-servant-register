@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
@@ -17,6 +18,8 @@ import java.util.List;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -27,6 +30,9 @@ public class OrganisationalUnitServiceTest {
 
     @Mock
     private OrganisationalUnitDtoFactory organisationalUnitDtoFactory;
+
+    @Mock
+    private AgencyTokenService agencyTokenService;
 
     @InjectMocks
     private OrganisationalUnitService organisationalUnitService;
@@ -95,5 +101,16 @@ public class OrganisationalUnitServiceTest {
         assertThat(organisationalUnitDtoList.size(), equalTo(3));
         assertThat(organisationalUnitDtoList.get(0).getName(), equalTo("parent1"));
         assertThat(organisationalUnitDtoList.get(2).getFormattedName(), equalTo("parent1 | child1 | grandchild1"));
+    }
+
+    @Test
+    public void shouldDeleteAgencyToken() {
+        AgencyToken agencyToken = new AgencyToken();
+        OrganisationalUnit organisationalUnit = new OrganisationalUnit();
+        organisationalUnit.setAgencyToken(agencyToken);
+
+        doNothing().when(agencyTokenService).deleteAgencyToken(agencyToken);
+
+        assertNull(organisationalUnitService.deleteAgencyToken(organisationalUnit));
     }
 }
