@@ -29,4 +29,8 @@ public class AgencyTokenService {
     public Optional<AgencyToken> getAgencyTokenByDomainTokenAndOrganisation(String domain, String token, String code) {
         return agencyTokenRepository.findByDomainTokenAndCode(domain, token, code);
     }
+
+    public void deleteAgencyToken(AgencyToken agencyToken) {
+        agencyTokenRepository.delete(agencyToken);
+    }
 }

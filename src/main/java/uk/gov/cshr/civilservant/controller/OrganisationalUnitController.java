@@ -4,6 +4,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
@@ -50,6 +51,7 @@ public class OrganisationalUnitController {
     }
 
     @PostMapping("/{organisationalUnitId}/agencyToken")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody AgencyToken agencyToken, UriComponentsBuilder builder) {
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
@@ -58,6 +60,7 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping("/{organisationalUnitId}/agencyToken")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity getAgencyToken(@PathVariable Long organisationalUnitId) {
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId)
                 .map(organisationalUnit -> ResponseEntity.ok(organisationalUnit.getAgencyToken()))
@@ -65,6 +68,7 @@ public class OrganisationalUnitController {
     }
 
     @PatchMapping("/{organisationalUnitId}/agencyToken")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody AgencyToken agencyToken) {
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.updateAgencyToken(organisationalUnit, agencyToken);
@@ -73,6 +77,7 @@ public class OrganisationalUnitController {
     }
 
     @DeleteMapping("/{organisationalUnitId}/agencyToken")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity deleteAgencyToken(@PathVariable Long organisationalUnitId) {
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.deleteAgencyToken(organisationalUnit);
