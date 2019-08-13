@@ -19,10 +19,12 @@ import java.util.Optional;
 public class OrganisationalUnitService extends SelfReferencingEntityService<OrganisationalUnit, OrganisationalUnitDto> {
 
     private OrganisationalUnitRepository repository;
+    private AgencyTokenService agencyTokenService;
 
-    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository, OrganisationalUnitDtoFactory organisationalUnitDtoFactory) {
+    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository, OrganisationalUnitDtoFactory organisationalUnitDtoFactory, AgencyTokenService agencyTokenService) {
         super(organisationalUnitRepository, organisationalUnitDtoFactory);
         this.repository = organisationalUnitRepository;
+        this.agencyTokenService = agencyTokenService;
     }
 
     public List<OrganisationalUnit> getOrganisationWithParents(String code) {
@@ -75,7 +77,11 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     }
 
     public OrganisationalUnit deleteAgencyToken(OrganisationalUnit organisationalUnit) {
+        AgencyToken agencyToken = organisationalUnit.getAgencyToken();
+
         organisationalUnit.setAgencyToken(null);
+
+        agencyTokenService.deleteAgencyToken(agencyToken);
 
         return repository.save(organisationalUnit);
     }
