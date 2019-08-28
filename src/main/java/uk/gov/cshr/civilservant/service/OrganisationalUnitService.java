@@ -75,6 +75,10 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         return repository.findById(id);
     }
 
+    public List<OrganisationalUnit> getOrganisationsNormalised() {
+        return repository.findAllNormalised();
+    }
+
     public OrganisationalUnit setAgencyToken(OrganisationalUnit organisationalUnit, AgencyToken agencyToken) {
         if (organisationalUnit.getAgencyToken() != null) {
             throw new TokenAlreadyExistsException(organisationalUnit.getId().toString());
@@ -107,10 +111,6 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         agencyTokenService.deleteAgencyToken(agencyToken);
 
         return repository.save(organisationalUnit);
-    }
-
-    public List<OrganisationalUnit> getOrganisationsNormalised() {
-        return repository.findAllNormalised();
     }
 
     public List<String> getOrganisationalUnitCodes() {

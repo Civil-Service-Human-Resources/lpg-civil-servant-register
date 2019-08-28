@@ -68,12 +68,12 @@ public class AgencyTokenController {
 
             List<OrganisationalUnit> PassedOrganisationalUnitList = new ArrayList<>();
             List<String> OrganisaitnalUnitCodeList = new ArrayList<>();
-            PassedOrganisationalUnitList = organisationalUnitService.getOrganisationWithParents(updateSpacesForAgencyTokenDTO.getCode());
-            for (OrganisationalUnit organisationalUnit: PassedOrganisationalUnitList)
-            {
-                OrganisaitnalUnitCodeList.add(organisationalUnit.getCode());
-            }
-            agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenRequestDTO.getDomain(), updateSpacesForAgencyTokenRequestDTO.getToken(), updateSpacesForAgencyTokenRequestDTO.getCode(), updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
+//            PassedOrganisationalUnitList = organisationalUnitService.getOrganisationWithParents(updateSpacesForAgencyTokenDTO.getCode());
+//            for (OrganisationalUnit organisationalUnit: PassedOrganisationalUnitList)
+//            {
+//                OrganisaitnalUnitCodeList.add(organisationalUnit.getCode());
+//            }
+//            agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenRequestDTO.getDomain(), updateSpacesForAgencyTokenRequestDTO.getToken(), updateSpacesForAgencyTokenRequestDTO.getCode(), updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
 
         } catch (TokenDoesNotExistException e) {
             log.warn("Token not found", e);
