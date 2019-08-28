@@ -12,7 +12,10 @@ import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @RepositoryRestController
 @RequestMapping("/organisationalUnits")
@@ -51,6 +54,23 @@ public class OrganisationalUnitController {
     @GetMapping("/normalised")
     public ResponseEntity<List<OrganisationalUnit>> getOrganisationNormalised() {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationsNormalised());
+    }
+
+    @GetMapping("/allCodesMap")
+    public ResponseEntity<Map<String, List<String>>> getAllCodes() {
+        Map<String, List<String>> codeParentCodesMap = new HashMap<>();
+
+        List<String> organisationalUnitCodes = organisationalUnitService.getOrganisationalUnitCodes();
+
+        organisationalUnitCodes.forEach(s -> {
+            List<String> parentCodes = organisationalUnitService.getOrganisationWithParents(s)
+                    .stream()
+                    .map(OrganisationalUnit::getCode)
+                    .collect(Collectors.toList());
+            codeParentCodesMap.put(s, parentCodes);
+        });
+
+        return ResponseEntity.ok(codeParentCodesMap);
     }
 }
 
