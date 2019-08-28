@@ -48,6 +48,44 @@ public class OrganisationalUnitServiceTest {
         ORG_UNIT_FAMILY = buildLargeFamilyOfOrganisationalUnits();
     }
 
+    private static List<OrganisationalUnit> buildLargeFamilyOfOrganisationalUnits() {
+        // the family entirely
+        List<OrganisationalUnit> theFamily = new ArrayList<>();
+        // godfathers children - first generation
+        List<OrganisationalUnit> godfathersChildren = buildGodFathersChildren();
+
+        OrganisationalUnit headOfFamily = new OrganisationalUnit();
+        headOfFamily.setCode("gf");
+        headOfFamily.setParent(null);
+        headOfFamily.setAbbreviation("GF");
+        headOfFamily.setName("Godfather: the head of the family");
+        headOfFamily.setId(new Long(100));
+        headOfFamily.setChildren(godfathersChildren);
+
+        // set parent of godfathers children to be the godfather
+        headOfFamily.getChildren().forEach(c -> c.setParent(headOfFamily));
+
+        theFamily.add(0, headOfFamily);
+        return theFamily;
+    }
+
+    private static List<OrganisationalUnit> buildGodFathersChildren() {
+        List<OrganisationalUnit> godfathersChildren = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            godfathersChildren.add(i, buildGFChildren(i));
+        }
+        return godfathersChildren;
+    }
+
+    private static OrganisationalUnit buildGFChildren(int index) {
+        OrganisationalUnit godfathersChild = new OrganisationalUnit();
+        godfathersChild.setCode("c" + index);
+        godfathersChild.setAbbreviation("C" + index);
+        godfathersChild.setName("child " + index + " of the godfathers");
+        godfathersChild.setId(new Long(index));
+        return godfathersChild;
+    }
+
     @Test
     public void shouldReturnParentOrganisationalUnits() {
         OrganisationalUnit parent1 = new OrganisationalUnit();
@@ -151,43 +189,5 @@ public class OrganisationalUnitServiceTest {
         doNothing().when(agencyTokenService).deleteAgencyToken(agencyToken);
 
         assertNull(organisationalUnitService.deleteAgencyToken(organisationalUnit));
-    }
-
-    private static List<OrganisationalUnit> buildLargeFamilyOfOrganisationalUnits() {
-        // the family entirely
-        List<OrganisationalUnit> theFamily = new ArrayList<>();
-        // godfathers children - first generation
-        List<OrganisationalUnit> godfathersChildren = buildGodFathersChildren();
-
-        OrganisationalUnit headOfFamily = new OrganisationalUnit();
-        headOfFamily.setCode("gf");
-        headOfFamily.setParent(null);
-        headOfFamily.setAbbreviation("GF");
-        headOfFamily.setName("Godfather: the head of the family");
-        headOfFamily.setId(new Long(100));
-        headOfFamily.setChildren(godfathersChildren);
-
-        // set parent of godfathers children to be the godfather
-        headOfFamily.getChildren().forEach(c -> c.setParent(headOfFamily));
-
-        theFamily.add(0, headOfFamily);
-        return theFamily;
-    }
-
-    private static List<OrganisationalUnit> buildGodFathersChildren(){
-        List<OrganisationalUnit> godfathersChildren = new ArrayList<>();
-        for(int i=0; i<5; i++) {
-            godfathersChildren.add(i, buildGFChildren(i));
-        }
-        return godfathersChildren;
-    }
-
-    private static OrganisationalUnit buildGFChildren(int index){
-        OrganisationalUnit godfathersChild = new OrganisationalUnit();
-        godfathersChild.setCode("c" + index);
-        godfathersChild.setAbbreviation("C" + index);
-        godfathersChild.setName("child " + index +" of the godfathers");
-        godfathersChild.setId(new Long(index));
-        return godfathersChild;
     }
 }

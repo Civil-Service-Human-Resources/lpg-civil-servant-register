@@ -148,7 +148,6 @@ public class OrganisationalUnitControllerTest {
         verify(organisationalUnitService, never()).getOrganisationalUnit(anyLong());
         verify(organisationalUnitService, never()).setAgencyToken(any(OrganisationalUnit.class), any(AgencyToken.class));
     }
-}
 
     @Test
     public void shouldReturnOkIfRequestingAllCodesMap() throws Exception {
@@ -182,3 +181,4 @@ public class OrganisationalUnitControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+}
