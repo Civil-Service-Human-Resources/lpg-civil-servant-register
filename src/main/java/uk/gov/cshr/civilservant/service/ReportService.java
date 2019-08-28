@@ -62,6 +62,12 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
+    public Map<String, CivilServantReportDto> getCivilServantMapNormalisedWithCodes() {
+        return civilServantRepository.findAllNormalisedWithCodes().stream()
+                .collect(Collectors.toMap(CivilServantReportDto::getUid, civilServantDto -> civilServantDto));
+    }
+
+    @Transactional(readOnly = true)
     public Map<String, CivilServantReportDto> getCivilServantMapByUserOrganisationNormalised(String userId) {
         CivilServant user = civilServantRepository.findByIdentity(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
