@@ -33,6 +33,13 @@ public class CivilServantReportDto {
         this.lineManagerUid = lineManagerUid;
     }
 
+    public CivilServantReportDto(String name, String organisation, String profession, String uid) {
+        this.name = name;
+        this.organisation = organisation;
+        this.profession = profession;
+        this.uid = uid;
+    }
+
     public CivilServantReportDto() {
     }
 }
