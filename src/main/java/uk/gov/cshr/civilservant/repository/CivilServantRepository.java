@@ -82,4 +82,13 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
             "left join Identity li on li.id = c.lineManager.identity.id " +
             "group by c.id ")
     List<CivilServantReportDto> findAllNormalisedWithCodes();
+
+    @Query("select new uk.gov.cshr.civilservant.dto.CivilServantReportDto(c.fullName, ou.code, p.name, i.uid) " +
+            "from CivilServant c " +
+            "left join OrganisationalUnit ou on ou.id = c.organisationalUnit.id " +
+            "left join Profession p on p.id = c.profession.id " +
+            "left join Identity i on i.id = c.identity.id " +
+            "where ou.code = ?1 " +
+            "group by c.id ")
+    List<CivilServantReportDto> findAllByOrganisationCodeNormalised(String organisationalUnitCode);
 }
