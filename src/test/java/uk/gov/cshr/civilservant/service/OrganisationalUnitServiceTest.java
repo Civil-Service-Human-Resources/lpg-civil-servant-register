@@ -96,4 +96,13 @@ public class OrganisationalUnitServiceTest {
         assertThat(organisationalUnitDtoList.get(0).getName(), equalTo("parent1"));
         assertThat(organisationalUnitDtoList.get(2).getFormattedName(), equalTo("parent1 | child1 | grandchild1"));
     }
+
+    @Test
+    public void shouldReturnAllOrganisationCodes() {
+        List<String> codes = Arrays.asList("code1", "code2");
+
+        when(organisationalUnitRepository.findAllCodes()).thenReturn(codes);
+
+        assertEquals(codes, organisationalUnitService.getOrganisationalUnitCodes());
+    }
 }
