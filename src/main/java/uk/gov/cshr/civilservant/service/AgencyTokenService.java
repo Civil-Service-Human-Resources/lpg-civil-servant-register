@@ -36,13 +36,12 @@ public class AgencyTokenService {
         // find token
         Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainTokenAndCode(domain, token, code);
 
-        if(agencyToken.isPresent()){
+        if (agencyToken.isPresent()) {
             // if it exists - do update
-           updateSpacesAvailable(agencyToken.get());
+            updateSpacesAvailable(agencyToken.get());
         } else {
             // Not found
             throw new TokenDoesNotExistException(domain);
-            //throw new TokenDoesNotExistException(organisationalUnit.getId().toString());
         }
 
         return agencyToken;
@@ -52,23 +51,24 @@ public class AgencyTokenService {
         agencyTokenRepository.delete(agencyToken);
     }
 
-    private boolean updateSpacesAvailable(AgencyToken agencyToken){
-        boolean isSuccessful = false;
-        synchronized (this){
+    private void updateSpacesAvailable(AgencyToken agencyToken) {
+
+        AgencyToken updatedAgencyToken = null;
+        synchronized (this) {
             // check existing quota
             int existing = agencyToken.getCapacityUsed();
 
             // check if enough
-            if(existing + 1 > agencyToken.getCapacity()) {
+            if (existing + 1 > agencyToken.getCapacity()) {
                 throw new NotEnoughSpaceAvailableException(agencyToken.getToken());
             }
 
             // update
-            agencyToken.setCapacityUsed(existing++);
+            int newCapacityUsed = agencyToken.getCapacityUsed() + 1;
+            agencyToken.setCapacityUsed(newCapacityUsed);
             agencyTokenRepository.save(agencyToken);
-            isSuccessful = true;
         }
-        return isSuccessful;
+
     }
 
 }

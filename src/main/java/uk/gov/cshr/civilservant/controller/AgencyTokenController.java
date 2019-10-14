@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
+import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
+import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
 
 @RestController
@@ -47,8 +49,16 @@ public class AgencyTokenController {
 
     @PostMapping
     public ResponseEntity getSpaceAvailable(@RequestBody AgencyTokenDTO agencyTokenDTO) {
-        return agencyTokenService.updateAgencyTokenSpacesAvailable(agencyTokenDTO.getDomain(), agencyTokenDTO.getOrganisation(), agencyTokenDTO.getAgencyTokenCode())
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        try {
+            agencyTokenService.updateAgencyTokenSpacesAvailable(agencyTokenDTO.getDomain(), agencyTokenDTO.getOrganisation(), agencyTokenDTO.getAgencyTokenCode());
+        } catch (TokenDoesNotExistException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } catch (NotEnoughSpaceAvailableException e) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
