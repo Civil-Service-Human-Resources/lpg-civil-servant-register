@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class AgencyTokenDTO {
 
-    private String organisation;
     private String domain;
-    private String agencyTokenCode;
+    private String token;
+    private String code;
 }
