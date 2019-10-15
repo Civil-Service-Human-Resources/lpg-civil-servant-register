@@ -60,7 +60,7 @@ public class AgencyTokenController {
             log.warn("Token not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (NotEnoughSpaceAvailableException e) {
-            log.warn("Not enough space availbale for token");
+            log.warn("Not enough space available for token");
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
             log.error("An error occurred");
