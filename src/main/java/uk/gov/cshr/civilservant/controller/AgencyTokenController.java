@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
 
+@Slf4j
 @RestController
 @RequestMapping("/agencyTokens")
 public class AgencyTokenController {
@@ -50,12 +52,18 @@ public class AgencyTokenController {
     @PostMapping
     public ResponseEntity getSpaceAvailable(@RequestBody AgencyTokenDTO agencyTokenDTO) {
         try {
-            agencyTokenService.updateAgencyTokenSpacesAvailable(agencyTokenDTO.getDomain(), agencyTokenDTO.getOrganisation(), agencyTokenDTO.getAgencyTokenCode());
+            log.info("Updating agency token with parameters domain=" + agencyTokenDTO.getDomain() +
+                    " token=" + agencyTokenDTO.getToken() +
+                    " code=" + agencyTokenDTO.getCode());
+            agencyTokenService.updateAgencyTokenSpacesAvailable(agencyTokenDTO.getDomain(), agencyTokenDTO.getToken(), agencyTokenDTO.getCode());
         } catch (TokenDoesNotExistException e) {
+            log.warn("Token not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (NotEnoughSpaceAvailableException e) {
+            log.warn("Not enough space availbale for token");
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
+            log.error("An error occurred");
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
