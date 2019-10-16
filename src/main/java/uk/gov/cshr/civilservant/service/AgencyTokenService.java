@@ -32,13 +32,13 @@ public class AgencyTokenService {
         return agencyTokenRepository.findByDomainTokenAndCode(domain, token, code);
     }
 
-    public Optional<AgencyToken> updateAgencyTokenSpacesAvailable(String domain, String token, String code) {
+    public Optional<AgencyToken> updateAgencyTokenSpacesAvailable(String domain, String token, String code, boolean isRemoveUser) {
         // find token
         Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainTokenAndCode(domain, token, code);
 
         if (agencyToken.isPresent()) {
             // if it exists - do update
-            updateSpacesAvailable(agencyToken.get());
+            updateSpacesAvailable(agencyToken.get(), isRemoveUser);
         } else {
             // Not found
             throw new TokenDoesNotExistException(domain);
@@ -51,8 +51,26 @@ public class AgencyTokenService {
         agencyTokenRepository.delete(agencyToken);
     }
 
-    private void updateSpacesAvailable(AgencyToken agencyToken) {
+    private void updateSpacesAvailable(AgencyToken agencyToken, boolean isRemoveUser) {
+        if(isRemoveUser) {
+            removeUserFromAgencyTokenUpdateSpacesAvailable(agencyToken);
+        } else {
+            addUserToAgencyTokenUpdateSpacesAvailable(agencyToken);
+        }
 
+    }
+
+    private void removeUserFromAgencyTokenUpdateSpacesAvailable(AgencyToken agencyToken) {
+        AgencyToken updatedAgencyToken = null;
+        synchronized (this) {
+            // update
+            int newCapacityUsed = agencyToken.getCapacityUsed() - 1;
+            agencyToken.setCapacityUsed(newCapacityUsed);
+            agencyTokenRepository.save(agencyToken);
+        }
+    }
+
+    private void addUserToAgencyTokenUpdateSpacesAvailable(AgencyToken agencyToken) {
         AgencyToken updatedAgencyToken = null;
         synchronized (this) {
             // check existing quota
@@ -68,7 +86,7 @@ public class AgencyTokenService {
             agencyToken.setCapacityUsed(newCapacityUsed);
             agencyTokenRepository.save(agencyToken);
         }
-
     }
+
 
 }
