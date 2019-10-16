@@ -90,7 +90,7 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.save(any(AgencyToken.class))).thenReturn(new AgencyToken());
 
         // when
-        Optional<AgencyToken> actual = agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code);
+        Optional<AgencyToken> actual = agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false);
 
         // then
         verify(agencyTokenRepository, times(1)).save(agencyTokenCaptor.capture());
@@ -112,7 +112,7 @@ public class AgencyTokenServiceTest {
 
         // when
         // then
-        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code))
+        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
                 .isInstanceOf(TokenDoesNotExistException.class);
 
         verify(agencyTokenRepository, never()).save(agencyTokenCaptor.capture());
@@ -138,7 +138,7 @@ public class AgencyTokenServiceTest {
 
         // when
         // then
-        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code))
+        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
                 .isInstanceOf(NotEnoughSpaceAvailableException.class);
 
         verify(agencyTokenRepository, never()).save(agencyTokenCaptor.capture());
@@ -164,7 +164,7 @@ public class AgencyTokenServiceTest {
 
         // when
         // then
-        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code))
+        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
                 .isInstanceOf(Exception.class);
 
         verify(agencyTokenRepository, never()).save(agencyTokenCaptor.capture());

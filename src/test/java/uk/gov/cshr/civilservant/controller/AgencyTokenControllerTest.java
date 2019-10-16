@@ -1,8 +1,6 @@
 package uk.gov.cshr.civilservant.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-import com.google.gson.GsonBuilder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +19,12 @@ import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -137,34 +134,34 @@ public class AgencyTokenControllerTest {
 
         AgencyTokenDTO dto = new AgencyTokenDTO();
         dto.setDomain(domain);
-        dto.setOrganisation(token);
-        dto.setAgencyTokenCode(code);
+        dto.setToken(token);
+        dto.setCode(code);
 
         AgencyToken agencyToken = new AgencyToken();
-        when(agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code)).thenReturn(Optional.of(agencyToken));
+        when(agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false)).thenReturn(Optional.of(agencyToken));
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/agencyTokens")
+        mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
                 .content(asJsonString(dto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk());;
+                .andExpect(status().isNoContent());
     }
 
     @Test
     public void shouldReturnNotFoundIfAgencyTokenNotFound() throws Exception {
         String domain = "example.com";
-        String orgId = "token123";
+        String token = "token123";
         String code = "code";
 
         AgencyTokenDTO dto = new AgencyTokenDTO();
         dto.setDomain(domain);
-        dto.setOrganisation(orgId);
-        dto.setAgencyTokenCode(code);
+        dto.setToken(token);
+        dto.setCode(code);
 
-        when(agencyTokenService.updateAgencyTokenSpacesAvailable(anyString(), anyString(), anyString())).thenThrow(new TokenDoesNotExistException(orgId));
+        when(agencyTokenService.updateAgencyTokenSpacesAvailable(anyString(), anyString(), anyString(), anyBoolean())).thenThrow(new TokenDoesNotExistException(token));
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/agencyTokens")
+        mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
                 .content(asJsonString(dto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
@@ -173,27 +170,25 @@ public class AgencyTokenControllerTest {
     }
 
     @Test
-    public void shouldReturnConflictdIfAgencyTokenHasNoSpacesAvailable() throws Exception {
+    public void shouldReturnConflictIfAgencyTokenHasNoSpacesAvailable() throws Exception {
         String domain = "example.com";
-        String orgId = "token123";
+        String token = "token123";
         String code = "code";
 
         AgencyTokenDTO dto = new AgencyTokenDTO();
         dto.setDomain(domain);
-        dto.setOrganisation(orgId);
-        dto.setAgencyTokenCode(code);
+        dto.setToken(token);
+        dto.setCode(code);
 
-        when(agencyTokenService.updateAgencyTokenSpacesAvailable(anyString(), anyString(), anyString())).thenThrow(new NotEnoughSpaceAvailableException(""));
+        when(agencyTokenService.updateAgencyTokenSpacesAvailable(anyString(), anyString(), anyString(), anyBoolean())).thenThrow(new NotEnoughSpaceAvailableException(token));
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/agencyTokens")
+        mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
                 .content(asJsonString(dto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isConflict());
     }
-
-
 
     public static String asJsonString(final Object obj) {
         try {

@@ -12,4 +12,5 @@ public class AgencyTokenDTO {
     private String domain;
     private String token;
     private String code;
+    private boolean removeUser;
 }

@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -49,13 +49,14 @@ public class AgencyTokenController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    @PostMapping
-    public ResponseEntity getSpaceAvailable(@RequestBody AgencyTokenDTO agencyTokenDTO) {
+    @PutMapping
+    public ResponseEntity updateSpaceAvailable(@RequestBody AgencyTokenDTO agencyTokenDTO) {
         try {
             log.info("Updating agency token with parameters domain=" + agencyTokenDTO.getDomain() +
                     " token=" + agencyTokenDTO.getToken() +
-                    " code=" + agencyTokenDTO.getCode());
-            agencyTokenService.updateAgencyTokenSpacesAvailable(agencyTokenDTO.getDomain(), agencyTokenDTO.getToken(), agencyTokenDTO.getCode());
+                    " code=" + agencyTokenDTO.getCode() +
+                    " isRemoveUser=" + agencyTokenDTO.isRemoveUser());
+            agencyTokenService.updateAgencyTokenSpacesAvailable(agencyTokenDTO.getDomain(), agencyTokenDTO.getToken(), agencyTokenDTO.getCode(), agencyTokenDTO.isRemoveUser());
         } catch (TokenDoesNotExistException e) {
             log.warn("Token not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -67,6 +68,7 @@ public class AgencyTokenController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
 }
