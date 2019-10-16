@@ -17,6 +17,7 @@ import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
+import uk.gov.cshr.civilservant.utils.JsonUtils;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -141,7 +142,7 @@ public class AgencyTokenControllerTest {
         when(agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false)).thenReturn(Optional.of(agencyToken));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
-                .content(asJsonString(dto))
+                .content(JsonUtils.asJsonString(dto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -162,7 +163,7 @@ public class AgencyTokenControllerTest {
         when(agencyTokenService.updateAgencyTokenSpacesAvailable(anyString(), anyString(), anyString(), anyBoolean())).thenThrow(new TokenDoesNotExistException(token));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
-                .content(asJsonString(dto))
+                .content(JsonUtils.asJsonString(dto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
@@ -183,20 +184,34 @@ public class AgencyTokenControllerTest {
         when(agencyTokenService.updateAgencyTokenSpacesAvailable(anyString(), anyString(), anyString(), anyBoolean())).thenThrow(new NotEnoughSpaceAvailableException(token));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
-                .content(asJsonString(dto))
+                .content(JsonUtils.asJsonString(dto))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isConflict());
     }
 
-    public static String asJsonString(final Object obj) {
-        try {
-            final ObjectMapper mapper = new ObjectMapper();
-            final String jsonContent = mapper.writeValueAsString(obj);
-            return jsonContent;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+    @Test
+    public void shouldReturnOkIfUserIsRemovedFromAValidAgencyToken() throws Exception {
+        String domain = "example.com";
+        String token = "token123";
+        String code = "code";
+
+        AgencyTokenDTO dto = new AgencyTokenDTO();
+        dto.setDomain(domain);
+        dto.setToken(token);
+        dto.setCode(code);
+
+        AgencyToken agencyToken = new AgencyToken();
+        when(agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false)).thenReturn(Optional.of(agencyToken));
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
+                .content(JsonUtils.asJsonString(dto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
     }
+
+
 }
