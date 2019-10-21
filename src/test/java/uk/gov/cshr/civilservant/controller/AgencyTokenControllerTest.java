@@ -1,6 +1,5 @@
 package uk.gov.cshr.civilservant.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +33,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WithMockUser(username = "user")
 public class AgencyTokenControllerTest {
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -212,6 +212,5 @@ public class AgencyTokenControllerTest {
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }
-
 
 }
