@@ -100,6 +100,40 @@ public class AgencyTokenServiceTest {
     }
 
     @Test
+    public void givenAValidAgencyAndIsARemoveUser_whenIUpdateAgencyTokenSpacesAvailable_thenReturnsSuccessfully() {
+        String token = "token123";
+        String domain = "example.com";
+        String code = "123456";
+
+        AgencyToken agencyToken = new AgencyToken();
+        agencyToken.setToken("thisisatoken");
+
+        int capacity = 100;
+        int capacityUsed = 50;
+        agencyToken.setCapacity(capacity);
+        agencyToken.setCapacityUsed(capacityUsed);
+        Optional<AgencyToken> optionalAgencyToken = Optional.of(agencyToken);
+
+        // should free up capacity by 1
+        int expectedNewCapacityUsed = capacityUsed - 1;
+
+        // given
+        when(agencyTokenRepository.findByDomainTokenAndCode(domain, token, code)).thenReturn(optionalAgencyToken);
+        when(agencyTokenRepository.save(any(AgencyToken.class))).thenReturn(new AgencyToken());
+
+        // when
+        agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, true);
+
+        // then
+        verify(agencyTokenRepository, times(1)).save(agencyTokenCaptor.capture());
+
+        AgencyToken actualAgencyTokenSavedToDatabase = agencyTokenCaptor.getValue();
+        assertThat(actualAgencyTokenSavedToDatabase.getCapacityUsed(), equalTo(expectedNewCapacityUsed));
+        assertThat(actualAgencyTokenSavedToDatabase.getCapacity(), equalTo(capacity));
+        assertThat(actualAgencyTokenSavedToDatabase.getToken(), equalTo("thisisatoken"));
+    }
+
+    @Test
     public void givenANotInExistanceAgencyToken_whenIUpdateAgencyTokenSpacesAvailable_thenTokenDoesNotExistExceptionShouldBeThrown() {
         String token = "token123";
         String domain = "example.com";
@@ -113,7 +147,7 @@ public class AgencyTokenServiceTest {
                 .isInstanceOf(TokenDoesNotExistException.class);
 
         // then
-        verify(agencyTokenRepository, never()).save(agencyTokenCaptor.capture());
+        verify(agencyTokenRepository, never()).save(any(AgencyToken.class));
     }
 
     @Test
@@ -139,7 +173,7 @@ public class AgencyTokenServiceTest {
                 .isInstanceOf(NotEnoughSpaceAvailableException.class);
 
         // then
-        verify(agencyTokenRepository, never()).save(agencyTokenCaptor.capture());
+        verify(agencyTokenRepository, never()).save(any(AgencyToken.class));
     }
 
     @Test
@@ -156,7 +190,7 @@ public class AgencyTokenServiceTest {
                 .isInstanceOf(Exception.class);
 
         // then
-        verify(agencyTokenRepository, never()).save(agencyTokenCaptor.capture());
+        verify(agencyTokenRepository, never()).save(any(AgencyToken.class));
     }
 
 }
