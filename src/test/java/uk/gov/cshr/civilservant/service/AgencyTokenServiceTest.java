@@ -12,7 +12,6 @@ import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.AgencyTokenRepository;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +21,6 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -90,7 +88,7 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.save(any(AgencyToken.class))).thenReturn(new AgencyToken());
 
         // when
-        Optional<AgencyToken> actual = agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false);
+        agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false);
 
         // then
         verify(agencyTokenRepository, times(1)).save(agencyTokenCaptor.capture());
@@ -111,10 +109,10 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.findByDomainTokenAndCode(domain, token, code)).thenThrow(new TokenDoesNotExistException(domain));
 
         // when
-        // then
         assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
                 .isInstanceOf(TokenDoesNotExistException.class);
 
+        // then
         verify(agencyTokenRepository, never()).save(agencyTokenCaptor.capture());
     }
 
@@ -137,10 +135,10 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.findByDomainTokenAndCode(domain, token, code)).thenReturn(optionalAgencyToken);
 
         // when
-        // then
         assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
                 .isInstanceOf(NotEnoughSpaceAvailableException.class);
 
+        // then
         verify(agencyTokenRepository, never()).save(agencyTokenCaptor.capture());
     }
 
@@ -150,23 +148,14 @@ public class AgencyTokenServiceTest {
         String domain = "example.com";
         String code = "123456";
 
-        AgencyToken agencyToken = new AgencyToken();
-        agencyToken.setToken("thisisatoken");
-
-        int capacity = 100;
-        int capacityUsed = 100;
-        agencyToken.setCapacity(capacity);
-        agencyToken.setCapacityUsed(capacityUsed);
-        Optional<AgencyToken> optionalAgencyToken = Optional.of(agencyToken);
-
         // given
         when(agencyTokenRepository.findByDomainTokenAndCode(domain, token, code)).thenThrow(new RuntimeException());
 
         // when
-        // then
         assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
                 .isInstanceOf(Exception.class);
 
+        // then
         verify(agencyTokenRepository, never()).save(agencyTokenCaptor.capture());
     }
 
