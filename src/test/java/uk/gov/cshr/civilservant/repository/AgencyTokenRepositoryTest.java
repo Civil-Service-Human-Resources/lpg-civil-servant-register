@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -78,7 +79,20 @@ public class AgencyTokenRepositoryTest {
         assertThat(actual.get().getCapacityUsed(), equalTo(91));
         assertThat(actual.get().getId(), is(notNullValue()));
         assertThat(actual.get().getAgencyDomains(), is(nullValue()));
-
     }
+
+    @Test
+    public void shouldFindAgencyTokenIncludingAgencyDomainsByExistingDomainAndTokenAndCode() {
+
+        Optional<AgencyToken> actual = agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains("nhs.scot", "token4Test", "nhs");
+
+        assertTrue(actual.isPresent());
+        assertThat(actual.get().getToken(), equalTo("token4Test"));
+        assertThat(actual.get().getCapacity(), equalTo(100));
+        assertThat(actual.get().getCapacityUsed(), equalTo(91));
+        assertThat(actual.get().getId(), is(notNullValue()));
+        assertThat(actual.get().getAgencyDomains(), hasSize(3));
+    }
+
 
 }
