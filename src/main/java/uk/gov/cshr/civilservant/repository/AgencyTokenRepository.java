@@ -32,4 +32,13 @@ public interface AgencyTokenRepository extends CrudRepository<AgencyToken, Long>
             "and a.token = ?2 " +
             "and ou.code = ?3")
     Optional<AgencyToken> findByDomainTokenAndCode(String domain, String token, String code);
+
+    @Query("SELECT DISTINCT at FROM AgencyToken at " +
+            "LEFT JOIN FETCH at.agencyDomains agencyDomains " +
+            "LEFT JOIN OrganisationalUnit ou ON ou.agencyToken.id = at.id  " +
+            "WHERE agencyDomains.domain = ?1 " +
+            "AND at.token = ?2 " +
+            "AND ou.code = ?3")
+    Optional<AgencyToken> findByDomainTokenAndCodeIncludingAgencyDomains(String domain, String token, String code);
+
 }

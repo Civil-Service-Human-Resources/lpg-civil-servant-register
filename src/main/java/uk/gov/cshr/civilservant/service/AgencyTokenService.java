@@ -30,13 +30,13 @@ public class AgencyTokenService {
     }
 
     public Optional<AgencyToken> getAgencyTokenByDomainTokenAndOrganisation(String domain, String token, String code) {
-        return agencyTokenRepository.findByDomainTokenAndCode(domain, token, code);
+        return agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code);
     }
 
     @Transactional
     public Optional<AgencyToken> updateAgencyTokenSpacesAvailable(String domain, String token, String code, boolean isRemoveUser) {
         // find token
-        Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainTokenAndCode(domain, token, code);
+        Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code);
 
         if (agencyToken.isPresent()) {
             // if it exists - do update
