@@ -84,7 +84,7 @@ public class AgencyTokenServiceTest {
         int expectedNewCapacityUsed = capacityUsed + 1;
 
         // given
-        when(agencyTokenRepository.findByDomainTokenAndCode(domain, token, code)).thenReturn(optionalAgencyToken);
+        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
         when(agencyTokenRepository.save(any(AgencyToken.class))).thenReturn(new AgencyToken());
 
         // when
@@ -118,7 +118,7 @@ public class AgencyTokenServiceTest {
         int expectedNewCapacityUsed = capacityUsed - 1;
 
         // given
-        when(agencyTokenRepository.findByDomainTokenAndCode(domain, token, code)).thenReturn(optionalAgencyToken);
+        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
         when(agencyTokenRepository.save(any(AgencyToken.class))).thenReturn(new AgencyToken());
 
         // when
@@ -140,7 +140,7 @@ public class AgencyTokenServiceTest {
         String code = "123456";
 
         // given
-        when(agencyTokenRepository.findByDomainTokenAndCode(domain, token, code)).thenThrow(new TokenDoesNotExistException(domain));
+        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenThrow(new TokenDoesNotExistException(domain));
 
         // when
         assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
@@ -166,7 +166,7 @@ public class AgencyTokenServiceTest {
         Optional<AgencyToken> optionalAgencyToken = Optional.of(agencyToken);
 
         // given
-        when(agencyTokenRepository.findByDomainTokenAndCode(domain, token, code)).thenReturn(optionalAgencyToken);
+        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
 
         // when
         assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
@@ -183,7 +183,7 @@ public class AgencyTokenServiceTest {
         String code = "123456";
 
         // given
-        when(agencyTokenRepository.findByDomainTokenAndCode(domain, token, code)).thenThrow(new RuntimeException());
+        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenThrow(new RuntimeException());
 
         // when
         assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
