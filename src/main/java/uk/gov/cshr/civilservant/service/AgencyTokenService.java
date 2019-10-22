@@ -1,6 +1,7 @@
 package uk.gov.cshr.civilservant.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
@@ -32,6 +33,7 @@ public class AgencyTokenService {
         return agencyTokenRepository.findByDomainTokenAndCode(domain, token, code);
     }
 
+    @Transactional
     public Optional<AgencyToken> updateAgencyTokenSpacesAvailable(String domain, String token, String code, boolean isRemoveUser) {
         // find token
         Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainTokenAndCode(domain, token, code);
@@ -52,7 +54,7 @@ public class AgencyTokenService {
     }
 
     private void updateSpacesAvailable(AgencyToken agencyToken, boolean isRemoveUser) {
-        if(isRemoveUser) {
+        if (isRemoveUser) {
             removeUserFromAgencyTokenUpdateSpacesAvailable(agencyToken);
         } else {
             addUserToAgencyTokenUpdateSpacesAvailable(agencyToken);
@@ -61,32 +63,25 @@ public class AgencyTokenService {
     }
 
     private void removeUserFromAgencyTokenUpdateSpacesAvailable(AgencyToken agencyToken) {
-        AgencyToken updatedAgencyToken = null;
-        synchronized (this) {
-            // update
-            int newCapacityUsed = agencyToken.getCapacityUsed() - 1;
-            agencyToken.setCapacityUsed(newCapacityUsed);
-            agencyTokenRepository.save(agencyToken);
-        }
+        // update
+        int newCapacityUsed = agencyToken.getCapacityUsed() - 1;
+        agencyToken.setCapacityUsed(newCapacityUsed);
+        agencyTokenRepository.save(agencyToken);
     }
 
     private void addUserToAgencyTokenUpdateSpacesAvailable(AgencyToken agencyToken) {
-        AgencyToken updatedAgencyToken = null;
-        synchronized (this) {
-            // check existing quota
-            int existing = agencyToken.getCapacityUsed();
+        // check existing quota
+        int existing = agencyToken.getCapacityUsed();
 
-            // check if enough
-            if (existing + 1 > agencyToken.getCapacity()) {
-                throw new NotEnoughSpaceAvailableException(agencyToken.getToken());
-            }
-
-            // update
-            int newCapacityUsed = agencyToken.getCapacityUsed() + 1;
-            agencyToken.setCapacityUsed(newCapacityUsed);
-            agencyTokenRepository.save(agencyToken);
+        // check if enough
+        if (existing + 1 > agencyToken.getCapacity()) {
+            throw new NotEnoughSpaceAvailableException(agencyToken.getToken());
         }
-    }
 
+        // update
+        int newCapacityUsed = agencyToken.getCapacityUsed() + 1;
+        agencyToken.setCapacityUsed(newCapacityUsed);
+        agencyTokenRepository.save(agencyToken);
+    }
 
 }
