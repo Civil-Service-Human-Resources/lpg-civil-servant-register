@@ -2,6 +2,7 @@ package uk.gov.cshr.civilservant.controller;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.GsonBuilder;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.cshr.civilservant.domain.Profession;
 import uk.gov.cshr.civilservant.service.ProfessionService;
+import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -38,6 +40,11 @@ public class ProfessionControllerTest {
 
     @MockBean
     private ProfessionService professionService;
+
+    @Before
+    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
+        MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
+    }
 
     @Test
     public void shouldReturnProfessionsAsTreeStructure() throws Exception {
