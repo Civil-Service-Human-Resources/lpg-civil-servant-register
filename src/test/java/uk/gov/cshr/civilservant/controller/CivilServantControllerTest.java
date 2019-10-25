@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.controller;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
+import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
 import java.util.Optional;
 
@@ -50,6 +52,11 @@ public class CivilServantControllerTest {
 
     @MockBean
     private CivilServantResourceFactory civilServantResourceFactory;
+
+    @Before
+    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
+        MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
+    }
 
     @Test
     public void shouldReturnNotFoundIfNoLineManager() throws Exception {
