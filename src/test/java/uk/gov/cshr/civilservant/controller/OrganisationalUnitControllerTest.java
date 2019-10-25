@@ -134,7 +134,7 @@ public class OrganisationalUnitControllerTest {
     }
 
     @Test
-    public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided_emptyDomains() throws Exception {
+    public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided_capacityTooHigh() throws Exception {
         // must be at least 1 domain
         dto.setAgencyDomains(new HashSet<>());
         requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
