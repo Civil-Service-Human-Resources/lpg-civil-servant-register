@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.controller;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
+import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +36,11 @@ public class OrganisationalUnitControllerTest {
 
     @MockBean
     private OrganisationalUnitService organisationalUnitService;
+
+    @Before
+    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
+        MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
+    }
 
     @Test
     public void shouldReturnOkIfRequestingOrganisationalUnitTree() throws Exception {
