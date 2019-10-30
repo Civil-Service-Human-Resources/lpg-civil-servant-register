@@ -15,8 +15,8 @@ public class AgencyTokenDTO {
     @NotNull(message = "token cannot be null")
     private String token;
 
-    @Size(min = 1, max = 1500, message
-            = "Capacity must be between 1 and 1500")
+    @Min(value = 1, message = "capacity should be greater than 0")
+    @Max(value = 1500, message = "capacity should not be greater than 1500")
     private int capacity;
 
     @PositiveOrZero
