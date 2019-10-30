@@ -17,6 +17,7 @@ import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.AgencyTokenFactory;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
+import uk.gov.cshr.civilservant.validation.AgencyTokenDTOValidator;
 
 import javax.validation.Valid;
 import java.util.HashMap;
