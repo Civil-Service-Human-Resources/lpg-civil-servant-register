@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
+import uk.gov.cshr.civilservant.dto.UpdateSpacesForAgencyTokenDTO;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
@@ -50,13 +50,13 @@ public class AgencyTokenController {
     }
 
     @PutMapping
-    public ResponseEntity updateSpaceAvailable(@RequestBody AgencyTokenDTO agencyTokenDTO) {
+    public ResponseEntity updateSpaceAvailable(@RequestBody UpdateSpacesForAgencyTokenDTO updateSpacesForAgencyTokenDTO) {
         try {
-            log.info("Updating agency token with parameters domain=" + agencyTokenDTO.getDomain() +
-                    " token=" + agencyTokenDTO.getToken() +
-                    " code=" + agencyTokenDTO.getCode() +
-                    " isRemoveUser=" + agencyTokenDTO.isRemoveUser());
-            agencyTokenService.updateAgencyTokenSpacesAvailable(agencyTokenDTO.getDomain(), agencyTokenDTO.getToken(), agencyTokenDTO.getCode(), agencyTokenDTO.isRemoveUser());
+            log.info("Updating agency token with parameters domain=" + updateSpacesForAgencyTokenDTO.getDomain() +
+                    " token=" + updateSpacesForAgencyTokenDTO.getToken() +
+                    " code=" + updateSpacesForAgencyTokenDTO.getCode() +
+                    " isRemoveUser=" + updateSpacesForAgencyTokenDTO.isRemoveUser());
+            agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenDTO.getDomain(), updateSpacesForAgencyTokenDTO.getToken(), updateSpacesForAgencyTokenDTO.getCode(), updateSpacesForAgencyTokenDTO.isRemoveUser());
         } catch (TokenDoesNotExistException e) {
             log.warn("Token not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
