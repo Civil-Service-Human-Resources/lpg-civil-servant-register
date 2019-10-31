@@ -1,9 +1,11 @@
 package uk.gov.cshr.civilservant.validation;
 
+import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 
+@Component
 public class AgencyTokenDTOValidator implements Validator {
 
     @Override
@@ -17,7 +19,7 @@ public class AgencyTokenDTOValidator implements Validator {
 
         // add spaces available logic
         if(agencyTokenDTO.getCapacityUsed() > agencyTokenDTO.getCapacity()) {
-            errors.rejectValue("capacity used", "invalid capacity used");
+            errors.rejectValue("capacityUsed", "invalid capacity used");
         }
 
     }

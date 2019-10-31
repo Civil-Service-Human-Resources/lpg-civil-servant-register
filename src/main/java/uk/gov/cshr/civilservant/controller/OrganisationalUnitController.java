@@ -62,6 +62,7 @@ public class OrganisationalUnitController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody @Valid AgencyTokenDTO agencyTokenDTO, UriComponentsBuilder builder) {
         AgencyToken agencyToken = AgencyTokenFactory.buildAgencyTokenFromAgencyTokenDTO(agencyTokenDTO);
+        agencyToken.setCapacityUsed(0);
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.created(builder.path("/organisationalUnits/{organisationalUnitId}/agencyToken").build(organisationalUnit.getId())).build();
@@ -80,6 +81,7 @@ public class OrganisationalUnitController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody @Valid AgencyTokenDTO agencyTokenDTO) {
         AgencyToken agencyToken = AgencyTokenFactory.buildAgencyTokenFromAgencyTokenDTO(agencyTokenDTO);
+        agencyToken.setCapacityUsed(agencyTokenDTO.getCapacityUsed());
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.updateAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.ok(agencyToken);
