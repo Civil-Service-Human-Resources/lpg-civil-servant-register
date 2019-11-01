@@ -1,20 +1,18 @@
 package uk.gov.cshr.civilservant.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.WebDataBinder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
-import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
-import uk.gov.cshr.civilservant.dto.factory.AgencyTokenFactory;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
-import uk.gov.cshr.civilservant.validation.AgencyTokenDTOValidator;
 
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -22,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RepositoryRestController
 @RequestMapping("/organisationalUnits")
 public class OrganisationalUnitController {
@@ -60,9 +59,11 @@ public class OrganisationalUnitController {
 
     @PostMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody @Valid AgencyTokenDTO agencyTokenDTO, UriComponentsBuilder builder) {
-        AgencyToken agencyToken = AgencyTokenFactory.buildAgencyTokenFromAgencyTokenDTO(agencyTokenDTO);
-        agencyToken.setCapacityUsed(0);
+    public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyToken agencyToken, BindingResult bindingResult, UriComponentsBuilder builder) {
+        if(bindingResult.hasErrors()){
+            new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.created(builder.path("/organisationalUnits/{organisationalUnitId}/agencyToken").build(organisationalUnit.getId())).build();
@@ -79,9 +80,7 @@ public class OrganisationalUnitController {
 
     @PatchMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @RequestBody @Valid AgencyTokenDTO agencyTokenDTO) {
-        AgencyToken agencyToken = AgencyTokenFactory.buildAgencyTokenFromAgencyTokenDTO(agencyTokenDTO);
-        agencyToken.setCapacityUsed(agencyTokenDTO.getCapacityUsed());
+    public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyToken agencyToken) {
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.updateAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.ok(agencyToken);
@@ -97,10 +96,10 @@ public class OrganisationalUnitController {
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 
-    @InitBinder("AgencyTokenDTO")
+    /*@InitBinder("AgencyTokenDTO")
     protected void initBinder(WebDataBinder binder) {
         binder.addValidators(new AgencyTokenDTOValidator());
-    }
+    }*/
 
 
     @GetMapping("/allCodesMap")
