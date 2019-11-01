@@ -11,16 +11,23 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
+import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
+import uk.gov.cshr.civilservant.utils.JsonUtils;
 import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,6 +43,20 @@ public class OrganisationalUnitControllerTest {
 
     @MockBean
     private OrganisationalUnitService organisationalUnitService;
+
+    //@MockBean
+    // @SpyBean
+    //private AgencyTokenDTOValidator agencyTokenDTOValidator;
+
+    private String requestBodyAgencyTokenAsAString;
+
+    private AgencyToken at;
+
+    @Before
+    public void setUp() {
+        at = AgencyTokenTestingUtils.createAgencyToken();
+        //dto = AgencyTokenTestingUtils.createAgencyTokenDTO();
+    }
 
     @Before
     public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
@@ -66,6 +87,54 @@ public class OrganisationalUnitControllerTest {
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldSaveAgencyTokenIfValidAgencyTokenDTOIsProvided() throws Exception {
+        OrganisationalUnit orgUnit = new OrganisationalUnit();
+        orgUnit.setAbbreviation("NHSDUNDEE");
+        orgUnit.setCode("NHSDUN");
+        Optional<OrganisationalUnit> orgUnitOptional = Optional.of(orgUnit);
+
+        when(organisationalUnitService.getOrganisationalUnit(anyLong())).thenReturn(orgUnitOptional);
+        when(organisationalUnitService.setAgencyToken(eq(orgUnit), any(AgencyToken.class))).thenReturn(orgUnit);
+
+        requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(at);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/organisationalUnits/123/agencyToken").contentType(APPLICATION_JSON)
+                        .accept(APPLICATION_JSON).content(requestBodyAgencyTokenAsAString))
+                .andDo(print())
+                .andExpect(status().isCreated());
+
+        //verify(agencyTokenDTOValidator, times(1)).validate(any(), any(Errors.class));
+
+        //assertThat()
+    }
+
+    @Test
+    public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided() throws Exception {
+       /* OrganisationalUnit orgUnit = new OrganisationalUnit();
+        orgUnit.setAbbreviation("NHSDUNDEE");
+        orgUnit.setCode("NHSDUN");
+
+        when(organisationalUnitService.getOrganisationalUnit(anyLong())).thenReturn(Optional.of(orgUnit));
+        when(organisationalUnitService.setAgencyToken(eq(orgUnit), any(AgencyToken.class))).thenReturn(orgUnit);*/
+
+        at.setToken("");
+        requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(at);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/organisationalUnits/123/agencyToken").contentType(APPLICATION_JSON)
+                        .accept(APPLICATION_JSON).content(requestBodyAgencyTokenAsAString))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        verify(organisationalUnitService, never()).getOrganisationalUnit(anyLong());
+
+        //verify(agencyTokenDTOValidator, times(1)).validate(any(), any(Errors.class));
+
+        //assertThat()
     }
 
     @Test

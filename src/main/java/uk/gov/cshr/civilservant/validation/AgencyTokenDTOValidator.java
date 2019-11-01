@@ -5,7 +5,10 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 
-@Component
+public class AgencyTokenDTOValidator{
+
+}
+/*@Component
 public class AgencyTokenDTOValidator implements Validator {
 
     @Override
@@ -19,9 +22,9 @@ public class AgencyTokenDTOValidator implements Validator {
 
         // add spaces available logic
         if(agencyTokenDTO.getCapacityUsed() > agencyTokenDTO.getCapacity()) {
-            errors.rejectValue("capacityUsed", "invalid capacity used");
+            errors.rejectValue("capacityUsed", "101","capacity used must be less than capacity");
         }
 
-    }
+    }*/
 
-}
+//}
