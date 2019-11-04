@@ -14,6 +14,8 @@ public class AgencyTokenFactory {
 
     public static AgencyToken buildAgencyTokenFromAgencyTokenDTO(AgencyTokenDTO agencyTokenDTO) {
         AgencyToken agencytoken = new AgencyToken();
+        // add here as should be validated by now.
+        agencytoken.setCapacityUsed(agencyTokenDTO.getCapacityUsed());
         agencytoken.setToken(agencyTokenDTO.getToken());
         agencytoken.setCapacity(agencyTokenDTO.getCapacity());
         Set<AgencyDomain> agencyDomains = agencyTokenDTO.getAgencyDomains().stream().map(dtoDomain -> createAgencyDomain(dtoDomain.getDomain())).collect(Collectors.toSet());

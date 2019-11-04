@@ -103,10 +103,7 @@ dependencies {
     compile group: 'org.springframework.security.oauth', name: 'spring-security-oauth2', version: '2.3.3.RELEASE'
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.2.0.RELEASE'
-
-    // https://mvnrepository.com/artifact/org.hibernate/hibernate-validator
-    compile group: 'org.hibernate', name: 'hibernate-validator', version: '6.1.0.Final'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
 
     // https://mvnrepository.com/artifact/com.h2database/h2
     compile group: 'com.h2database', name: 'h2', version: '1.4.197'
