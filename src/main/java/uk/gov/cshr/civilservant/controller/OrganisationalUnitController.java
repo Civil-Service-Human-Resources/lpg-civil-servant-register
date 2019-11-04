@@ -2,16 +2,18 @@ package uk.gov.cshr.civilservant.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
+import uk.gov.cshr.civilservant.dto.factory.AgencyTokenFactory;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import javax.validation.Valid;
@@ -21,7 +23,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-@RepositoryRestController
+@RestController
 @RequestMapping("/organisationalUnits")
 public class OrganisationalUnitController {
 
@@ -59,11 +61,8 @@ public class OrganisationalUnitController {
 
     @PostMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyToken agencyToken, BindingResult bindingResult, UriComponentsBuilder builder) {
-        if(bindingResult.hasErrors()){
-            new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
+    public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyTokenDTO agencyTokenDTO, UriComponentsBuilder builder) {
+        AgencyToken agencyToken = AgencyTokenFactory.buildAgencyTokenFromAgencyTokenDTO(agencyTokenDTO);
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.created(builder.path("/organisationalUnits/{organisationalUnitId}/agencyToken").build(organisationalUnit.getId())).build();
@@ -80,11 +79,12 @@ public class OrganisationalUnitController {
 
     @PatchMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyToken agencyToken) {
+    public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyTokenDTO agencyTokenDTO) {
+        AgencyToken agencyToken = AgencyTokenFactory.buildAgencyTokenFromAgencyTokenDTO(agencyTokenDTO);
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.updateAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.ok(agencyToken);
-        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.CONFLICT));
     }
 
     @DeleteMapping("/{organisationalUnitId}/agencyToken")
@@ -93,13 +93,21 @@ public class OrganisationalUnitController {
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.deleteAgencyToken(organisationalUnit);
             return ResponseEntity.ok(organisationalUnit);
-        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
-    /*@InitBinder("AgencyTokenDTO")
-    protected void initBinder(WebDataBinder binder) {
-        binder.addValidators(new AgencyTokenDTOValidator());
-    }*/
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
 
 
     @GetMapping("/allCodesMap")
