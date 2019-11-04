@@ -151,6 +151,17 @@ public class OrganisationalUnitControllerTest {
         // must be at least 1 domain
         dto.setAgencyDomains(new HashSet<>());
         requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
+        //verify(agencyTokenDTOValidator, times(1)).validate(any(), any(Errors.class));
+
+        //assertThat()
+    }
+
+    @Test
+    public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided_capacityUsedGreaterThanCapacity() throws Exception {
+        // capacity must be between 1 and 1500, this should fail validation
+        dto.setCapacity(0);
+        dto.setCapacityUsed(100);
+        requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/organisationalUnits/123/agencyToken").contentType(APPLICATION_JSON)
