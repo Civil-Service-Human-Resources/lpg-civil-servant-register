@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
@@ -44,18 +45,13 @@ public class OrganisationalUnitControllerTest {
     @MockBean
     private OrganisationalUnitService organisationalUnitService;
 
-    //@MockBean
-    // @SpyBean
-    //private AgencyTokenDTOValidator agencyTokenDTOValidator;
-
     private String requestBodyAgencyTokenAsAString;
 
-    private AgencyToken at;
+    private AgencyTokenDTO dto;
 
     @Before
     public void setUp() {
-        at = AgencyTokenTestingUtils.createAgencyToken();
-        //dto = AgencyTokenTestingUtils.createAgencyTokenDTO();
+        dto = AgencyTokenTestingUtils.createAgencyTokenDTO();
     }
 
     @Before
@@ -99,7 +95,7 @@ public class OrganisationalUnitControllerTest {
         when(organisationalUnitService.getOrganisationalUnit(anyLong())).thenReturn(orgUnitOptional);
         when(organisationalUnitService.setAgencyToken(eq(orgUnit), any(AgencyToken.class))).thenReturn(orgUnit);
 
-        requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(at);
+        requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/organisationalUnits/123/agencyToken").contentType(APPLICATION_JSON)
@@ -113,16 +109,30 @@ public class OrganisationalUnitControllerTest {
     }
 
     @Test
-    public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided() throws Exception {
-       /* OrganisationalUnit orgUnit = new OrganisationalUnit();
-        orgUnit.setAbbreviation("NHSDUNDEE");
-        orgUnit.setCode("NHSDUN");
+    public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided_capacityLessThan1() throws Exception {
+        // capacity must be between 1 and 1500, this should fail validation
+        dto.setCapacity(0);
+        requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
 
-        when(organisationalUnitService.getOrganisationalUnit(anyLong())).thenReturn(Optional.of(orgUnit));
-        when(organisationalUnitService.setAgencyToken(eq(orgUnit), any(AgencyToken.class))).thenReturn(orgUnit);*/
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/organisationalUnits/123/agencyToken").contentType(APPLICATION_JSON)
+                        .accept(APPLICATION_JSON).content(requestBodyAgencyTokenAsAString))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
 
-        at.setToken("");
-        requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(at);
+        verify(organisationalUnitService, never()).getOrganisationalUnit(anyLong());
+
+        //verify(agencyTokenDTOValidator, times(1)).validate(any(), any(Errors.class));
+
+        //assertThat()
+    }
+
+    @Test
+    public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided_capacityUsedGreaterThanCapacity() throws Exception {
+        // capacity must be between 1 and 1500, this should fail validation
+        dto.setCapacity(0);
+        dto.setCapacityUsed(100);
+        requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.post("/organisationalUnits/123/agencyToken").contentType(APPLICATION_JSON)

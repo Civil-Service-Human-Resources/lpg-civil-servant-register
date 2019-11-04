@@ -2,15 +2,10 @@ package uk.gov.cshr.civilservant.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import uk.gov.cshr.civilservant.validation.ValidCapacityUsed;
 
 import javax.persistence.*;
 import java.util.Set;
 
-@ValidCapacityUsed(
-        capacity = "capacity",
-        capacityUsed = "capacityUsed"
-)
 @Data
 @Entity
 public class AgencyToken implements RegistryEntity {

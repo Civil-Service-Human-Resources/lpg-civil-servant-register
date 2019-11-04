@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class AgencyTokenDTOValidatorTest {
 
     @Autowired
-    private AgencyTokenValidator classUnderTest;
+    private AgencyTokenDTOValidator classUnderTest;
 
     @Ignore
     @Test
@@ -32,23 +32,21 @@ public class AgencyTokenDTOValidatorTest {
         Errors errors = new BeanPropertyBindingResult(validDTO, "");
 
         // when
-       // classUnderTest.isValid(validDTO, null);
-        //classUnderTest.validate(validDTO, errors);
+        classUnderTest.validate(validDTO, errors);
 
         // then
-       // assertThat(errors.getAllErrors()).hasSize(0);
+        assertThat(errors.getAllErrors()).hasSize(0);
     }
 
-    @Ignore
     @Test
     public void givenAValidAgencyTokenDTO_whenCapacityUsedIsGreaterThanCapacity_thenAgencyTokenDTOValidationFails() {
         // given
         AgencyTokenDTO capacityUsedGreaterThanCapacityDTO = AgencyTokenTestingUtils.createAgencyTokenDTO();
         capacityUsedGreaterThanCapacityDTO.setCapacityUsed(101);
-        Errors errors = new BeanPropertyBindingResult(capacityUsedGreaterThanCapacityDTO, "");
+        Errors errors = new BeanPropertyBindingResult(capacityUsedGreaterThanCapacityDTO, "capacity used must be less than capacity");
 
         // when
-        //classUnderTest.validate(capacityUsedGreaterThanCapacityDTO, errors);
+        classUnderTest.validate(capacityUsedGreaterThanCapacityDTO, errors);
 
         // then
         assertThat(errors.getAllErrors()).hasSize(1);
