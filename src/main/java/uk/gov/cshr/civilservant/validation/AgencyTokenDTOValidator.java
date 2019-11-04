@@ -5,10 +5,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 
-public class AgencyTokenDTOValidator{
-
-}
-/*@Component
+@Component
 public class AgencyTokenDTOValidator implements Validator {
 
     @Override
@@ -25,6 +22,6 @@ public class AgencyTokenDTOValidator implements Validator {
             errors.rejectValue("capacityUsed", "101","capacity used must be less than capacity");
         }
 
-    }*/
+    }
 
-//}
+}
