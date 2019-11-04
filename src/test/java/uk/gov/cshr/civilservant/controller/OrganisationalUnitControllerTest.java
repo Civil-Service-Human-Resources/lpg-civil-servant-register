@@ -20,6 +20,7 @@ import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
 import uk.gov.cshr.civilservant.utils.JsonUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -94,9 +95,8 @@ public class OrganisationalUnitControllerTest {
                 .andDo(print())
                 .andExpect(status().isCreated());
 
-        //verify(agencyTokenDTOValidator, times(1)).validate(any(), any(Errors.class));
-
-        //assertThat()
+        verify(organisationalUnitService, times(1)).getOrganisationalUnit(eq(123L));
+        verify(organisationalUnitService, times(1)).setAgencyToken(eq(orgUnit), any(AgencyToken.class));
     }
 
     @Test
@@ -112,15 +112,12 @@ public class OrganisationalUnitControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(organisationalUnitService, never()).getOrganisationalUnit(anyLong());
-
-        //verify(agencyTokenDTOValidator, times(1)).validate(any(), any(Errors.class));
-
-        //assertThat()
+        verify(organisationalUnitService, never()).setAgencyToken(any(OrganisationalUnit.class), any(AgencyToken.class));
     }
 
     @Test
     public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided_capacityUsedGreaterThanCapacity() throws Exception {
-        // capacity must be between 1 and 1500, this should fail validation
+        // this should fail validation
         dto.setCapacity(0);
         dto.setCapacityUsed(100);
         requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
@@ -132,9 +129,38 @@ public class OrganisationalUnitControllerTest {
                 .andExpect(status().isBadRequest());
 
         verify(organisationalUnitService, never()).getOrganisationalUnit(anyLong());
+        verify(organisationalUnitService, never()).setAgencyToken(any(OrganisationalUnit.class), any(AgencyToken.class));
+    }
 
-        //verify(agencyTokenDTOValidator, times(1)).validate(any(), any(Errors.class));
+    @Test
+    public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided_emptyDomains() throws Exception {
+        // must be at least 1 domain
+        dto.setAgencyDomains(new HashSet<>());
+        requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
 
-        //assertThat()
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/organisationalUnits/123/agencyToken").contentType(APPLICATION_JSON)
+                        .accept(APPLICATION_JSON).content(requestBodyAgencyTokenAsAString))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        verify(organisationalUnitService, never()).getOrganisationalUnit(anyLong());
+        verify(organisationalUnitService, never()).setAgencyToken(any(OrganisationalUnit.class), any(AgencyToken.class));
+    }
+
+    @Test
+    public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided_capacityTooHigh() throws Exception {
+        // must be at least 1 domain
+        dto.setAgencyDomains(new HashSet<>());
+        requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/organisationalUnits/123/agencyToken").contentType(APPLICATION_JSON)
+                        .accept(APPLICATION_JSON).content(requestBodyAgencyTokenAsAString))
+                .andDo(print())
+                .andExpect(status().isBadRequest());
+
+        verify(organisationalUnitService, never()).getOrganisationalUnit(anyLong());
+        verify(organisationalUnitService, never()).setAgencyToken(any(OrganisationalUnit.class), any(AgencyToken.class));
     }
 }
