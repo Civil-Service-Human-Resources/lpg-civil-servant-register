@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
+import uk.gov.cshr.civilservant.exception.InvalidCapacityUsedException;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.AgencyTokenRepository;
@@ -188,6 +189,65 @@ public class AgencyTokenServiceTest {
         // when
         assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
                 .isInstanceOf(Exception.class);
+
+        // then
+        verify(agencyTokenRepository, never()).save(any(AgencyToken.class));
+    }
+
+    @Test
+    public void givenAValidAgencyTokenWithOnlyOneSpaceAvailableAndIsRemoveAUser_whenIUpdateAgencyTokenSpacesAvailable_thenReturnsSuccessfully() {
+        String token = "token123";
+        String domain = "example.com";
+        String code = "123456";
+
+        AgencyToken agencyToken = new AgencyToken();
+        agencyToken.setToken("thisisatoken");
+
+        int capacity = 100;
+        int capacityUsed = 1;
+        agencyToken.setCapacity(capacity);
+        agencyToken.setCapacityUsed(capacityUsed);
+        Optional<AgencyToken> optionalAgencyToken = Optional.of(agencyToken);
+
+        // should free up capacity by 1
+        int expectedNewCapacityUsed = 0;
+
+        // given
+        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
+
+        // when
+        agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, true);
+
+        // then
+        verify(agencyTokenRepository, times(1)).save(agencyTokenCaptor.capture());
+
+        AgencyToken actualAgencyTokenSavedToDatabase = agencyTokenCaptor.getValue();
+        assertThat(actualAgencyTokenSavedToDatabase.getCapacityUsed(), equalTo(expectedNewCapacityUsed));
+        assertThat(actualAgencyTokenSavedToDatabase.getCapacity(), equalTo(capacity));
+        assertThat(actualAgencyTokenSavedToDatabase.getToken(), equalTo("thisisatoken"));
+    }
+
+    @Test
+    public void givenAValidAgencyTokenWithZeroSpaceAvailableAndIsRemoveAUser_whenIUpdateAgencyTokenSpacesAvailable_thenExceptionShouldBeThrown() {
+        String token = "token123";
+        String domain = "example.com";
+        String code = "123456";
+
+        AgencyToken agencyToken = new AgencyToken();
+        agencyToken.setToken("thisisatoken");
+
+        int capacity = 100;
+        int capacityUsed = 0;
+        agencyToken.setCapacity(capacity);
+        agencyToken.setCapacityUsed(capacityUsed);
+        Optional<AgencyToken> optionalAgencyToken = Optional.of(agencyToken);
+
+        // given
+        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
+
+        // when
+        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, true))
+                .isInstanceOf(InvalidCapacityUsedException.class);
 
         // then
         verify(agencyTokenRepository, never()).save(any(AgencyToken.class));
