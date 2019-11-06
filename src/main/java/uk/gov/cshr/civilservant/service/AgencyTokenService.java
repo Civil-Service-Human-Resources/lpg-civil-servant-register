@@ -33,6 +33,10 @@ public class AgencyTokenService {
         return agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code);
     }
 
+    public Optional<AgencyToken> getAgencyTokenByDomainAndOrganisation(String domain, String code) {
+        return agencyTokenRepository.findByDomainAndCode(domain, code);
+    }
+
     @Transactional
     public Optional<AgencyToken> updateAgencyTokenSpacesAvailable(String domain, String token, String code, boolean isRemoveUser) {
         // find token

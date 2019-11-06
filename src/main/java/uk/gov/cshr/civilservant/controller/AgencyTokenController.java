@@ -42,6 +42,13 @@ public class AgencyTokenController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @GetMapping(params = {"domain", "code"})
+    public ResponseEntity getAgencyTokensByDomainAndOrganisationalUnit(@RequestParam String domain, @RequestParam String code) {
+        return agencyTokenService.getAgencyTokenByDomainAndOrganisation(domain, code)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
     @GetMapping(params = {"domain", "token", "code"})
     public ResponseEntity getAgencyTokensByDomainTokenAndOrganisationalUnit(@RequestParam String domain, @RequestParam String token, @RequestParam String code) {
         return agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, token, code)
