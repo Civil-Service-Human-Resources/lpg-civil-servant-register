@@ -24,7 +24,6 @@ public class AgencyTokenDTOValidatorTest {
     @Autowired
     private AgencyTokenDTOValidator classUnderTest;
 
-    @Ignore
     @Test
     public void givenAValidAgencyTokenDTO_whenValidated_thenAgencyTokenDTOValidationPasses() {
         // given
@@ -42,7 +41,8 @@ public class AgencyTokenDTOValidatorTest {
     public void givenAValidAgencyTokenDTO_whenCapacityUsedIsGreaterThanCapacity_thenAgencyTokenDTOValidationFails() {
         // given
         AgencyTokenDTO capacityUsedGreaterThanCapacityDTO = AgencyTokenTestingUtils.createAgencyTokenDTO();
-        capacityUsedGreaterThanCapacityDTO.setCapacityUsed(101);
+        capacityUsedGreaterThanCapacityDTO.setCapacity(10);
+        capacityUsedGreaterThanCapacityDTO.setCapacityUsed(11);
         Errors errors = new BeanPropertyBindingResult(capacityUsedGreaterThanCapacityDTO, "capacity used must be less than capacity");
 
         // when
@@ -50,8 +50,8 @@ public class AgencyTokenDTOValidatorTest {
 
         // then
         assertThat(errors.getAllErrors()).hasSize(1);
-        assertThat(errors.getFieldError().getField()).isEqualTo("capacityUsed");
-        assertThat(errors.getAllErrors().get(0).getDefaultMessage()).isEqualTo("capacity used must be less than capacity");
+        assertThat(errors.getFieldError().getField()).isEqualTo("capacity");
+        assertThat(errors.getAllErrors().get(0).getDefaultMessage()).isEqualTo("capacity cannot be less than capacity used");
     }
 
 }
