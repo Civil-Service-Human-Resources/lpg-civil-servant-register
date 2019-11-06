@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.cshr.civilservant.domain.AgencyDomain;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
@@ -177,10 +178,6 @@ public class OrganisationalUnitController {
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
     }
 
-    /*@InitBinder("AgencyTokenDTO")
-    protected void initBinder(WebDataBinder binder) {
-        binder.addValidators(new AgencyTokenDTOValidator());
-    }*/
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Map<String, String> handleValidationExceptions(
@@ -192,6 +189,30 @@ public class OrganisationalUnitController {
             errors.put(fieldName, errorMessage);
         });
         return errors;
+    }
+
+    /* assumes any validation has already happened.*/
+    private AgencyToken buildAgencyTokenFromAgencyTokenDTO(AgencyTokenDTO agencyTokenDTO, boolean isCreateNewToken) {
+        AgencyToken agencytoken = new AgencyToken();
+
+        if(isCreateNewToken){
+            agencytoken.setCapacityUsed(0);
+        } else {
+            agencytoken.setCapacityUsed(agencyTokenDTO.getCapacityUsed());
+        }
+
+        agencytoken.setToken(agencyTokenDTO.getToken());
+        agencytoken.setCapacity(agencyTokenDTO.getCapacity());
+        Set<AgencyDomain> agencyDomains = agencyTokenDTO.getAgencyDomains().stream().map(dtoDomain -> createAgencyDomain(dtoDomain.getDomain())).collect(Collectors.toSet());
+        agencytoken.setAgencyDomains(agencyDomains);
+        return agencytoken;
+    }
+
+    /* assumes any validation has already happened.*/
+    private AgencyDomain createAgencyDomain(String domain) {
+        AgencyDomain agencyDomain = new AgencyDomain();
+        agencyDomain.setDomain(domain);
+        return agencyDomain;
     }
 
 }
