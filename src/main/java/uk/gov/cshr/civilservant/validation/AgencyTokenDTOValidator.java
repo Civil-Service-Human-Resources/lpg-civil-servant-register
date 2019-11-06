@@ -17,9 +17,9 @@ public class AgencyTokenDTOValidator implements Validator {
     public void validate(Object target, Errors errors) {
         AgencyTokenDTO agencyTokenDTO = (AgencyTokenDTO) target;
 
-        // add spaces available logic
-        if(agencyTokenDTO.getCapacityUsed() > agencyTokenDTO.getCapacity()) {
-            errors.rejectValue("capacityUsed", "101","capacity used must be less than capacity");
+        // ensure when capacity is set, check that the capacity, does not go less than the capacityused
+        if(agencyTokenDTO.getCapacity() < agencyTokenDTO.getCapacityUsed()) {
+            errors.rejectValue("capacity", "101","capacity cannot be less than capacity used");
         }
 
     }
