@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
-import uk.gov.cshr.civilservant.exception.InvalidCapacityUsedException;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.AgencyTokenRepository;
@@ -247,7 +246,7 @@ public class AgencyTokenServiceTest {
 
         // when
         assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, true))
-                .isInstanceOf(InvalidCapacityUsedException.class);
+                .isInstanceOf(NotEnoughSpaceAvailableException.class);
 
         // then
         verify(agencyTokenRepository, never()).save(any(AgencyToken.class));

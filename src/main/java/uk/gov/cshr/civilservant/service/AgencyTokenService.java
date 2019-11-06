@@ -3,7 +3,6 @@ package uk.gov.cshr.civilservant.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
-import uk.gov.cshr.civilservant.exception.InvalidCapacityUsedException;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.AgencyTokenRepository;
@@ -67,7 +66,7 @@ public class AgencyTokenService {
         // check capacity used doesn't go less than zero
         // unlikely scenario but could happen theoretically
         if((agencyToken.getCapacityUsed() - 1) < 0){
-            throw new InvalidCapacityUsedException(agencyToken.getToken());
+            throw new NotEnoughSpaceAvailableException(agencyToken.getToken());
         }
 
         // update
