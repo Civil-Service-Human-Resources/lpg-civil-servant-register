@@ -213,4 +213,33 @@ public class AgencyTokenControllerTest {
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    public void shouldReturnOkIfRequestingAgencyTokensWithDomainOrgParams() throws Exception {
+        AgencyToken agencyToken = new AgencyToken();
+        String domain = "example.com";
+        String code = "code";
+
+        when(agencyTokenService.getAgencyTokenByDomainAndOrganisation(domain, code)).thenReturn(Optional.of(agencyToken));
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(String.format("/agencyTokens?domain=%s&code=%s", domain, code))
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturnNotFoundIfRequestingAgencysWithDomainOrgParams() throws Exception {
+        String domain = "example.com";
+        String code = "code";
+
+        when(agencyTokenService.getAgencyTokenByDomainAndOrganisation(domain, code)).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get(String.format("/agencyTokens?domain=%s&code=%s", domain, code))
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
 }
