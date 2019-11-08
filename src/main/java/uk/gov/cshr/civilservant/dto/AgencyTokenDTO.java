@@ -4,7 +4,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.cshr.civilservant.validation.ValidCapacity;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Set;
 
 @NoArgsConstructor
