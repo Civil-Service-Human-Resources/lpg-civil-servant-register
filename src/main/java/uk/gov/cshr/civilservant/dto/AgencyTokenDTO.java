@@ -2,8 +2,7 @@ package uk.gov.cshr.civilservant.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import uk.gov.cshr.civilservant.validation.MaxCapacityAgencyToken;
-import uk.gov.cshr.civilservant.validation.MinCapacityAgencyToken;
+import uk.gov.cshr.civilservant.validation.ValidCapacity;
 
 import javax.validation.constraints.*;
 import java.util.Set;
@@ -17,8 +16,7 @@ public class AgencyTokenDTO {
     @NotNull(message = "token cannot be null")
     private String token;
 
-    @MinCapacityAgencyToken
-    @MaxCapacityAgencyToken
+    @ValidCapacity
     private int capacity;
 
     @PositiveOrZero
