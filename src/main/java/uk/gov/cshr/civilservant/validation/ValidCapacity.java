@@ -5,12 +5,12 @@ import javax.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = {MinCapacityAgencyTokenValidator.class})
+@Constraint(validatedBy = {ValidAgencyTokenCapacityValidator.class})
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface MinCapacityAgencyToken {
+public @interface ValidCapacity {
 
-    String message() default "Invalid minimum capacity"; //message to be returned on validation failure
+    String message() default "Invalid capacity";
 
     Class<?>[] groups() default {};
 
