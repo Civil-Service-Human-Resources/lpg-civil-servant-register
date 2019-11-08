@@ -29,7 +29,7 @@ public class ValidAgencyTokenCapacityValidatorTest {
     @Test
     public void givenAValidCapacity_whenValidated_thenAgencyTokenDTOValidationPasses() {
         // given
-        Integer capacity = minValueFromConfig + 1;;
+        Integer capacity = minValueFromConfig + 1;
 
         // when
         boolean actual = classUnderTest.isValid(capacity, null);
