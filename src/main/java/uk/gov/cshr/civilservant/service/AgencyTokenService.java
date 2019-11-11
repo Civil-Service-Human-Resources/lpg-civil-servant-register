@@ -7,7 +7,6 @@ import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.AgencyTokenRepository;
 
-import javax.validation.constraints.Null;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,16 +57,16 @@ public class AgencyTokenService {
         agencyTokenRepository.delete(agencyToken);
     }
 
-    private void updateSpacesAvailable(AgencyToken agencyToken, boolean isRemoveUser) {
+    private AgencyToken updateSpacesAvailable(AgencyToken agencyToken, boolean isRemoveUser) {
         if (isRemoveUser) {
-            removeUserFromAgencyTokenUpdateSpacesAvailable(agencyToken);
+            return removeUserFromAgencyTokenUpdateSpacesAvailable(agencyToken);
         } else {
-            addUserToAgencyTokenUpdateSpacesAvailable(agencyToken);
+            return addUserToAgencyTokenUpdateSpacesAvailable(agencyToken);
         }
 
     }
 
-    private void removeUserFromAgencyTokenUpdateSpacesAvailable(AgencyToken agencyToken) {
+    private AgencyToken removeUserFromAgencyTokenUpdateSpacesAvailable(AgencyToken agencyToken) {
         // check capacity used doesn't go less than zero
         // unlikely scenario but could happen theoretically
         if((agencyToken.getCapacityUsed() - 1) < 0){
@@ -77,10 +76,10 @@ public class AgencyTokenService {
         // update
         int newCapacityUsed = agencyToken.getCapacityUsed() - 1;
         agencyToken.setCapacityUsed(newCapacityUsed);
-        agencyTokenRepository.save(agencyToken);
+        return agencyTokenRepository.save(agencyToken);
     }
 
-    private void addUserToAgencyTokenUpdateSpacesAvailable(AgencyToken agencyToken) {
+    private AgencyToken addUserToAgencyTokenUpdateSpacesAvailable(AgencyToken agencyToken) {
         // check existing quota
         int existing = agencyToken.getCapacityUsed();
 
@@ -92,7 +91,7 @@ public class AgencyTokenService {
         // update
         int newCapacityUsed = agencyToken.getCapacityUsed() + 1;
         agencyToken.setCapacityUsed(newCapacityUsed);
-        agencyTokenRepository.save(agencyToken);
+        return agencyTokenRepository.save(agencyToken);
     }
 
 }
