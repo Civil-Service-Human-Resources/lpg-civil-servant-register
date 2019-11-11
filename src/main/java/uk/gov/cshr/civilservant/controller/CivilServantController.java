@@ -14,10 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
+import uk.gov.cshr.civilservant.service.AgencyTokenService;
+import uk.gov.cshr.civilservant.service.CivilServantService;
 import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 
@@ -39,13 +42,17 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private final CivilServantResourceFactory civilServantResourceFactory;
 
+    private final CivilServantService civilServantService;
+
     public CivilServantController(LineManagerService lineManagerService, CivilServantRepository civilServantRepository,
                                   RepositoryEntityLinks repositoryEntityLinks,
-                                  CivilServantResourceFactory civilServantResourceFactory) {
+                                  CivilServantResourceFactory civilServantResourceFactory,
+                                  CivilServantService civilServantService) {
         this.lineManagerService = lineManagerService;
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
         this.civilServantResourceFactory = civilServantResourceFactory;
+        this.civilServantService = civilServantService;
     }
 
     @GetMapping
@@ -109,8 +116,9 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     @PreAuthorize("hasAnyAuthority('IDENTITY_DELETE', 'CLIENT')")
     @Transactional
     public ResponseEntity deleteCivilServant(@PathVariable String uid) {
-        civilServantRepository.findByIdentity(uid).ifPresent(civilServant -> civilServantRepository.delete(civilServant));
-
+        // TODO - ADD DOMAIN TO IDENTITY IN HERE
+        Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(uid);
+        civilServantService.deleteCivilServant(civilServant.get(), "");
         return ResponseEntity.noContent().build();
     }
 
