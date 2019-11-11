@@ -249,5 +249,4 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         resource.add(ControllerLinkBuilder.linkTo(CivilServantController.class).withRel("civilServants"));
         return resource;
     }
-
 }

@@ -40,8 +40,7 @@ public class AgencyTokenService {
 
     @Transactional
     public Optional<AgencyToken> updateAgencyTokenSpacesAvailable(String domain, String token, List<String> codes, boolean isRemoveUser) {
-        for (String code: codes)
-        {
+        for (String code : codes) {
             Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code);
             if (agencyToken.isPresent()) {
                 // if it exists - do update
@@ -49,8 +48,28 @@ public class AgencyTokenService {
                 return agencyToken;
             }
         }
-
         throw new TokenDoesNotExistException(domain);
+
+    }
+
+    @Transactional
+    public AgencyToken updateAgencyTokenSpacesAvailable(AgencyToken agencyToken, boolean isRemoveUser) {
+        return updateSpacesAvailable(agencyToken, isRemoveUser);
+    }
+
+
+            public Optional<AgencyToken> updateAgencyTokenSpacesAvailable(String domain, String token, String code, boolean isRemoveUser) {
+            // find token
+            Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code);
+
+            if (agencyToken.isPresent()) {
+                // if it exists - do update
+                return Optional.of(updateSpacesAvailable(agencyToken.get(), isRemoveUser));
+            } else {
+                // Not found
+                throw new TokenDoesNotExistException(domain);
+//>>>>>>> 250dd26... LC-14 - Starting to add delete identity code.  work in progress.
+            }
     }
 
     public void deleteAgencyToken(AgencyToken agencyToken) {
