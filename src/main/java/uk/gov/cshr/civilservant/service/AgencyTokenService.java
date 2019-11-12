@@ -52,6 +52,7 @@ public class AgencyTokenService {
 
     }
 
+//<<<<<<< HEAD
     @Transactional
     public AgencyToken updateAgencyTokenSpacesAvailable(AgencyToken agencyToken, boolean isRemoveUser) {
         return updateSpacesAvailable(agencyToken, isRemoveUser);
@@ -72,6 +73,8 @@ public class AgencyTokenService {
             }
     }
 
+//=======
+//>>>>>>> 2ad9acc... LC-14 - Removed update agency token logic from delete civil servant.
     public void deleteAgencyToken(AgencyToken agencyToken) {
         agencyTokenRepository.delete(agencyToken);
     }
