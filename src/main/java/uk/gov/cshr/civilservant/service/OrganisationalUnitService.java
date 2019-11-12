@@ -34,6 +34,13 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         return organisationalUnitList;
     }
 
+    public List<OrganisationalUnit> getOrganisationWithChildren(String code) {
+        List<OrganisationalUnit> organisationalUnitList = new ArrayList<>();
+        getOrganisationalUnitWithChildren(code, organisationalUnitList);
+
+        return organisationalUnitList;
+    }
+
     private List<OrganisationalUnit> getOrganisationalUnit(String code, List<OrganisationalUnit> organisationalUnits) {
         repository.findByCode(code).ifPresent(organisationalUnit -> {
             organisationalUnits.add(organisationalUnit);
@@ -43,9 +50,33 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         return organisationalUnits;
     }
 
+    private List<OrganisationalUnit> getOrganisationalUnitWithChildren(String code, List<OrganisationalUnit> organisationalUnits) {
+        repository.findByCode(code).ifPresent(organisationalUnit -> {
+            organisationalUnits.add(organisationalUnit);
+            getChildren(organisationalUnit, organisationalUnits);
+        });
+
+        return organisationalUnits;
+    }
+
     private void getParent(OrganisationalUnit organisationalUnit, List<OrganisationalUnit> organisationalUnits) {
         Optional<OrganisationalUnit> parent = Optional.ofNullable(organisationalUnit.getParent());
         parent.ifPresent(parentOrganisationalUnit -> getOrganisationalUnit(parentOrganisationalUnit.getCode(), organisationalUnits));
+    }
+
+    private void getChildren(OrganisationalUnit organisationalUnit, List<OrganisationalUnit> organisationalUnits) {
+        Optional<List<OrganisationalUnit>> children = Optional.ofNullable(organisationalUnit.getChildren());
+
+        children.ifPresent(childList -> {
+            for(OrganisationalUnit child: childList)
+            {
+                getOrganisationalUnit(child.getCode(), organisationalUnits);
+                if(child.hasChildren())
+                {
+
+                }
+            }
+        });
     }
 
     public Optional<OrganisationalUnit> getOrganisationalUnit(Long id) {

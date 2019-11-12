@@ -9,10 +9,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.UpdateSpacesForAgencyTokenDTO;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
+import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -20,9 +25,11 @@ import uk.gov.cshr.civilservant.service.AgencyTokenService;
 public class AgencyTokenController {
 
     private AgencyTokenService agencyTokenService;
+    private OrganisationalUnitService organisationalUnitService;
 
-    public AgencyTokenController(AgencyTokenService agencyTokenService) {
+    public AgencyTokenController(AgencyTokenService agencyTokenService, OrganisationalUnitService organisationalUnitService) {
         this.agencyTokenService = agencyTokenService;
+        this.organisationalUnitService = organisationalUnitService;
     }
 
     @GetMapping
@@ -56,6 +63,9 @@ public class AgencyTokenController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    // we want to get OrganisationalUnit
+
+    // or we can create a function to get the parents of a passed code for an organisation
     @PutMapping
     public ResponseEntity updateSpaceAvailable(@RequestBody UpdateSpacesForAgencyTokenDTO updateSpacesForAgencyTokenDTO) {
         try {
@@ -63,6 +73,11 @@ public class AgencyTokenController {
                     " token=" + updateSpacesForAgencyTokenDTO.getToken() +
                     " code=" + updateSpacesForAgencyTokenDTO.getCode() +
                     " isRemoveUser=" + updateSpacesForAgencyTokenDTO.isRemoveUser());
+
+            List<OrganisationalUnit> PassedOrganisationalUnitList = new ArrayList<>();
+            PassedOrganisationalUnitList = organisationalUnitService.getOrganisationWithChildren(updateSpacesForAgencyTokenDTO.getCode());
+            System.out.println(PassedOrganisationalUnitList);
+
             agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenDTO.getDomain(), updateSpacesForAgencyTokenDTO.getToken(), updateSpacesForAgencyTokenDTO.getCode(), updateSpacesForAgencyTokenDTO.isRemoveUser());
         } catch (TokenDoesNotExistException e) {
             log.warn("Token not found");
