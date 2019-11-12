@@ -1,6 +1,5 @@
 package uk.gov.cshr.civilservant.service;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -201,7 +200,6 @@ public class AgencyTokenServiceTest {
         verify(agencyTokenRepository, never()).save(any(AgencyToken.class));
     }
 
-    @Ignore
     @Test
     public void givenAValidAgencyTokenWithOnlyOneSpaceAvailableAndIsRemoveAUser_whenIUpdateAgencyTokenSpacesAvailable_thenReturnsSuccessfully() {
         String token = "token123";
@@ -224,6 +222,7 @@ public class AgencyTokenServiceTest {
 
         // given
         when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
+        when(agencyTokenRepository.save(any(AgencyToken.class))).thenReturn(new AgencyToken());
 
         // when
         agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, true);
