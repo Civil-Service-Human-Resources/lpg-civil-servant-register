@@ -75,10 +75,14 @@ public class AgencyTokenController {
                     " isRemoveUser=" + updateSpacesForAgencyTokenDTO.isRemoveUser());
 
             List<OrganisationalUnit> PassedOrganisationalUnitList = new ArrayList<>();
-            PassedOrganisationalUnitList = organisationalUnitService.getOrganisationWithChildren(updateSpacesForAgencyTokenDTO.getCode());
-            System.out.println(PassedOrganisationalUnitList);
+            List<String> OrganisaitnalUnitCodeList = new ArrayList<>();
+            PassedOrganisationalUnitList = organisationalUnitService.getOrganisationWithParents(updateSpacesForAgencyTokenDTO.getCode());
+            for (OrganisationalUnit organisationalUnit: PassedOrganisationalUnitList)
+            {
+                OrganisaitnalUnitCodeList.add(organisationalUnit.getCode());
+            }
 
-            agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenDTO.getDomain(), updateSpacesForAgencyTokenDTO.getToken(), updateSpacesForAgencyTokenDTO.getCode(), updateSpacesForAgencyTokenDTO.isRemoveUser());
+            agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenDTO.getDomain(), updateSpacesForAgencyTokenDTO.getToken(), OrganisaitnalUnitCodeList, updateSpacesForAgencyTokenDTO.isRemoveUser());
         } catch (TokenDoesNotExistException e) {
             log.warn("Token not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
