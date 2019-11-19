@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
-import uk.gov.cshr.civilservant.resource.OrganisationalUnitResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
@@ -68,13 +67,13 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/org")
+    @GetMapping("/orgcode")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Resource<OrganisationalUnitResource>> getOrgForCivilServant() {
+    public ResponseEntity<String> getOrgForCivilServant() {
         LOGGER.debug("Getting civil servant org details for logged in user");
 
         return civilServantRepository.findByPrincipal()
-                .map(civilServant -> ResponseEntity.ok(civilServantResourceFactory.getCivilServantOrganisationalUnit(civilServant)))
+                .map(civilServant -> ResponseEntity.ok(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
