@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
+import uk.gov.cshr.civilservant.resource.OrganisationalUnitResource;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
 import java.util.Optional;
@@ -54,6 +55,17 @@ public class CivilServantResourceFactory {
         resource.add(linkFactory.createRelationshipLink(civilServant, "grade"));
         resource.add(linkFactory.createRelationshipLink(civilServant, "profession"));
 
+        return resource;
+    }
+
+    public Resource<OrganisationalUnitResource> getCivilServantOrganisationalUnit(CivilServant civilServant) {
+        OrganisationalUnitResource organisationalUnitResource = new OrganisationalUnitResource();
+
+        if (civilServant.getOrganisationalUnit().isPresent()) {
+            organisationalUnitResource.setOrganisationalUnit(civilServant.getOrganisationalUnit().get());
+        }
+
+        Resource<OrganisationalUnitResource> resource = new Resource<>(organisationalUnitResource);
         return resource;
     }
 

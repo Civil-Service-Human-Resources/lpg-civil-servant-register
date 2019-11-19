@@ -22,6 +22,7 @@ import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
+import uk.gov.cshr.civilservant.resource.OrganisationalUnitResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
@@ -73,6 +74,16 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
         return civilServantRepository.findByPrincipal().map(
                 civilServant -> ResponseEntity.ok(civilServantResourceFactory.create(civilServant)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/org")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Resource<OrganisationalUnitResource>> getOrgForCivilServant() {
+        LOGGER.debug("Getting civil servant org details for logged in user");
+
+        return civilServantRepository.findByPrincipal()
+                .map(civilServant -> ResponseEntity.ok(civilServantResourceFactory.getCivilServantOrganisationalUnit(civilServant)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
