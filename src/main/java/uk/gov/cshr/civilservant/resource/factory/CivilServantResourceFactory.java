@@ -6,8 +6,6 @@ import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
-import java.util.Optional;
-
 @Component
 public class CivilServantResourceFactory {
     private final IdentityService identityService;
