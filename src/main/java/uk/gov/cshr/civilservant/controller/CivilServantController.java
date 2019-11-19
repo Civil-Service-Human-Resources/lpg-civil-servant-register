@@ -78,12 +78,19 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     @GetMapping("/orgcode")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> getOrgForCivilServant() {
-        LOGGER.debug("Getting civil servant org details for logged in user");
+    public ResponseEntity<OrgCodeDTO> getOrgForCivilServant() {
+        log.debug("Getting civil servant org details for logged in user");
 
-        return civilServantRepository.findByPrincipal()
-                .map(civilServant -> ResponseEntity.ok(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant)))
-                .orElse(ResponseEntity.notFound().build());
+        Optional<CivilServant> civilServant = civilServantRepository.findByPrincipal();
+
+        if (civilServant.isPresent()) {
+            return civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant.get())
+                    .map(orgCodeDTO -> ResponseEntity.ok(orgCodeDTO))
+                    .orElse(ResponseEntity.notFound().build());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
     @PatchMapping("/manager")
