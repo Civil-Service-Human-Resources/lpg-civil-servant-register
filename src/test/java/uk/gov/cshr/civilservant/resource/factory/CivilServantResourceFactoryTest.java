@@ -9,9 +9,11 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import uk.gov.cshr.civilservant.domain.*;
+import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
@@ -91,9 +93,9 @@ public class CivilServantResourceFactoryTest {
     public void givenOrgUnitAndOrgUnitCodeExists_whenGetCivilServantOrganisationalUnitCode_thenOrgCodeShouldReturnOrgCode(){
         CivilServant civilServant = buildCivilServant();
 
-        String actual = factory.getCivilServantOrganisationalUnitCode(civilServant);
+        Optional<OrgCodeDTO> actual = factory.getCivilServantOrganisationalUnitCode(civilServant);
 
-        assertThat(actual).isEqualTo("co");
+        assertThat(actual.get().getCode()).isEqualTo("co");
     }
 
     @Test
@@ -101,7 +103,7 @@ public class CivilServantResourceFactoryTest {
         CivilServant civilServant = buildCivilServant();
         civilServant.getOrganisationalUnit().get().setCode(null);
 
-        String actual = factory.getCivilServantOrganisationalUnitCode(civilServant);
+        Optional<OrgCodeDTO> actual = factory.getCivilServantOrganisationalUnitCode(civilServant);
 
         assertThat(actual).isEmpty();
     }
@@ -111,7 +113,7 @@ public class CivilServantResourceFactoryTest {
         CivilServant civilServant = buildCivilServant();
         civilServant.setOrganisationalUnit(null);
 
-        String actual = factory.getCivilServantOrganisationalUnitCode(civilServant);
+        Optional<OrgCodeDTO> actual = factory.getCivilServantOrganisationalUnitCode(civilServant);
 
         assertThat(actual).isEmpty();
     }

@@ -15,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
@@ -69,12 +70,19 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     @GetMapping("/orgcode")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> getOrgForCivilServant() {
+    public ResponseEntity<OrgCodeDTO> getOrgForCivilServant() {
         LOGGER.debug("Getting civil servant org details for logged in user");
 
-        return civilServantRepository.findByPrincipal()
-                .map(civilServant -> ResponseEntity.ok(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant)))
-                .orElse(ResponseEntity.notFound().build());
+        Optional<CivilServant> civilServant = civilServantRepository.findByPrincipal();
+
+        if(civilServant.isPresent()) {
+            return civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant.get())
+                    .map(orgCodeDTO -> ResponseEntity.ok(orgCodeDTO))
+                    .orElse(ResponseEntity.notFound().build());
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
     @PatchMapping("/manager")

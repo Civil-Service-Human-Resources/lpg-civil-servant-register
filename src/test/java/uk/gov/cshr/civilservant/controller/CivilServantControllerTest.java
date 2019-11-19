@@ -11,11 +11,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.hateoas.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
+import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
@@ -26,14 +31,15 @@ import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -133,6 +139,62 @@ public class CivilServantControllerTest {
 
         verify(civilServantRepository).save(any());
         verify(lineManagerService).notifyLineManager(any(), any(), any());
+    }
+
+    @Test
+    public void givenOrgCodeExists_shouldReturnOk() throws Exception {
+
+        CivilServant civilServant = createCivilServant("uid");
+        OrgCodeDTO dto = new OrgCodeDTO();
+        dto.setCode("co");
+
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
+        when(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant)).thenReturn(Optional.of(dto));
+
+        mockMvc.perform(
+                get("/civilServants/orgcode")
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("co"));
+
+        verify(civilServantRepository).findByPrincipal();
+        verify(civilServantResourceFactory).getCivilServantOrganisationalUnitCode(eq(civilServant));
+    }
+
+    @Test
+    public void givenOrgExistsWithNoCode_shouldReturnOk() throws Exception {
+
+        CivilServant civilServant = createCivilServant("uid");
+
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
+        when(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant)).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                get("/civilServants/orgcode")
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+
+        verify(civilServantRepository).findByPrincipal();
+        verify(civilServantResourceFactory).getCivilServantOrganisationalUnitCode(eq(civilServant));
+    }
+
+    @Test
+    public void givenOrgDoesNotExistsWith_shouldReturnNotFound() throws Exception {
+
+        CivilServant civilServant = createCivilServant("uid");
+
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                get("/civilServants/orgcode")
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+
+        verify(civilServantRepository).findByPrincipal();
+        verify(civilServantResourceFactory, never()).getCivilServantOrganisationalUnitCode(any(CivilServant.class));
     }
 
     private CivilServant createCivilServant(String uid) {
