@@ -70,7 +70,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     @GetMapping("/orgcode")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<OrgCodeDTO> getOrgForCivilServant() {
+    public ResponseEntity<OrgCodeDTO> getOrgCodeForCivilServant() {
         LOGGER.debug("Getting civil servant org details for logged in user");
 
         Optional<CivilServant> civilServant = civilServantRepository.findByPrincipal();

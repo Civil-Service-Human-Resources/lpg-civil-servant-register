@@ -11,13 +11,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.hateoas.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultActions;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
@@ -31,7 +27,6 @@ import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
