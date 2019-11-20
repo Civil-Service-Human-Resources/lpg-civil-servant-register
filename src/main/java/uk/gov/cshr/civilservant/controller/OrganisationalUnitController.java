@@ -37,6 +37,7 @@ public class OrganisationalUnitController {
     @GetMapping("/tree")
     @Cacheable("organisationalUnitsTree")
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
+        log.info("Getting org tree");
         List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParents();
 
         return ResponseEntity.ok(organisationalUnits);
@@ -45,6 +46,7 @@ public class OrganisationalUnitController {
     @GetMapping("/flat")
     @Cacheable("organisationalUnitsFlat")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
+        log.info("Getting org flat");
         List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
 
         return ResponseEntity.ok(organisationalUnitsMap);
@@ -58,6 +60,23 @@ public class OrganisationalUnitController {
     @GetMapping("/normalised")
     public ResponseEntity<List<OrganisationalUnit>> getOrganisationNormalised() {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationsNormalised());
+    }
+
+    @GetMapping("/allCodesMap")
+    public ResponseEntity<Map<String, List<String>>> getAllCodes() {
+        Map<String, List<String>> codeParentCodesMap = new HashMap<>();
+
+        List<String> organisationalUnitCodes = organisationalUnitService.getOrganisationalUnitCodes();
+
+        organisationalUnitCodes.forEach(s -> {
+            List<String> parentCodes = organisationalUnitService.getOrganisationWithParents(s)
+                    .stream()
+                    .map(OrganisationalUnit::getCode)
+                    .collect(Collectors.toList());
+            codeParentCodesMap.put(s, parentCodes);
+        });
+
+        return ResponseEntity.ok(codeParentCodesMap);
     }
 
     @PostMapping("/{organisationalUnitId}/agencyToken")
@@ -132,23 +151,5 @@ public class OrganisationalUnitController {
         AgencyDomain agencyDomain = new AgencyDomain();
         agencyDomain.setDomain(domain);
         return agencyDomain;
-    }
-
-
-    @GetMapping("/allCodesMap")
-    public ResponseEntity<Map<String, List<String>>> getAllCodes() {
-        Map<String, List<String>> codeParentCodesMap = new HashMap<>();
-
-        List<String> organisationalUnitCodes = organisationalUnitService.getOrganisationalUnitCodes();
-
-        organisationalUnitCodes.forEach(s -> {
-            List<String> parentCodes = organisationalUnitService.getOrganisationWithParents(s)
-                    .stream()
-                    .map(OrganisationalUnit::getCode)
-                    .collect(Collectors.toList());
-            codeParentCodesMap.put(s, parentCodes);
-        });
-
-        return ResponseEntity.ok(codeParentCodesMap);
     }
 }
