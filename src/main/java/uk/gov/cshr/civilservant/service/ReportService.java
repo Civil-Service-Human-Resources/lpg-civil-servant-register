@@ -10,6 +10,7 @@ import uk.gov.cshr.civilservant.exception.UserNotFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,12 @@ public class ReportService {
     }
 
     @Transactional(readOnly = true)
+    public Map<String, CivilServantReportDto> getCivilServantMapNormalisedWithCodes() {
+        return civilServantRepository.findAllNormalisedWithCodes().stream()
+                .collect(Collectors.toMap(CivilServantReportDto::getUid, civilServantDto -> civilServantDto));
+    }
+
+    @Transactional(readOnly = true)
     public Map<String, CivilServantReportDto> getCivilServantMapByUserOrganisationNormalised(String userId) {
         CivilServant user = civilServantRepository.findByIdentity(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
@@ -86,4 +93,10 @@ public class ReportService {
         return Collections.emptyMap();
     }
 
+    @Transactional(readOnly = true)
+    public Map<String, CivilServantReportDto> getCivilServantMapByOrganisationCodeNormalised(String organisationCode) {
+        List<CivilServantReportDto> allByOrganisationCodeNormalised = civilServantRepository.findAllByOrganisationCodeNormalised(organisationCode);
+        return allByOrganisationCodeNormalised.stream()
+                .collect(Collectors.toMap(CivilServantReportDto::getUid, civilServant -> civilServant));
+    }
 }

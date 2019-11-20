@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.controller;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
 import uk.gov.cshr.civilservant.utils.JsonUtils;
+import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -39,6 +41,11 @@ public class AgencyTokenControllerTest {
 
     @MockBean
     private AgencyTokenService agencyTokenService;
+
+    @Before
+    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
+        MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
+    }
 
     @Test
     public void shouldReturnOkIfRequestingAgencyTokens() throws Exception {
