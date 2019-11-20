@@ -47,13 +47,9 @@ public class OrganisationalUnitControllerTest {
     private AgencyTokenDTO dto;
 
     @Before
-    public void setUp() {
-        dto = AgencyTokenTestingUtils.createAgencyTokenDTO();
-    }
-
-    @Before
     public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
         MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
+        dto = AgencyTokenTestingUtils.createAgencyTokenDTO();
     }
 
     @Test
