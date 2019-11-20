@@ -44,17 +44,13 @@ public class OrganisationalUnitControllerTest {
     @MockBean
     private OrganisationalUnitService organisationalUnitService;
 
-    @Before
-    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
-        MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
-    }
-
     private String requestBodyAgencyTokenAsAString;
 
     private AgencyTokenDTO dto;
 
     @Before
-    public void setUp(){
+    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
+        MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
         dto = AgencyTokenTestingUtils.createAgencyTokenDTO();
     }
 

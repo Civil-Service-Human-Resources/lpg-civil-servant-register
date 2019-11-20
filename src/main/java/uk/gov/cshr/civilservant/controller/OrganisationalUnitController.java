@@ -40,7 +40,7 @@ public class OrganisationalUnitController {
     @GetMapping("/tree")
     @Cacheable("organisationalUnitsTree")
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
-        LOGGER.info("Getting org tree");
+        log.info("Getting org tree");
         List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParents();
 
         return ResponseEntity.ok(organisationalUnits);
@@ -49,7 +49,7 @@ public class OrganisationalUnitController {
     @GetMapping("/flat")
     @Cacheable("organisationalUnitsFlat")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
-        LOGGER.info("Getting org flat");
+        log.info("Getting org flat");
         List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
 
         return ResponseEntity.ok(organisationalUnitsMap);
@@ -81,7 +81,6 @@ public class OrganisationalUnitController {
 
         return ResponseEntity.ok(codeParentCodesMap);
     }
-}
 
     @PostMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
