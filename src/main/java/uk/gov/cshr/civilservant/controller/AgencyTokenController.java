@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.cshr.civilservant.dto.CheckValidTokenDTO;
 import uk.gov.cshr.civilservant.dto.UpdateSpacesForAgencyTokenDTO;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
@@ -78,4 +79,17 @@ public class AgencyTokenController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @GetMapping(params = {"domain", "token", "code", "isRemoveUser"})
+    public ResponseEntity<CheckValidTokenDTO> checkTokenAvailable(@RequestParam String domain, @RequestParam String token, @RequestParam String code, @RequestParam boolean isRemoveUser) {
+        try {
+            if(agencyTokenService.checkTokenAvailable(domain, token, code, isRemoveUser)) {
+                return ResponseEntity.ok(new CheckValidTokenDTO(true));
+            } else {
+                return ResponseEntity.ok(new CheckValidTokenDTO(false));
+            }
+        } catch (TokenDoesNotExistException e) {
+            log.warn("Token not found");
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }

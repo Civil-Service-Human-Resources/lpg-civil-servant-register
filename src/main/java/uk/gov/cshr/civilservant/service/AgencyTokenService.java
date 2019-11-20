@@ -66,6 +66,28 @@ public class AgencyTokenService {
 
     }
 
+    // checks if the token and organisation are pairs or not
+    // checks if the token has enough spaces
+    public boolean checkTokenAvailable(String domain, String token, String code, boolean isRemoveUser) {
+
+        Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code);
+
+        if (agencyToken.isPresent()) {
+            int existing = agencyToken.get().getCapacityUsed();
+            if (!isRemoveUser && existing + 1 > agencyToken.get().getCapacity()) {
+                return false;
+            }
+            else if (isRemoveUser && agencyToken.get().getCapacityUsed() - 1 < 0) {
+                return false;
+            }
+        }
+        else {
+            throw new TokenDoesNotExistException(domain);
+        }
+
+        return true;
+    }
+
     private void removeUserFromAgencyTokenUpdateSpacesAvailable(AgencyToken agencyToken) {
         // check capacity used doesn't go less than zero
         // unlikely scenario but could happen theoretically
