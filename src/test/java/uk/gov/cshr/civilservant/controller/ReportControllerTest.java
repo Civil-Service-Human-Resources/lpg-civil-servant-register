@@ -1,6 +1,9 @@
 package uk.gov.cshr.civilservant.controller;
 
 import com.google.common.collect.ImmutableMap;
+import com.microsoft.applicationinsights.web.internal.WebRequestTrackingFilter;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +16,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
 import uk.gov.cshr.civilservant.service.ReportService;
+import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import java.util.Enumeration;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
@@ -33,6 +42,14 @@ public class ReportControllerTest {
 
     @MockBean
     private ReportService reportService;
+
+
+    @Before
+    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
+        MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
+    }
+
+
 
     @Test
     @WithMockUser(username = "user", authorities = {"ORGANISATION_REPORTER"})

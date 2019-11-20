@@ -16,6 +16,7 @@ import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
+import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
 import uk.gov.cshr.civilservant.utils.JsonUtils;
 
@@ -42,6 +43,11 @@ public class OrganisationalUnitControllerTest {
 
     @MockBean
     private OrganisationalUnitService organisationalUnitService;
+
+    @Before
+    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
+        MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
+    }
 
     private String requestBodyAgencyTokenAsAString;
 
