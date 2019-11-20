@@ -29,4 +29,7 @@ public interface OrganisationalUnitRepository extends SelfReferencingEntityRepos
     @PreAuthorize("isAuthenticated()")
     @CacheEvict(value = {"organisationalUnitsTree", "organisationalUnitsFlat"}, allEntries = true)
     void deleteById(Long aLong);
+
+    @Query(value = "select o.code from organisational_unit o", nativeQuery = true)
+    List<String> findAllCodes();
 }

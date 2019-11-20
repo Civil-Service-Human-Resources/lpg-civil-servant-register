@@ -56,6 +56,14 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         return repository.findAllNormalised();
     }
 
+    @Transactional
+    public Optional<OrganisationalUnit> get(Long id) {
+        return repository.findById(id);
+    }
+
+    public List<String> getOrganisationalUnitCodes() {
+        return repository.findAllCodes();
+    }
     public OrganisationalUnit setAgencyToken(OrganisationalUnit organisationalUnit, AgencyToken agencyToken) {
         if (organisationalUnit.getAgencyToken() != null) {
             throw new TokenAlreadyExistsException(organisationalUnit.getId().toString());

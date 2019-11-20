@@ -16,9 +16,12 @@ import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
+import java.util.HashMap;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,6 +40,7 @@ public class OrganisationalUnitController {
     @GetMapping("/tree")
     @Cacheable("organisationalUnitsTree")
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
+        LOGGER.info("Getting org tree");
         List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParents();
 
         return ResponseEntity.ok(organisationalUnits);
@@ -45,6 +49,7 @@ public class OrganisationalUnitController {
     @GetMapping("/flat")
     @Cacheable("organisationalUnitsFlat")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
+        LOGGER.info("Getting org flat");
         List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
 
         return ResponseEntity.ok(organisationalUnitsMap);
@@ -59,6 +64,24 @@ public class OrganisationalUnitController {
     public ResponseEntity<List<OrganisationalUnit>> getOrganisationNormalised() {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationsNormalised());
     }
+
+    @GetMapping("/allCodesMap")
+    public ResponseEntity<Map<String, List<String>>> getAllCodes() {
+        Map<String, List<String>> codeParentCodesMap = new HashMap<>();
+
+        List<String> organisationalUnitCodes = organisationalUnitService.getOrganisationalUnitCodes();
+
+        organisationalUnitCodes.forEach(s -> {
+            List<String> parentCodes = organisationalUnitService.getOrganisationWithParents(s)
+                    .stream()
+                    .map(OrganisationalUnit::getCode)
+                    .collect(Collectors.toList());
+            codeParentCodesMap.put(s, parentCodes);
+        });
+
+        return ResponseEntity.ok(codeParentCodesMap);
+    }
+}
 
     @PostMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")

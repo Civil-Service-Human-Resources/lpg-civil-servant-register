@@ -104,6 +104,15 @@ public class OrganisationalUnitServiceTest {
     }
 
     @Test
+    public void shouldReturnAllOrganisationCodes() {
+        List<String> codes = Arrays.asList("code1", "code2");
+
+        when(organisationalUnitRepository.findAllCodes()).thenReturn(codes);
+
+        assertEquals(codes, organisationalUnitService.getOrganisationalUnitCodes());
+    }
+
+    @Test
     public void shouldDeleteAgencyToken() {
         AgencyToken agencyToken = new AgencyToken();
         OrganisationalUnit organisationalUnit = new OrganisationalUnit();

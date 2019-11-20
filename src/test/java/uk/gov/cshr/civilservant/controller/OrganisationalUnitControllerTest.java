@@ -20,6 +20,7 @@ import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
 import uk.gov.cshr.civilservant.utils.JsonUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -72,6 +73,39 @@ public class OrganisationalUnitControllerTest {
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat")
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturnOkIfRequestingAllCodesMap() throws Exception {
+        String code1 = "code1";
+        String code2 = "code2";
+        List<String> organisationalUnitsCodesList = Arrays.asList(code1, code2);
+
+        OrganisationalUnit organisationalUnit1 = new OrganisationalUnit();
+        organisationalUnit1.setCode(code1);
+
+        OrganisationalUnit organisationalUnit2 = new OrganisationalUnit();
+        organisationalUnit2.setCode(code2);
+
+        OrganisationalUnit organisationalUnit3 = new OrganisationalUnit();
+        organisationalUnit3.setCode(code1);
+
+        OrganisationalUnit organisationalUnit4 = new OrganisationalUnit();
+        organisationalUnit4.setCode(code2);
+
+        List<OrganisationalUnit> organisationalUnitsParentsList1 = Arrays.asList(organisationalUnit1, organisationalUnit2);
+        List<OrganisationalUnit> organisationalUnitsParentsList2 = Arrays.asList(organisationalUnit3, organisationalUnit4);
+
+        when(organisationalUnitService.getOrganisationalUnitCodes()).thenReturn(organisationalUnitsCodesList);
+
+        when(organisationalUnitService.getOrganisationWithParents(code1)).thenReturn(organisationalUnitsParentsList1);
+        when(organisationalUnitService.getOrganisationWithParents(code2)).thenReturn(organisationalUnitsParentsList2);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/organisationalUnits/allCodesMap")
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());

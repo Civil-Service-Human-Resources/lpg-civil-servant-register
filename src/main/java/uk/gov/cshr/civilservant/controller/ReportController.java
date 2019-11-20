@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cshr.civilservant.dto.CivilServantDto;
 import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
@@ -42,6 +43,16 @@ public class ReportController {
     @GetMapping("/civilServants")
     public ResponseEntity<Map<String, CivilServantReportDto>> listAllCivilServants() {
         return ResponseEntity.ok(reportService.getCivilServantMapNormalised());
+    }
+
+    @GetMapping("/civilServants/code")
+    public ResponseEntity<Map<String, CivilServantReportDto>> listAllCivilServantsWithCodes() {
+        return ResponseEntity.ok(reportService.getCivilServantMapNormalisedWithCodes());
+    }
+
+    @GetMapping(value = "/civilServants", params = "code")
+    public ResponseEntity<Map<String, CivilServantReportDto>> listAllCivilServantsByOrganisation(@RequestParam("code") String organisationalUnitCode) {
+        return ResponseEntity.ok(reportService.getCivilServantMapByOrganisationCodeNormalised(organisationalUnitCode));
     }
 
     @GetMapping("/civilServants")
