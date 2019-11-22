@@ -73,7 +73,6 @@ public class AgencyTokenController {
 //            {
 //                OrganisaitnalUnitCodeList.add(organisationalUnit.getCode());
 //            }
-//            agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenRequestDTO.getDomain(), updateSpacesForAgencyTokenRequestDTO.getToken(), updateSpacesForAgencyTokenRequestDTO.getCode(), updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
 
         } catch (TokenDoesNotExistException e) {
             log.warn("Token not found", e);
