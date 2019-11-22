@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
-import uk.gov.cshr.civilservant.dto.UpdateSpacesForAgencyTokenDTO;
+import uk.gov.cshr.civilservant.dto.UpdateSpacesForAgencyTokenRequestDTO;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
@@ -142,7 +142,7 @@ public class AgencyTokenControllerTest {
         String code = "code";
         List<String> codes = Arrays.asList("code1", "code2", "code3");
 
-        UpdateSpacesForAgencyTokenDTO dto = new UpdateSpacesForAgencyTokenDTO();
+        UpdateSpacesForAgencyTokenRequestDTO dto = new UpdateSpacesForAgencyTokenRequestDTO();
         dto.setDomain(domain);
         dto.setToken(token);
         dto.setCode(code);
@@ -164,7 +164,7 @@ public class AgencyTokenControllerTest {
         String token = "token123";
         String code = "code";
 
-        UpdateSpacesForAgencyTokenDTO dto = new UpdateSpacesForAgencyTokenDTO();
+        UpdateSpacesForAgencyTokenRequestDTO dto = new UpdateSpacesForAgencyTokenRequestDTO();
         dto.setDomain(domain);
         dto.setToken(token);
         dto.setCode(code);
@@ -185,7 +185,7 @@ public class AgencyTokenControllerTest {
         String token = "token123";
         String code = "code";
 
-        UpdateSpacesForAgencyTokenDTO dto = new UpdateSpacesForAgencyTokenDTO();
+        UpdateSpacesForAgencyTokenRequestDTO dto = new UpdateSpacesForAgencyTokenRequestDTO();
         dto.setDomain(domain);
         dto.setToken(token);
         dto.setCode(code);
@@ -207,7 +207,7 @@ public class AgencyTokenControllerTest {
         String code = "code";
         List<String> codes = Arrays.asList("code1", "code2", "code3");
 
-        UpdateSpacesForAgencyTokenDTO dto = new UpdateSpacesForAgencyTokenDTO();
+        UpdateSpacesForAgencyTokenRequestDTO dto = new UpdateSpacesForAgencyTokenRequestDTO();
         dto.setDomain(domain);
         dto.setToken(token);
         dto.setCode(code);
