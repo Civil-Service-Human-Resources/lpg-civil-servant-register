@@ -3,14 +3,9 @@ package uk.gov.cshr.civilservant.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
-import uk.gov.cshr.civilservant.dto.UpdateSpacesForAgencyTokenDTO;
+import uk.gov.cshr.civilservant.dto.UpdateSpacesForAgencyTokenRequestDTO;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
@@ -63,16 +58,13 @@ public class AgencyTokenController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    // we want to get OrganisationalUnit
-
-    // or we can create a function to get the parents of a passed code for an organisation
     @PutMapping
-    public ResponseEntity updateSpaceAvailable(@RequestBody UpdateSpacesForAgencyTokenDTO updateSpacesForAgencyTokenDTO) {
+    public ResponseEntity updateSpaceAvailable(@RequestBody UpdateSpacesForAgencyTokenRequestDTO updateSpacesForAgencyTokenRequestDTO) {
         try {
-            log.info("Updating agency token with parameters domain=" + updateSpacesForAgencyTokenDTO.getDomain() +
-                    " token=" + updateSpacesForAgencyTokenDTO.getToken() +
-                    " code=" + updateSpacesForAgencyTokenDTO.getCode() +
-                    " isRemoveUser=" + updateSpacesForAgencyTokenDTO.isRemoveUser());
+            log.info("Updating agency token with parameters domain=" + updateSpacesForAgencyTokenRequestDTO.getDomain() +
+                    " token=" + updateSpacesForAgencyTokenRequestDTO.getToken() +
+                    " code=" + updateSpacesForAgencyTokenRequestDTO.getCode() +
+                    " isRemoveUser=" + updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
 
             List<OrganisationalUnit> PassedOrganisationalUnitList = new ArrayList<>();
             List<String> OrganisaitnalUnitCodeList = new ArrayList<>();
@@ -81,8 +73,8 @@ public class AgencyTokenController {
             {
                 OrganisaitnalUnitCodeList.add(organisationalUnit.getCode());
             }
+            agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenRequestDTO.getDomain(), updateSpacesForAgencyTokenRequestDTO.getToken(), updateSpacesForAgencyTokenRequestDTO.getCode(), updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
 
-            agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenDTO.getDomain(), updateSpacesForAgencyTokenDTO.getToken(), OrganisaitnalUnitCodeList, updateSpacesForAgencyTokenDTO.isRemoveUser());
         } catch (TokenDoesNotExistException e) {
             log.warn("Token not found");
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
