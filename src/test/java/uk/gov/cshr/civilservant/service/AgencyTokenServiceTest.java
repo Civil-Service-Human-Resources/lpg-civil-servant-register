@@ -13,6 +13,7 @@ import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.AgencyTokenRepository;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,6 +72,7 @@ public class AgencyTokenServiceTest {
         String token = "token123";
         String domain = "example.com";
         String code = "123456";
+        List<String> codes = Arrays.asList("code1", "code2", "123456");
 
         AgencyToken agencyToken = new AgencyToken();
         agencyToken.setToken("thisisatoken");
@@ -88,7 +90,7 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.save(any(AgencyToken.class))).thenReturn(new AgencyToken());
 
         // when
-        agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false);
+        agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, false);
 
         // then
         verify(agencyTokenRepository, times(1)).save(agencyTokenCaptor.capture());
@@ -104,6 +106,7 @@ public class AgencyTokenServiceTest {
         String token = "token123";
         String domain = "example.com";
         String code = "123456";
+        List<String> codes = Arrays.asList("code1", "123456", "code3");
 
         AgencyToken agencyToken = new AgencyToken();
         agencyToken.setToken("thisisatoken");
@@ -122,7 +125,7 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.save(any(AgencyToken.class))).thenReturn(new AgencyToken());
 
         // when
-        agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, true);
+        agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, true);
 
         // then
         verify(agencyTokenRepository, times(1)).save(agencyTokenCaptor.capture());
@@ -138,12 +141,13 @@ public class AgencyTokenServiceTest {
         String token = "token123";
         String domain = "example.com";
         String code = "123456";
+        List<String> codes = Arrays.asList("code1", "code2", "123456");
 
         // given
         when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenThrow(new TokenDoesNotExistException(domain));
 
         // when
-        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
+        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, false))
                 .isInstanceOf(TokenDoesNotExistException.class);
 
         // then
@@ -155,6 +159,7 @@ public class AgencyTokenServiceTest {
         String token = "token123";
         String domain = "example.com";
         String code = "123456";
+        List<String> codes = Arrays.asList("code1", "123456", "code3");
 
         AgencyToken agencyToken = new AgencyToken();
         agencyToken.setToken("thisisatoken");
@@ -169,7 +174,7 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
 
         // when
-        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
+        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, false))
                 .isInstanceOf(NotEnoughSpaceAvailableException.class);
 
         // then
@@ -181,12 +186,14 @@ public class AgencyTokenServiceTest {
         String token = "token123";
         String domain = "example.com";
         String code = "123456";
+        List<String> codes = Arrays.asList("code1", "code2", "123456");
+
 
         // given
         when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenThrow(new RuntimeException());
 
         // when
-        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false))
+        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, false))
                 .isInstanceOf(Exception.class);
 
         // then
@@ -198,6 +205,8 @@ public class AgencyTokenServiceTest {
         String token = "token123";
         String domain = "example.com";
         String code = "123456";
+        List<String> codes = Arrays.asList("123456", "code2", "code3");
+
 
         AgencyToken agencyToken = new AgencyToken();
         agencyToken.setToken("thisisatoken");
@@ -215,7 +224,7 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
 
         // when
-        agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, true);
+        agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, true);
 
         // then
         verify(agencyTokenRepository, times(1)).save(agencyTokenCaptor.capture());
@@ -231,6 +240,7 @@ public class AgencyTokenServiceTest {
         String token = "token123";
         String domain = "example.com";
         String code = "123456";
+        List<String> codes = Arrays.asList("123456", "code2", "code3");
 
         AgencyToken agencyToken = new AgencyToken();
         agencyToken.setToken("thisisatoken");
@@ -245,7 +255,7 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
 
         // when
-        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, true))
+        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, true))
                 .isInstanceOf(NotEnoughSpaceAvailableException.class);
 
         // then

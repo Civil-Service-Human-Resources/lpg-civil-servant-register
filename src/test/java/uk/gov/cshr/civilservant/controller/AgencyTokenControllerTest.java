@@ -21,10 +21,11 @@ import uk.gov.cshr.civilservant.utils.JsonUtils;
 import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -139,6 +140,7 @@ public class AgencyTokenControllerTest {
         String domain = "example.com";
         String token = "token123";
         String code = "code";
+        List<String> codes = Arrays.asList("code1", "code2", "code3");
 
         UpdateSpacesForAgencyTokenDTO dto = new UpdateSpacesForAgencyTokenDTO();
         dto.setDomain(domain);
@@ -146,7 +148,7 @@ public class AgencyTokenControllerTest {
         dto.setCode(code);
 
         AgencyToken agencyToken = new AgencyToken();
-        when(agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false)).thenReturn(Optional.of(agencyToken));
+        when(agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, false)).thenReturn(Optional.of(agencyToken));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
                 .content(JsonUtils.asJsonString(dto))
@@ -167,7 +169,7 @@ public class AgencyTokenControllerTest {
         dto.setToken(token);
         dto.setCode(code);
 
-        when(agencyTokenService.updateAgencyTokenSpacesAvailable(anyString(), anyString(), anyString(), anyBoolean())).thenThrow(new TokenDoesNotExistException(token));
+        when(agencyTokenService.updateAgencyTokenSpacesAvailable(anyString(), anyString(), anyList(), anyBoolean())).thenThrow(new TokenDoesNotExistException(token));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
                 .content(JsonUtils.asJsonString(dto))
@@ -188,7 +190,7 @@ public class AgencyTokenControllerTest {
         dto.setToken(token);
         dto.setCode(code);
 
-        when(agencyTokenService.updateAgencyTokenSpacesAvailable(anyString(), anyString(), anyString(), anyBoolean())).thenThrow(new NotEnoughSpaceAvailableException(token));
+        when(agencyTokenService.updateAgencyTokenSpacesAvailable(anyString(), anyString(), anyList(), anyBoolean())).thenThrow(new NotEnoughSpaceAvailableException(token));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
                 .content(JsonUtils.asJsonString(dto))
@@ -203,6 +205,7 @@ public class AgencyTokenControllerTest {
         String domain = "example.com";
         String token = "token123";
         String code = "code";
+        List<String> codes = Arrays.asList("code1", "code2", "code3");
 
         UpdateSpacesForAgencyTokenDTO dto = new UpdateSpacesForAgencyTokenDTO();
         dto.setDomain(domain);
@@ -210,7 +213,7 @@ public class AgencyTokenControllerTest {
         dto.setCode(code);
 
         AgencyToken agencyToken = new AgencyToken();
-        when(agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, false)).thenReturn(Optional.of(agencyToken));
+        when(agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, false)).thenReturn(Optional.of(agencyToken));
 
         mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
                 .content(JsonUtils.asJsonString(dto))
