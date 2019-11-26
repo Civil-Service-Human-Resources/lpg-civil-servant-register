@@ -41,8 +41,6 @@ public class AgencyTokenService {
 
     @Transactional
     public Optional<AgencyToken> updateAgencyTokenSpacesAvailable(String domain, String token, List<String> codes, boolean isRemoveUser) {
-        // find token
-
         for (String code: codes)
         {
             Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code);
