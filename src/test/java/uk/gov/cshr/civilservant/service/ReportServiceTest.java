@@ -52,8 +52,8 @@ public class ReportServiceTest {
         when(civilServantRepository.findAllByOrganisationalUnit(organisationalUnit))
                 .thenReturn(Arrays.asList(civilServant1, civilServant2));
 
-        CivilServantDto civilServantDto1 = new CivilServantDto();
-        CivilServantDto civilServantDto2 = new CivilServantDto();
+        CivilServantDto civilServantDto1 = CivilServantDto.builder().build();
+        CivilServantDto civilServantDto2 = CivilServantDto.builder().build();
 
         when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantDto1);
         when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantDto2);
@@ -80,8 +80,8 @@ public class ReportServiceTest {
         when(civilServantRepository.findAllByProfession(profession))
                 .thenReturn(Arrays.asList(civilServant1, civilServant2));
 
-        CivilServantDto civilServantDto1 = new CivilServantDto();
-        CivilServantDto civilServantDto2 = new CivilServantDto();
+        CivilServantDto civilServantDto1 = CivilServantDto.builder().build();
+        CivilServantDto civilServantDto2 = CivilServantDto.builder().build();
 
         when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantDto1);
         when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantDto2);
@@ -131,8 +131,8 @@ public class ReportServiceTest {
         when(civilServantRepository.findAll())
                 .thenReturn(Arrays.asList(civilServant1, civilServant2));
 
-        CivilServantDto civilServantDto1 = new CivilServantDto();
-        CivilServantDto civilServantDto2 = new CivilServantDto();
+        CivilServantDto civilServantDto1 = CivilServantDto.builder().build();
+        CivilServantDto civilServantDto2 = CivilServantDto.builder().build();
 
         when(civilServantResourceFactory.create(civilServant1)).thenReturn(civilServantDto1);
         when(civilServantResourceFactory.create(civilServant2)).thenReturn(civilServantDto2);

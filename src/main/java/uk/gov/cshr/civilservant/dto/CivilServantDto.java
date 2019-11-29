@@ -1,10 +1,19 @@
 package uk.gov.cshr.civilservant.dto;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import uk.gov.cshr.civilservant.domain.CivilServant;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
-@Data
+@Builder
+@EqualsAndHashCode
+@Getter
 public class CivilServantDto {
     private String id;
     private String uid;
@@ -14,16 +23,4 @@ public class CivilServantDto {
     private String profession;
     private List<String> otherAreasOfWork;
     private String grade;
-
-    public CivilServantDto(Long id, String name, String organisation, String profession, String uid, String grade) {
-        this.id = id.toString();
-        this.name = name;
-        this.organisation = organisation;
-        this.profession = profession;
-        this.uid = uid;
-        this.grade = grade;
-    }
-
-    public CivilServantDto() {
-    }
 }

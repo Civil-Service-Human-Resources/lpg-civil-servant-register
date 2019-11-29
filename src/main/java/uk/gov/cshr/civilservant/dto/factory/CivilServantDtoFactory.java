@@ -13,30 +13,35 @@ import java.util.stream.Collectors;
 public class CivilServantDtoFactory extends DtoFactory<CivilServantDto, CivilServant>  {
 
     public CivilServantDtoFactory() {
-
     }
 
+    /**
+     * Create transform given Entity to corresponding Dto object. Note: CivilServantDto.email is always of null value
+     * @param civilServant the CivilServant entity
+     * @return CivilServantDto the CivilServant Dto object
+     */
     public CivilServantDto create(CivilServant civilServant) {
-        CivilServantDto civilServantDto = new CivilServantDto();
-        civilServantDto.setId(civilServant.getIdentity().getUid());
-        civilServantDto.setName(civilServant.getFullName());
+        CivilServantDto.CivilServantDtoBuilder builder = CivilServantDto.builder();
+
+        builder.id(civilServant.getIdentity().getUid());
+        builder.name(civilServant.getFullName());
 
         if (civilServant.getOrganisationalUnit().isPresent()) {
-            civilServantDto.setOrganisation(civilServant.getOrganisationalUnit().get().getName());
+            builder.organisation(civilServant.getOrganisationalUnit().get().getName());
         }
 
         if (civilServant.getProfession().isPresent()) {
-            civilServantDto.setProfession(civilServant.getProfession().get().getName());
+           builder.profession(civilServant.getProfession().get().getName());
         }
 
-        civilServantDto.setOtherAreasOfWork(civilServant.getOtherAreasOfWork().stream()
+        builder.otherAreasOfWork(civilServant.getOtherAreasOfWork().stream()
                 .map(Profession::getName)
                 .collect(Collectors.toList()));
 
         if (civilServant.getGrade().isPresent()) {
-            civilServantDto.setGrade(civilServant.getGrade().get().getName());
+            builder.grade(civilServant.getGrade().get().getName());
         }
 
-        return civilServantDto;
+        return builder.build();
     }
 }

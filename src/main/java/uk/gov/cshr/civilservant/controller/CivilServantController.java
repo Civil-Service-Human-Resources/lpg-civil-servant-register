@@ -1,5 +1,9 @@
 package uk.gov.cshr.civilservant.controller;
 
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Optional;
+import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
@@ -14,11 +18,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.domain.Identity;
-import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
-import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateForceOrgChangeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
@@ -26,12 +33,9 @@ import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
+import uk.gov.cshr.civilservant.service.CivilServantService;
 import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
-
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Optional;
 
 @Slf4j
 @RepositoryRestController
@@ -41,6 +45,8 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private final LineManagerService lineManagerService;
 
+    private final CivilServantService civilServantService;
+
     private final CivilServantRepository civilServantRepository;
 
     private final RepositoryEntityLinks repositoryEntityLinks;
@@ -49,11 +55,11 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private final OrganisationalUnitRepository organisationalUnitRepository;
 
-    public CivilServantController(LineManagerService lineManagerService, CivilServantRepository civilServantRepository,
-                                  RepositoryEntityLinks repositoryEntityLinks,
-                                  CivilServantResourceFactory civilServantResourceFactory,
-                                  OrganisationalUnitRepository organisationalUnitRepository) {
+    public CivilServantController(LineManagerService lineManagerService, CivilServantService civilServantService, CivilServantRepository civilServantRepository,
+        RepositoryEntityLinks repositoryEntityLinks,
+        CivilServantResourceFactory civilServantResourceFactory, OrganisationalUnitRepository organisationalUnitRepository) {
         this.lineManagerService = lineManagerService;
+        this.civilServantService = civilServantService;
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
         this.civilServantResourceFactory = civilServantResourceFactory;
@@ -63,7 +69,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     @GetMapping
     public ResponseEntity<Resources<Void>> list() {
         log.debug("Listing civil servant links");
-
         Resources<Void> resource = new Resources<>(new ArrayList<>());
         resource.add(repositoryEntityLinks.linkToSingleResource(CivilServant.class, "me").withRel("me"));
         return ResponseEntity.ok(resource);
@@ -73,7 +78,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Resource<CivilServantResource>> get() {
         log.debug("Getting civil servant details for logged in user");
-
         return civilServantRepository.findByPrincipal().map(
                 civilServant -> ResponseEntity.ok(civilServantResourceFactory.create(civilServant)))
                 .orElse(ResponseEntity.notFound().build());
@@ -103,7 +107,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
             CivilServant lineManager = optionalLineManager.get();
             CivilServant civilServant = optionalCivilServant.get();
             if (lineManager.equals(civilServant)) {
-                log.info("User tried to set line manager to themself, {}.", civilServant);
+                log.info("User can not be line manager of himself, {}.", civilServant);
                 return ResponseEntity.badRequest().build();
             }
 
@@ -233,6 +237,22 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
             log.error("An error occurred updating Civil Servants force org change flag", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @PatchMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
+    @Transactional
+    public ResponseEntity<Resource<CivilServantResource>> updateCivilServantProfile(
+        @RequestBody Map<String, String> profileUpdate) {
+        log.info("Entering CivilServant.updateCivilServant ....");
+        ResponseEntity<Resource<CivilServantResource>> response = civilServantRepository.findByPrincipal().map(
+            civilServant -> {
+                civilServantService.update(civilServant, profileUpdate);
+                log.info("Existing CivilServant.updateCivilServantProfile ....");
+                return ResponseEntity.ok(civilServantResourceFactory.create(civilServant));
+            }).orElse(ResponseEntity.notFound().build());
+        log.info("Existing CivilServant.updateCivilServantProfile ....");
+        return response;
     }
 
     @Override
