@@ -7,18 +7,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Grade;
+import uk.gov.cshr.civilservant.domain.Interest;
 import uk.gov.cshr.civilservant.domain.Profession;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.repository.GradeRepository;
+import uk.gov.cshr.civilservant.repository.InterestRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.repository.ProfessionRepository;
 import uk.gov.cshr.civilservant.service.exception.GeneralServiceException;
 
-import java.security.GeneralSecurityException;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -28,19 +32,35 @@ public class CivilServantService {
     private final ProfessionRepository professionRepository;
     private final OrganisationalUnitRepository organisationalUnitRepository;
     private final GradeRepository gradeRepository;
+    private final InterestRepository interestRepository;
 
     private enum ProfileItem {
-        fullName, emailAddress, organisationUnit, otherAreasOfWork, profession, interests, grade, lineManager
+        fullName, emailAddress, organisationUnit, otherAreasOfWork, profession, interests, grade
     }
 
     @Autowired
-    public CivilServantService(CivilServantRepository civilServantRepository, ProfessionRepository professionRepository, OrganisationalUnitRepository organisationalUnitRepository, GradeRepository gradeRepository) {
+    public CivilServantService(CivilServantRepository civilServantRepository, ProfessionRepository professionRepository, OrganisationalUnitRepository organisationalUnitRepository, GradeRepository gradeRepository, InterestRepository interestRepository) {
         this.civilServantRepository = civilServantRepository;
         this.professionRepository = professionRepository;
         this.organisationalUnitRepository = organisationalUnitRepository;
         this.gradeRepository = gradeRepository;
+        this.interestRepository = interestRepository;
     }
 
+    /**
+     * Update learner's profile based on given update details.
+     * @param civilServant the Civil Servant
+     * @param profileUpdate A mapping of profile item to new values. Only one mapping is expected.
+     *                      For each profile item its mapping is expected below: <br/><br/>
+     *                      fullName -> "John Big" <br/>
+     *                      organisationUnit -> "12" <br/>
+     *                      otherAreasOfWork -> "2,6,15" <br/>
+     *                      profession -> '2'  (i.e. primary area of work) <br/>
+     *                      interests -> '3,5,7' <br/>
+     *                      grade -> '5' <br/>
+     *                      emailAddress (Not sure)
+     * @return true if the profile is updated successfully
+     */
     public boolean update(CivilServant civilServant, Map<String, String> profileUpdate) {
         checkAndThrowIllegalArgumentException(profileUpdate);
         Pair<String, String> profileUpdatePair = new ImmutablePair
@@ -66,9 +86,17 @@ public class CivilServantService {
             case interests:
                 updateInterests(civilServant, profileUpdatePair.getValue());
                 break;
-            case emailAddress:break;
+            case emailAddress:
+                updateEmailAddress(civilServant, profileUpdatePair.getValue());
+                break;
         }
+        civilServantRepository.saveAndFlush(civilServant);
         return true;
+    }
+
+    private void updateEmailAddress(CivilServant civilServant, String newEmail) {
+        // not sure how email update in profile is handled
+        throw new UnsupportedOperationException("updateEmailAddress is not implemented yet");
     }
 
     private void updateDepartment(CivilServant civilServant, String orgUnitId) {
@@ -81,7 +109,18 @@ public class CivilServantService {
     }
 
     private void updateOtherAreasOfWork(CivilServant civilServant, String newAreasOfWork) {
+        // comma-seperated profession ids
+        String[] newProfessionIds = newAreasOfWork.split(",");
+        if (newProfessionIds.length > 0) {
+            Set<Profession> newProfessions =  findProfessions (newProfessionIds);
+            civilServant.setOtherAreasOfWork(newProfessions);
+        }
+    }
 
+    private Set<Profession> findProfessions(String[] professionIds) {
+        return Arrays.stream(professionIds)
+                .map(professionId-> professionRepository.getOne(Long.parseLong(professionId)))
+                .collect(Collectors.toSet());
     }
 
     private void updatePrimaryAreaOfWork(CivilServant civilServant, String professionId) {
@@ -94,9 +133,29 @@ public class CivilServantService {
         });
     }
 
-    //todo: a set of interests
-    private void updateInterests(CivilServant civilServant, String newInterests) {
-        civilServant.getInterests();
+    private void updateInterests(CivilServant civilServant, String newInterestIds) {
+        String[] interestIds = newInterestIds.split(",");
+        if (interestIds.length > 0){
+            Set<Interest> newInterests = findInterests(interestIds);
+            civilServant.setInterests(newInterests);
+        }
+    }
+
+    private Set<Interest> findInterests(final String[] interestIds) {
+        final Set<Interest> interests = new HashSet<>(interestIds.length);
+        for (String interestId:interestIds) {
+            Optional<Interest> interstOptional = interestRepository.findById(Long.parseLong(interestId));
+            interstOptional.orElseThrow(()->
+                new GeneralServiceException(String.format("Interest %s can not be found !", interestId))
+            );
+            interests.add(interstOptional.get());
+        }
+
+        return Arrays.stream(interestIds)
+                    .map(interestId -> interestRepository.findById(Long.parseLong(interestId)))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .collect(Collectors.toSet());
     }
 
     private void updateGrade(final CivilServant civilServant, final String gradeId) {
@@ -106,16 +165,16 @@ public class CivilServantService {
                 Optional<Grade> gradeOptional = gradeRepository.findById(newGradeId);
                 gradeOptional.ifPresent(civilServant::setGrade);
                 gradeOptional.orElseThrow(()->
-                        new GeneralServiceException(String.format("Can not find Grade with id %s ....", gradeId)));
+                     new GeneralServiceException(String.format("Can not find Grade with id %s ....", gradeId)));
             }
         });
     }
 
-    private void updateFullName(CivilServant civilServant, String newName) {
+    private void updateFullName(final CivilServant civilServant, final String newName) {
         civilServant.setFullName(newName);
     }
 
-    private void checkAndThrowIllegalArgumentException(Map<String, String> entry) {
+    private void checkAndThrowIllegalArgumentException(final Map<String, String> entry) {
         if (Objects.isNull(entry)){
             throw new IllegalArgumentException("Invalid profile update received while updating CivilServant! ");
         }
