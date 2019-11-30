@@ -59,7 +59,8 @@ public class CivilServantService {
      *                      interests -> '3,5,7' <br/>
      *                      grade -> '5' <br/>
      *                      emailAddress (Not sure)
-     * @return true if the profile is updated successfully
+     * @return true if the profile is updated successfully <br/>
+     *         false if GeneralServiceException is being thrown
      */
     public boolean update(CivilServant civilServant, Map<String, String> profileUpdate) {
         checkAndThrowIllegalArgumentException(profileUpdate);
@@ -67,31 +68,37 @@ public class CivilServantService {
                                     (profileUpdate.keySet().iterator().next(),profileUpdate.values().iterator().next());
         ProfileItem updateItem = ProfileItem.valueOf(profileUpdate.keySet().iterator().next());
         log.debug("Updating {} to {}....", profileUpdatePair.getKey(), profileUpdatePair.getValue());
-        switch (updateItem) {
-            case fullName:
-                updateFullName(civilServant, profileUpdatePair.getValue());
-                break;
-            case profession:
-                updatePrimaryAreaOfWork(civilServant, profileUpdatePair.getValue());
-                break;
-            case otherAreasOfWork:
-                updateOtherAreasOfWork(civilServant, profileUpdatePair.getValue());
-                break;
-            case organisationUnit:
-                updateDepartment(civilServant, profileUpdatePair.getValue());
-                break;
-            case grade:
-                updateGrade(civilServant, profileUpdatePair.getValue());
-                break;
-            case interests:
-                updateInterests(civilServant, profileUpdatePair.getValue());
-                break;
-            case emailAddress:
-                updateEmailAddress(civilServant, profileUpdatePair.getValue());
-                break;
+        try {
+            switch (updateItem) {
+                case fullName:
+                    updateFullName(civilServant, profileUpdatePair.getValue());
+                    break;
+                case profession:
+                    updatePrimaryAreaOfWork(civilServant, profileUpdatePair.getValue());
+                    break;
+                case otherAreasOfWork:
+                    updateOtherAreasOfWork(civilServant, profileUpdatePair.getValue());
+                    break;
+                case organisationUnit:
+                    updateDepartment(civilServant, profileUpdatePair.getValue());
+                    break;
+                case grade:
+                    updateGrade(civilServant, profileUpdatePair.getValue());
+                    break;
+                case interests:
+                    updateInterests(civilServant, profileUpdatePair.getValue());
+                    break;
+                case emailAddress:
+                    updateEmailAddress(civilServant, profileUpdatePair.getValue());
+                    break;
+            }
+            civilServantRepository.saveAndFlush(civilServant);
+            return true;
+        } catch (GeneralServiceException gse) {
+            log.error(String.format("Caught GeneralServiceException while updating CS profile: %s",
+                                        gse.getMessage()), gse);
         }
-        civilServantRepository.saveAndFlush(civilServant);
-        return true;
+        return false;
     }
 
     private void updateEmailAddress(CivilServant civilServant, String newEmail) {
@@ -143,19 +150,14 @@ public class CivilServantService {
 
     private Set<Interest> findInterests(final String[] interestIds) {
         final Set<Interest> interests = new HashSet<>(interestIds.length);
-        for (String interestId:interestIds) {
+        for (String interestId: interestIds) {
             Optional<Interest> interstOptional = interestRepository.findById(Long.parseLong(interestId));
             interstOptional.orElseThrow(()->
                 new GeneralServiceException(String.format("Interest %s can not be found !", interestId))
             );
             interests.add(interstOptional.get());
         }
-
-        return Arrays.stream(interestIds)
-                    .map(interestId -> interestRepository.findById(Long.parseLong(interestId)))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .collect(Collectors.toSet());
+        return interests;
     }
 
     private void updateGrade(final CivilServant civilServant, final String gradeId) {
