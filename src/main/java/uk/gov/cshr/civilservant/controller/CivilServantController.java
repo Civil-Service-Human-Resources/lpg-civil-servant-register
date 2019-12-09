@@ -15,13 +15,17 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
+import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
+import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -40,13 +44,17 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private final CivilServantResourceFactory civilServantResourceFactory;
 
+    private final OrganisationalUnitRepository organisationalUnitRepository;
+
     public CivilServantController(LineManagerService lineManagerService, CivilServantRepository civilServantRepository,
                                   RepositoryEntityLinks repositoryEntityLinks,
-                                  CivilServantResourceFactory civilServantResourceFactory) {
+                                  CivilServantResourceFactory civilServantResourceFactory,
+                                  OrganisationalUnitRepository organisationalUnitRepository) {
         this.lineManagerService = lineManagerService;
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
         this.civilServantResourceFactory = civilServantResourceFactory;
+        this.organisationalUnitRepository = organisationalUnitRepository;
     }
 
     @GetMapping
@@ -121,6 +129,33 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
             return ResponseEntity.ok(civilServantResourceFactory.create(civilServant));
         }
         return ResponseEntity.unprocessableEntity().build();
+    }
+
+    @PutMapping("/org")
+    @PreAuthorize("isAuthenticated()")
+    @Transactional
+    public ResponseEntity updateOrganisation(@Valid @RequestBody UpdateOrganisationDTO updateOrganisationDTO) {
+
+        LOGGER.info("updating civil servants organisation");
+        Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
+
+        if (optionalCivilServant.isPresent()) {
+
+            Optional<OrganisationalUnit> newOrgUnit = organisationalUnitRepository.findByCode(updateOrganisationDTO.getOrgainisation());
+            if(newOrgUnit.isPresent()) {
+                CivilServant civilServant = optionalCivilServant.get();
+                civilServant.setOrganisationalUnit(newOrgUnit.get());
+                civilServantRepository.save(civilServant);
+                return ResponseEntity.noContent().build();
+            } else {
+                LOGGER.warn("new organisation to update to has not been found");
+                return ResponseEntity.notFound().build();
+            }
+
+        } else {
+            LOGGER.warn("civil servant to update has not been found");
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/{uid}/delete")
