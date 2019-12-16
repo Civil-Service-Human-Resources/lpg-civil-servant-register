@@ -136,12 +136,12 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     @Transactional
     public ResponseEntity updateOrganisation(@Valid @RequestBody UpdateOrganisationDTO updateOrganisationDTO) {
 
-        LOGGER.info("updating civil servants organisation");
-        Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
+        LOGGER.info("updating civil servants organisation for organisation="+updateOrganisationDTO.getOrganisation());
+        Optional<CivilServant> optionalCivilServant = civilServantRepository.findByIdentity(updateOrganisationDTO.getUid());
 
         if (optionalCivilServant.isPresent()) {
 
-            Optional<OrganisationalUnit> newOrgUnit = organisationalUnitRepository.findByCode(updateOrganisationDTO.getOrgainisation());
+            Optional<OrganisationalUnit> newOrgUnit = organisationalUnitRepository.findByCode(updateOrganisationDTO.getOrganisation());
             if(newOrgUnit.isPresent()) {
                 CivilServant civilServant = optionalCivilServant.get();
                 civilServant.setOrganisationalUnit(newOrgUnit.get());
