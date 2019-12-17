@@ -10,15 +10,18 @@ import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
+import uk.gov.cshr.civilservant.repository.IdentityRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
@@ -46,15 +49,19 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private final OrganisationalUnitRepository organisationalUnitRepository;
 
+    private final IdentityRepository identityRepository;
+
     public CivilServantController(LineManagerService lineManagerService, CivilServantRepository civilServantRepository,
                                   RepositoryEntityLinks repositoryEntityLinks,
                                   CivilServantResourceFactory civilServantResourceFactory,
-                                  OrganisationalUnitRepository organisationalUnitRepository) {
+                                  OrganisationalUnitRepository organisationalUnitRepository,
+                                  IdentityRepository identityRepository) {
         this.lineManagerService = lineManagerService;
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
         this.civilServantResourceFactory = civilServantResourceFactory;
         this.organisationalUnitRepository = organisationalUnitRepository;
+        this.identityRepository = identityRepository;
     }
 
     @GetMapping
@@ -76,12 +83,12 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/orgcode")
+    @GetMapping("/org")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<OrgCodeDTO> getOrgCodeForCivilServant() {
-        LOGGER.debug("Getting civil servant org details for logged in user");
+    public ResponseEntity<OrgCodeDTO> getOrgCodeForCivilServant(@RequestParam(value = "uid") String uid) {
+        LOGGER.debug("Getting civil servant org details for logged in user with uid " + uid);
 
-        Optional<CivilServant> civilServant = civilServantRepository.findByPrincipal();
+        Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(uid);
 
         if(civilServant.isPresent()) {
             return civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant.get())
@@ -133,28 +140,39 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     @PutMapping("/org")
     @PreAuthorize("isAuthenticated()")
-    @Transactional
     public ResponseEntity updateOrganisation(@Valid @RequestBody UpdateOrganisationDTO updateOrganisationDTO) {
 
         LOGGER.info("updating civil servants organisation for organisation="+updateOrganisationDTO.getOrganisation());
-        Optional<CivilServant> optionalCivilServant = civilServantRepository.findByIdentity(updateOrganisationDTO.getUid());
 
-        if (optionalCivilServant.isPresent()) {
+        try {
+            Optional<Identity> identity = identityRepository.findByUid(updateOrganisationDTO.getUid());
 
-            Optional<OrganisationalUnit> newOrgUnit = organisationalUnitRepository.findByCode(updateOrganisationDTO.getOrganisation());
-            if(newOrgUnit.isPresent()) {
-                CivilServant civilServant = optionalCivilServant.get();
-                civilServant.setOrganisationalUnit(newOrgUnit.get());
-                civilServantRepository.save(civilServant);
-                return ResponseEntity.noContent().build();
+            if (identity.isPresent()) {
+                Identity identityFound = identity.get();
+                Optional<CivilServant> optionalCivilServant = civilServantRepository.findByIdentity(identityFound.getUid());
+                if (optionalCivilServant.isPresent()) {
+                    Optional<OrganisationalUnit> newOrgUnit = organisationalUnitRepository.findByCode(updateOrganisationDTO.getOrganisation());
+                    if (newOrgUnit.isPresent()) {
+                        CivilServant civilServant = optionalCivilServant.get();
+                        civilServant.setOrganisationalUnit(newOrgUnit.get());
+                        civilServantRepository.save(civilServant);
+                        return ResponseEntity.noContent().build();
+                    } else {
+                        LOGGER.warn("new organisation to update to has not been found");
+                        return ResponseEntity.notFound().build();
+                    }
+
+                } else {
+                    LOGGER.warn("civil servant to update has not been found");
+                    return ResponseEntity.notFound().build();
+                }
             } else {
-                LOGGER.warn("new organisation to update to has not been found");
+                LOGGER.warn("identity to update has not been found");
                 return ResponseEntity.notFound().build();
             }
-
-        } else {
-            LOGGER.warn("civil servant to update has not been found");
-            return ResponseEntity.notFound().build();
+        } catch(Exception e) {
+            LOGGER.error("An error occurred updating Civil Servants organisation", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
