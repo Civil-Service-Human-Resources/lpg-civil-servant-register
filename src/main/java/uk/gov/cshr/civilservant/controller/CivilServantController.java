@@ -16,12 +16,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
-import uk.gov.cshr.civilservant.repository.IdentityRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
@@ -49,19 +47,15 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private final OrganisationalUnitRepository organisationalUnitRepository;
 
-    private final IdentityRepository identityRepository;
-
     public CivilServantController(LineManagerService lineManagerService, CivilServantRepository civilServantRepository,
                                   RepositoryEntityLinks repositoryEntityLinks,
                                   CivilServantResourceFactory civilServantResourceFactory,
-                                  OrganisationalUnitRepository organisationalUnitRepository,
-                                  IdentityRepository identityRepository) {
+                                  OrganisationalUnitRepository organisationalUnitRepository) {
         this.lineManagerService = lineManagerService;
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
         this.civilServantResourceFactory = civilServantResourceFactory;
         this.organisationalUnitRepository = organisationalUnitRepository;
-        this.identityRepository = identityRepository;
     }
 
     @GetMapping
