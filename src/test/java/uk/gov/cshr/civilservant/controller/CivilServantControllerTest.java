@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.hateoas.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -18,6 +19,7 @@ import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
+import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
@@ -25,6 +27,7 @@ import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
+import uk.gov.cshr.civilservant.utils.JsonUtils;
 import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
 import java.util.Optional;
@@ -190,6 +193,105 @@ public class CivilServantControllerTest {
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void givenCivilServantExistsAndOrgUnitExists_whenUpdateOrganisation_shouldReturn204() throws Exception {
+
+        UpdateOrganisationDTO requestDTO = new UpdateOrganisationDTO();
+        requestDTO.setOrganisation("co");
+        requestDTO.setUid("myuid");
+
+        CivilServant civilServant = createCivilServant("myuid");
+        OrganisationalUnit dto = new OrganisationalUnit();
+        dto.setCode("co");
+
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
+        when(organisationalUnitRepository.findByCode(eq("co"))).thenReturn(Optional.of(dto));
+        when(civilServantRepository.save(eq(civilServant))).thenReturn(new CivilServant());
+
+        mockMvc.perform(
+                patch("/civilServants/org").contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(JsonUtils.asJsonString(requestDTO))
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        verify(civilServantRepository).findByPrincipal();
+        verify(organisationalUnitRepository).findByCode(eq("co"));
+        verify(civilServantRepository).save(eq(civilServant));
+    }
+
+    @Test
+    public void givenCivilServantDoesNotExist_whenUpdateOrganisation_shouldReturn404() throws Exception {
+
+        UpdateOrganisationDTO requestDTO = new UpdateOrganisationDTO();
+        requestDTO.setOrganisation("co");
+        requestDTO.setUid("myuid");
+
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                patch("/civilServants/org").contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(JsonUtils.asJsonString(requestDTO))
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+
+        verify(civilServantRepository).findByPrincipal();
+        verify(organisationalUnitRepository, never()).findByCode(anyString());
+        verify(civilServantRepository, never()).save(any());
+    }
+
+    @Test
+    public void givenOrgNotExist_whenUpdateOrganisation_shouldReturn404() throws Exception {
+
+        UpdateOrganisationDTO requestDTO = new UpdateOrganisationDTO();
+        requestDTO.setOrganisation("co");
+        requestDTO.setUid("myuid");
+
+        CivilServant civilServant = createCivilServant("myuid");
+
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
+        when(organisationalUnitRepository.findByCode(eq("co"))).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                patch("/civilServants/org").contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(JsonUtils.asJsonString(requestDTO))
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+
+        verify(civilServantRepository).findByPrincipal();
+        verify(organisationalUnitRepository).findByCode(anyString());
+        verify(civilServantRepository, never()).save(any());
+    }
+
+    @Test
+    public void givenTechnicalErrorOccurs_whenUpdateOrganisation_shouldReturn404() throws Exception {
+
+        UpdateOrganisationDTO requestDTO = new UpdateOrganisationDTO();
+        requestDTO.setOrganisation("co");
+        requestDTO.setUid("myuid");
+
+        CivilServant civilServant = createCivilServant("myuid");
+        OrganisationalUnit dto = new OrganisationalUnit();
+        dto.setCode("co");
+
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
+        when(organisationalUnitRepository.findByCode(eq("co"))).thenReturn(Optional.of(dto));
+        when(civilServantRepository.save(any(CivilServant.class))).thenThrow(new RuntimeException());
+
+        mockMvc.perform(
+                patch("/civilServants/org").contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content(JsonUtils.asJsonString(requestDTO))
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isInternalServerError());
+
+        verify(civilServantRepository).findByPrincipal();
+        verify(organisationalUnitRepository).findByCode(anyString());
+        verify(civilServantRepository).save(any());
     }
 
     private CivilServant createCivilServant(String uid) {
