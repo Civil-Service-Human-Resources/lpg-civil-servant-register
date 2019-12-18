@@ -138,39 +138,31 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         return ResponseEntity.unprocessableEntity().build();
     }
 
-    @PutMapping("/org")
+    @PatchMapping("/org")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity updateOrganisation(@Valid @RequestBody UpdateOrganisationDTO updateOrganisationDTO) {
 
-        LOGGER.info("updating civil servants organisation for organisation="+updateOrganisationDTO.getOrganisation());
+        LOGGER.info("updating civil servants organisation for organisation=" + updateOrganisationDTO.getOrganisation());
 
         try {
-            Optional<Identity> identity = identityRepository.findByUid(updateOrganisationDTO.getUid());
-
-            if (identity.isPresent()) {
-                Identity identityFound = identity.get();
-                Optional<CivilServant> optionalCivilServant = civilServantRepository.findByIdentity(identityFound.getUid());
-                if (optionalCivilServant.isPresent()) {
-                    Optional<OrganisationalUnit> newOrgUnit = organisationalUnitRepository.findByCode(updateOrganisationDTO.getOrganisation());
-                    if (newOrgUnit.isPresent()) {
-                        CivilServant civilServant = optionalCivilServant.get();
-                        civilServant.setOrganisationalUnit(newOrgUnit.get());
-                        civilServantRepository.save(civilServant);
-                        return ResponseEntity.noContent().build();
-                    } else {
-                        LOGGER.warn("new organisation to update to has not been found");
-                        return ResponseEntity.notFound().build();
-                    }
-
+            Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
+            if (optionalCivilServant.isPresent()) {
+                Optional<OrganisationalUnit> newOrgUnit = organisationalUnitRepository.findByCode(updateOrganisationDTO.getOrganisation());
+                if (newOrgUnit.isPresent()) {
+                    CivilServant civilServant = optionalCivilServant.get();
+                    civilServant.setOrganisationalUnit(newOrgUnit.get());
+                    civilServantRepository.save(civilServant);
+                    return ResponseEntity.noContent().build();
                 } else {
-                    LOGGER.warn("civil servant to update has not been found");
+                    LOGGER.warn("new organisation to update to has not been found");
                     return ResponseEntity.notFound().build();
                 }
+
             } else {
-                LOGGER.warn("identity to update has not been found");
+                LOGGER.warn("civil servant to update has not been found");
                 return ResponseEntity.notFound().build();
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOGGER.error("An error occurred updating Civil Servants organisation", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
