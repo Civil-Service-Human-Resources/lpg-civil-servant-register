@@ -76,13 +76,13 @@ public class AgencyTokenController {
             agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenRequestDTO.getDomain(), updateSpacesForAgencyTokenRequestDTO.getToken(), updateSpacesForAgencyTokenRequestDTO.getCode(), updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
 
         } catch (TokenDoesNotExistException e) {
-            log.warn("Token not found");
+            log.warn("Token not found", e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (NotEnoughSpaceAvailableException e) {
-            log.warn("Not enough space available for token");
+            log.warn("Not enough space available for token", e);
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
-            log.error("An error occurred");
+            log.error("An error occurred", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
