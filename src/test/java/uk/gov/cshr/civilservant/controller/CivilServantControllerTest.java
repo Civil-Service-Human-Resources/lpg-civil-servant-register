@@ -3,6 +3,8 @@ package uk.gov.cshr.civilservant.controller;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,12 +34,12 @@ import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -61,6 +63,9 @@ public class CivilServantControllerTest {
 
     @MockBean
     private OrganisationalUnitRepository organisationalUnitRepository;
+
+    @Captor
+    private ArgumentCaptor<CivilServant> civilServantOrgToBeDeletedCaptor;
 
     @Before
     public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
@@ -265,7 +270,7 @@ public class CivilServantControllerTest {
     }
 
     @Test
-    public void givenTechnicalErrorOccurs_whenUpdateOrganisation_shouldReturn404() throws Exception {
+    public void givenTechnicalErrorOccurs_whenUpdateOrganisation_shouldReturn500() throws Exception {
 
         UpdateOrganisationDTO requestDTO = new UpdateOrganisationDTO();
         requestDTO.setOrganisation("co");
@@ -290,9 +295,79 @@ public class CivilServantControllerTest {
         verify(civilServantRepository).save(any());
     }
 
+    @Test
+    public void givenCivilServantExists_whenDeleteOrganisation_shouldReturn204() throws Exception {
+
+        CivilServant civilServant = createCivilServant("myuid");
+        OrganisationalUnit existingOrg = new OrganisationalUnit();
+        existingOrg.setCode("co");
+        civilServant.setOrganisationalUnit(existingOrg);
+        long expectedIDOfCivilServant = civilServant.getId();
+
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
+        when(civilServantRepository.save(eq(civilServant))).thenReturn(new CivilServant());
+
+        mockMvc.perform(
+                delete("/civilServants/org")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+
+        verify(civilServantRepository).findByPrincipal();
+        verify(civilServantRepository).save(civilServantOrgToBeDeletedCaptor.capture());
+
+        CivilServant actualCivilServantWhosOrgHasBeenDeleted = civilServantOrgToBeDeletedCaptor.getValue();
+        assertThat(actualCivilServantWhosOrgHasBeenDeleted.getId()).isEqualTo(expectedIDOfCivilServant);
+
+        Optional<OrganisationalUnit> afterDeletionOrgUnit = actualCivilServantWhosOrgHasBeenDeleted.getOrganisationalUnit();
+        assertThat(actualCivilServantWhosOrgHasBeenDeleted.getOrganisationalUnit()).isEmpty();
+    }
+
+    @Test
+    public void givenCivilServantDoesNotExists_whenDeleteOrganisation_shouldReturn404() throws Exception {
+
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                delete("/civilServants/org")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+
+        verify(civilServantRepository).findByPrincipal();
+        verify(civilServantRepository, never()).save(any(CivilServant.class));
+    }
+
+    @Test
+    public void givenTechnicalErrorOccurs_whenDeleteOrganisation_shouldReturn500() throws Exception {
+
+        CivilServant civilServant = createCivilServant("myuid");
+        OrganisationalUnit existingOrg = new OrganisationalUnit();
+        existingOrg.setCode("co");
+        civilServant.setOrganisationalUnit(existingOrg);
+        long expectedIDOfCivilServant = civilServant.getId();
+
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
+        when(civilServantRepository.save(eq(civilServant))).thenThrow(new RuntimeException());
+
+        mockMvc.perform(
+                delete("/civilServants/org")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isInternalServerError());
+
+        verify(civilServantRepository).findByPrincipal();
+        verify(civilServantRepository).save(eq(civilServant));
+    }
+
     private CivilServant createCivilServant(String uid) {
         Identity identity = new Identity(uid);
-        return new CivilServant(identity);
+        CivilServant cs = new CivilServant(identity);
+        cs.setId(new Long(123));
+        return cs;
     }
 
     @TestConfiguration
