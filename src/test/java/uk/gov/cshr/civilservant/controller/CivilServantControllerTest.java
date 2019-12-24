@@ -200,7 +200,6 @@ public class CivilServantControllerTest {
 
         UpdateOrganisationDTO requestDTO = new UpdateOrganisationDTO();
         requestDTO.setOrganisation("co");
-        requestDTO.setUid("myuid");
 
         CivilServant civilServant = createCivilServant("myuid");
         OrganisationalUnit dto = new OrganisationalUnit();
@@ -227,7 +226,6 @@ public class CivilServantControllerTest {
 
         UpdateOrganisationDTO requestDTO = new UpdateOrganisationDTO();
         requestDTO.setOrganisation("co");
-        requestDTO.setUid("myuid");
 
         when(civilServantRepository.findByPrincipal()).thenReturn(Optional.empty());
 
@@ -248,7 +246,6 @@ public class CivilServantControllerTest {
 
         UpdateOrganisationDTO requestDTO = new UpdateOrganisationDTO();
         requestDTO.setOrganisation("co");
-        requestDTO.setUid("myuid");
 
         CivilServant civilServant = createCivilServant("myuid");
 
@@ -272,7 +269,6 @@ public class CivilServantControllerTest {
 
         UpdateOrganisationDTO requestDTO = new UpdateOrganisationDTO();
         requestDTO.setOrganisation("co");
-        requestDTO.setUid("myuid");
 
         CivilServant civilServant = createCivilServant("myuid");
         OrganisationalUnit dto = new OrganisationalUnit();
