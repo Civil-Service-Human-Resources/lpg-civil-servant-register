@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
+import uk.gov.cshr.civilservant.dto.UpdateForceOrgChangeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
@@ -114,21 +115,24 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     }
 
     @GetMapping("/org")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<OrgCodeDTO> getOrgCodeForCivilServant(@RequestParam(value = "uid") String uid) {
-        log.debug("Getting civil servant org details for logged in user with uid " + uid);
+        log.debug("Getting civil servant org details for user with uid " + uid);
 
         Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(uid);
 
         if (civilServant.isPresent()) {
             return civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant.get())
                     .map(orgCodeDTO -> ResponseEntity.ok(orgCodeDTO))
-                    .orElse(ResponseEntity.notFound().build());
+                    .orElse(buildNotFound(uid));
         } else {
-            log.warn(String.format("Civil Servant with uid %s not found", uid));
-            return ResponseEntity.notFound().build();
+            return buildNotFound(uid);
         }
 
+    }
+
+    private ResponseEntity<OrgCodeDTO> buildNotFound(String uid) {
+        log.warn(String.format("Civil Servant with uid %s not found", uid));
+        return ResponseEntity.notFound().build();
     }
 
     @PatchMapping("/org")
@@ -194,6 +198,50 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         civilServantRepository.findByIdentity(uid).ifPresent(civilServant -> civilServantRepository.delete(civilServant));
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/org/reset")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity getForceOrgChangeFlag() {
+
+        log.info("getting civil servants force org change flag");
+
+        try {
+            Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
+            if (optionalCivilServant.isPresent()) {
+                CivilServant civilServant = optionalCivilServant.get();
+                return ResponseEntity.ok(civilServant.getForceOrgReset());
+            } else {
+                log.warn("civil servant to update has not been found");
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("An error occurred updating Civil Servants force org change flag", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PatchMapping("/org/reset")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity updateForceOrgChangeFlag(@Valid @RequestBody UpdateForceOrgChangeDTO updateForceOrgChangeDTO) {
+
+        log.info("updating civil servants force org change flag to=" + updateForceOrgChangeDTO.isForceOrgChange());
+
+        try {
+            Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
+            if (optionalCivilServant.isPresent()) {
+                CivilServant civilServant = optionalCivilServant.get();
+                civilServant.setForceOrgReset(updateForceOrgChangeDTO.isForceOrgChange());
+                civilServantRepository.save(civilServant);
+                return ResponseEntity.noContent().build();
+            } else {
+                log.warn("civil servant to update has not been found");
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            log.error("An error occurred updating Civil Servants force org change flag", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @Override
