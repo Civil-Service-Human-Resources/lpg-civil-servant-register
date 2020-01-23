@@ -29,28 +29,19 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
 
     public List<OrganisationalUnit> getOrganisationWithParents(String code) {
         List<OrganisationalUnit> organisationalUnitList = new ArrayList<>();
-        getOrganisationalUnit(code, organisationalUnitList);
+        getOrganisationalUnitAndParent(code, organisationalUnitList);
 
         return organisationalUnitList;
     }
 
     public List<OrganisationalUnit> getOrganisationWithChildren(String code) {
         List<OrganisationalUnit> organisationalUnitList = new ArrayList<>();
-        getOrganisationalUnitWithChildren(code, organisationalUnitList);
+        getOrganisationalUnitAndChildren(code, organisationalUnitList);
 
         return organisationalUnitList;
     }
 
-    private List<OrganisationalUnit> getOrganisationalUnit(String code, List<OrganisationalUnit> organisationalUnits) {
-        repository.findByCode(code).ifPresent(organisationalUnit -> {
-            organisationalUnits.add(organisationalUnit);
-            getParent(organisationalUnit, organisationalUnits);
-        });
-
-        return organisationalUnits;
-    }
-
-    private List<OrganisationalUnit> getOrganisationalUnitWithChildren(String code, List<OrganisationalUnit> organisationalUnits) {
+    private List<OrganisationalUnit> getOrganisationalUnitAndChildren(String code, List<OrganisationalUnit> organisationalUnits) {
         repository.findByCode(code).ifPresent(organisationalUnit -> {
             organisationalUnits.add(organisationalUnit);
             getChildren(organisationalUnit, organisationalUnits);
@@ -59,24 +50,25 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         return organisationalUnits;
     }
 
+    private List<OrganisationalUnit> getOrganisationalUnitAndParent(String code, List<OrganisationalUnit> organisationalUnits) {
+        repository.findByCode(code).ifPresent(organisationalUnit -> {
+            organisationalUnits.add(organisationalUnit);
+            getParent(organisationalUnit, organisationalUnits);
+        });
+
+        return organisationalUnits;
+    }
+
     private void getParent(OrganisationalUnit organisationalUnit, List<OrganisationalUnit> organisationalUnits) {
         Optional<OrganisationalUnit> parent = Optional.ofNullable(organisationalUnit.getParent());
-        parent.ifPresent(parentOrganisationalUnit -> getOrganisationalUnit(parentOrganisationalUnit.getCode(), organisationalUnits));
+        parent.ifPresent(parentOrganisationalUnit -> getOrganisationalUnitAndParent(parentOrganisationalUnit.getCode(), organisationalUnits));
     }
 
     private void getChildren(OrganisationalUnit organisationalUnit, List<OrganisationalUnit> organisationalUnits) {
-        Optional<List<OrganisationalUnit>> children = Optional.ofNullable(organisationalUnit.getChildren());
-
-        children.ifPresent(childList -> {
-            for(OrganisationalUnit child: childList)
-            {
-                getOrganisationalUnit(child.getCode(), organisationalUnits);
-                if(child.hasChildren())
-                {
-
-                }
-            }
-        });
+        if (organisationalUnit.hasChildren()) {
+            List<OrganisationalUnit> listOfChildren = organisationalUnit.getChildren();
+            listOfChildren.stream().forEach(childOrganisationalUnit -> getOrganisationalUnitAndChildren(childOrganisationalUnit.getCode(), organisationalUnits));
+        }
     }
 
     public Optional<OrganisationalUnit> getOrganisationalUnit(Long id) {
