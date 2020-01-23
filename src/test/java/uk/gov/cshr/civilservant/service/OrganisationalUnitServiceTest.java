@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.service;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -14,16 +15,21 @@ import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrganisationalUnitServiceTest {
+
+    private static List<OrganisationalUnit> ORG_UNIT_FAMILY;
 
     @Mock
     private OrganisationalUnitRepository organisationalUnitRepository;
@@ -36,6 +42,11 @@ public class OrganisationalUnitServiceTest {
 
     @InjectMocks
     private OrganisationalUnitService organisationalUnitService;
+
+    @BeforeClass
+    public static void staticSetUp() {
+        ORG_UNIT_FAMILY = buildLargeFamilyOfOrganisationalUnits();
+    }
 
     @Test
     public void shouldReturnParentOrganisationalUnits() {
@@ -113,6 +124,25 @@ public class OrganisationalUnitServiceTest {
     }
 
     @Test
+    public void givenAnOrgWithChildren_whenGetOrganisationWithChildren_thenShouldReturnCurrentOrganisationAllChildrenOrganisationalUnits() {
+        // given
+        Optional<OrganisationalUnit> topOrg = Optional.of(ORG_UNIT_FAMILY.get(0));
+        when(organisationalUnitRepository.findByCode(eq("gf"))).thenReturn(topOrg);
+
+        for (int i=0; i<ORG_UNIT_FAMILY.get(0).getChildren().size(); i++) {
+            String codeOfChildAtIndexI = "c"+i;
+            Optional<OrganisationalUnit> childAtIndexI = Optional.of(ORG_UNIT_FAMILY.get(0).getChildren().get(i));
+            when(organisationalUnitRepository.findByCode(eq(codeOfChildAtIndexI))).thenReturn(childAtIndexI);
+        }
+
+        // when
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationWithChildren("gf");
+
+        // then
+        assertThat(actual, hasSize(6));
+    }
+
+    @Test
     public void shouldDeleteAgencyToken() {
         AgencyToken agencyToken = new AgencyToken();
         OrganisationalUnit organisationalUnit = new OrganisationalUnit();
@@ -121,5 +151,43 @@ public class OrganisationalUnitServiceTest {
         doNothing().when(agencyTokenService).deleteAgencyToken(agencyToken);
 
         assertNull(organisationalUnitService.deleteAgencyToken(organisationalUnit));
+    }
+
+    private static List<OrganisationalUnit> buildLargeFamilyOfOrganisationalUnits() {
+        // the family entirely
+        List<OrganisationalUnit> theFamily = new ArrayList<>();
+        // godfathers children - first generation
+        List<OrganisationalUnit> godfathersChildren = buildGodFathersChildren();
+
+        OrganisationalUnit headOfFamily = new OrganisationalUnit();
+        headOfFamily.setCode("gf");
+        headOfFamily.setParent(null);
+        headOfFamily.setAbbreviation("GF");
+        headOfFamily.setName("Godfather: the head of the family");
+        headOfFamily.setId(new Long(100));
+        headOfFamily.setChildren(godfathersChildren);
+
+        // set parent of godfathers children to be the godfather
+        headOfFamily.getChildren().forEach(c -> c.setParent(headOfFamily));
+
+        theFamily.add(0, headOfFamily);
+        return theFamily;
+    }
+
+    private static List<OrganisationalUnit> buildGodFathersChildren(){
+        List<OrganisationalUnit> godfathersChildren = new ArrayList<>();
+        for(int i=0; i<5; i++) {
+            godfathersChildren.add(i, buildGFChildren(i));
+        }
+        return godfathersChildren;
+    }
+
+    private static OrganisationalUnit buildGFChildren(int index){
+        OrganisationalUnit godfathersChild = new OrganisationalUnit();
+        godfathersChild.setCode("c" + index);
+        godfathersChild.setAbbreviation("C" + index);
+        godfathersChild.setName("child " + index +" of the godfathers");
+        godfathersChild.setId(new Long(index));
+        return godfathersChild;
     }
 }
