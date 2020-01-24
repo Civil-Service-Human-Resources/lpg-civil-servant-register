@@ -36,6 +36,8 @@ public class AgencyTokenServiceTest {
     @InjectMocks
     private AgencyTokenService agencyTokenService;
 
+    List<String> codes = Arrays.asList("code1", "code2", "123456");
+
     @Test
     public void getAllAgencyTokens() {
         List<AgencyToken> agencyTokens = new ArrayList<>();
