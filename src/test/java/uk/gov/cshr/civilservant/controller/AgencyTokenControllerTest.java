@@ -1,7 +1,6 @@
 package uk.gov.cshr.civilservant.controller;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +42,8 @@ public class AgencyTokenControllerTest {
 
     @MockBean
     private AgencyTokenService agencyTokenService;
+
+    List<String> codes = Arrays.asList("code1", "code2", "code3");
 
     @Before
     public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
@@ -141,7 +142,6 @@ public class AgencyTokenControllerTest {
         String domain = "example.com";
         String token = "token123";
         String code = "code";
-        List<String> codes = Arrays.asList("code1", "code2", "code3");
 
         UpdateSpacesForAgencyTokenRequestDTO dto = new UpdateSpacesForAgencyTokenRequestDTO();
         dto.setDomain(domain);
@@ -159,7 +159,6 @@ public class AgencyTokenControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    @Ignore
     @Test
     public void shouldReturnNotFoundIfAgencyTokenNotFound() throws Exception {
         String domain = "example.com";
@@ -181,7 +180,6 @@ public class AgencyTokenControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    @Ignore
     @Test
     public void shouldReturnConflictIfAgencyTokenHasNoSpacesAvailable() throws Exception {
         String domain = "example.com";
@@ -208,7 +206,6 @@ public class AgencyTokenControllerTest {
         String domain = "example.com";
         String token = "token123";
         String code = "code";
-        List<String> codes = Arrays.asList("code1", "code2", "code3");
 
         UpdateSpacesForAgencyTokenRequestDTO dto = new UpdateSpacesForAgencyTokenRequestDTO();
         dto.setDomain(domain);
