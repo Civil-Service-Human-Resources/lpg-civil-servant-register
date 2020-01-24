@@ -17,9 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.eq;
@@ -30,18 +27,22 @@ import static org.mockito.Mockito.when;
 public class OrganisationalUnitServiceTest {
 
     private static List<OrganisationalUnit> ORG_UNIT_FAMILY;
-    UnitDt
-            st
+
+    private static int COUNTER = 0;
+
+    private static String GODFATHERS_CODE = "gf";
+
     @Mock
     private OrganisationalUnitRepository organisationalUnitRepository;
+
     @Mock
     private OrganisationalUnitDtoFactory organisationalUnitDtoFactory;
+
     @Mock
     private AgencyTokenService agencyTokenService;
+
     @InjectMocks
     private OrganisationalUnitService organisationalUnitService;
-
-    ublic
 
     @BeforeClass
     public static void staticSetUp() {
@@ -162,15 +163,12 @@ public class OrganisationalUnitServiceTest {
         organisationalUnits.add(grandchildOrganisationalUnit);
 
         OrganisationalUnitDto parentOrgUnitDto = new OrganisationalUnitDto();
-            parentOrg
-                    p
-            o.setName(parentOrganisationalUnit.getName());
+            parentOrgUnitDto.setName(parentOrganisationalUnit.getName());
         parentOrgUnitDto.setCode(parentOrganisationalUnit.getCode());
         parentOrgUnitDto.setFormattedName("parent1");
 
         OrganisationalUnitDto childOrgUnitDto = new OrganisationalUnitDto();
-            childOrgUnitDto.setName(childOrgaorgani
-                    onalUnit.getName());
+            childOrgUnitDto.setName(childOrganisationalUnit.getName());
         childOrgUnitDto.setCode(childOrganisationalUnit.getCode());
         childOrgUnitDto.setFormattedName("parent1 | child1");
 
@@ -183,8 +181,7 @@ public class OrganisationalUnitServiceTest {
 
         when(organisationalUnitDtoFactory.create(parentOrganisationalUnit)).thenReturn(parentOrgUnitDto);
         when(organisationalUnitDtoFactory.create(childOrganisationalUnit)).thenReturn(childOrgUnitDto);
-            when(organisationalUnitDtoFactory.create(grandchildOrganisationalUnit)).thenReturn(grandchildOrg @Te
-            o);
+            when(organisationalUnitDtoFactory.create(grandchildOrganisationalUnit)).thenReturn(grandchildOrgUnitDto);
 
         List<OrganisationalUnitDto> organisationalUnitDtoList = organisationalUnitService.getListSortedByValue();
 
@@ -193,6 +190,94 @@ public class OrganisationalUnitServiceTest {
         assertThat(organisationalUnitDtoList.get(2).getFormattedName(), equalTo("parent1 | child1 | grandchild1"));
     }
 
-        @Test);
+        @Test
+        public void shouldReturnAllOrganisationCodes () {
+            List<String> codes = Arrays.asList("code1", "code2");
+
+            when(organisationalUnitRepository.findAllCodes()).thenReturn(codes);
+
+            assertEquals(codes, organisationalUnitService.getOrganisationalUnitCodes());
+        }
+
+        @Test
+        public void givenAnOrgWithChildren_whenGetOrganisationWithChildren_thenShouldReturnCurrentOrganisationAllChildrenOrganisationalUnits
+        () {
+            // given
+            Optional<OrganisationalUnit> topOrg = Optional.of(ORG_UNIT_FAMILY.get(0));
+            when(organisationalUnitRepository.findByCode(eq(GODFATHERS_CODE))).thenReturn(topOrg);
+
+            for (int i = 0; i < ORG_UNIT_FAMILY.get(0).getChildren().size(); i++) {
+                String codeOfChildAtIndexI = "god" + i;
+                Optional<OrganisationalUnit> childAtIndexI = Optional.of(ORG_UNIT_FAMILY.get(0).getChildren().get(i));
+                when(organisationalUnitRepository.findByCode(eq(codeOfChildAtIndexI))).thenReturn(childAtIndexI);
+            }
+
+            // when
+            List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationWithChildren(GODFATHERS_CODE);
+
+            // then
+            assertThat(actual, hasSize(6));
+        }
+
+        @Test
+        public void shouldDeleteAgencyToken () {
+            AgencyToken agencyToken = new AgencyToken();
+            OrganisationalUnit organisationalUnit = new OrganisationalUnit();
+            organisationalUnit.setAgencyToken(agencyToken);
+
+            doNothing().when(agencyTokenService).deleteAgencyToken(agencyToken);
+
+            assertNull(organisationalUnitService.deleteAgencyToken(organisationalUnit));
+        }
+
+        private static List<OrganisationalUnit> buildLargeFamilyOfOrganisationalUnits () {
+            // the family entirely
+            List<OrganisationalUnit> theFamily = new ArrayList<>();
+
+
+            OrganisationalUnit headOfFamily = new OrganisationalUnit();
+            headOfFamily.setCode(GODFATHERS_CODE);
+            headOfFamily.setParent(null);
+            headOfFamily.setAbbreviation(GODFATHERS_CODE.toUpperCase());
+            headOfFamily.setName("Godfather: the head of the family");
+            headOfFamily.setId(new Long(COUNTER));
+            COUNTER++;
+            // godfathers children - first generation
+            List<OrganisationalUnit> godfathersChildren = buildGodFathersChildren();
+            headOfFamily.setChildren(godfathersChildren);
+
+            // set parent of godfathers children to be the godfather
+            headOfFamily.getChildren().forEach(c -> c.setParent(headOfFamily));
+
+            theFamily.add(0, headOfFamily);
+            return theFamily;
+        }
+
+        private static List<OrganisationalUnit> buildGodFathersChildren () {
+            List<OrganisationalUnit> godfathersChildren = new ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                //godfathersChildren.add(i, buildGFChildren(i));
+                godfathersChildren.add(i, buildChild("god", i, "godfathers"));
+            }
+            return godfathersChildren;
+        }
+
+    /*private static OrganisationalUnit buildGFChildren(int index){
+        OrganisationalUnit godfathersChild = new OrganisationalUnit();
+        godfathersChild.setCode("c" + index);
+        godfathersChild.setAbbreviation("C" + index);
+        godfathersChild.setName("child " + index +" of the godfathers");
+        godfathersChild.setId(new Long(index));
+        return godfathersChild;
+    }
+*/
+        private static OrganisationalUnit buildChild (String code,int index, String name){
+            OrganisationalUnit child = new OrganisationalUnit();
+            child.setCode(code + index);
+            child.setAbbreviation(code.toUpperCase() + index);
+            child.setName("child " + index + " of the " + name);
+            child.setId(new Long(COUNTER));
+            COUNTER++;
+            return child;
     }
 }
