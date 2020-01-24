@@ -150,7 +150,7 @@ public class OrganisationalUnitControllerTest {
     }
 
     @Test
-    public void shouldReturnOkIfRequestingAllCodesMap() throws Exception {
+    public void shouldReturnOkIfRequestingAllCodesMap2() throws Exception {
         String code1 = "code1";
         String code2 = "code2";
         List<String> organisationalUnitsCodesList = Arrays.asList(code1, code2);
