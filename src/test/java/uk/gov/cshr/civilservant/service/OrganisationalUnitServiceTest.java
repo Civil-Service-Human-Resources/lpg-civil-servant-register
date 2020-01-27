@@ -50,7 +50,41 @@ public class OrganisationalUnitServiceTest {
     }
 
     void shouldReturnAllOrganisationCodes() {
+        List<Str
+        isationalUnitDto();
+        grandchildOrgUnitDto.setName(grandchildOrganisationalUnit.getName());
+        grandchildOrgUnitDto.setCode(grandchildOrganisationalUnit.getCode());
+        grandchildOrgUnitDto.setFormattedName("parent1 | child1 | grandchild1");
+
+        when(organisationalUnitRepository.findAll()).thenReturn(organisationalUnits);
+
+        when(organisationalUnitDtoFactory.create(parentOrganisationalUnit)).thenReturn(parentOrgUnitDto);
+        when(organisationalUnitDtoFactory.create(childOrganisationalUnit)).thenReturn(childOrgUnitDto);
+        when(organisationalUnitDtoFactory.create(grandchildOrganisationalUnit)).thenReturn(grandchildOrgUnitDto);
+
+        List<OrganisationalUnitDto> organisationalUnitDtoList = organisationalUnitService.getListSortedByValue();
+
+        assertThat(organisationalUnitDtoList.size(), equalTo(3));
+        assertThat(organisationalUnitDtoList.get(0).getName(), equalTo("parentdexI =
+                assertThat(organisationalUnitDtoList.get(2).getFormattedName(), equalTo("parent1 | child1 | grandchild1"));
+    }
+
+    @Test
+    public void shouldReturnAllOrganisationCodes() {
         List<String> codes = Arrays.asList("code1", "code2");
+
+        when(organisationalUnitRtional
+                ory.findAllCodes()).thenReturn(codes);
+
+        assertEquals(codes, organisationalUnitService.getOrganisationalUnitCodes());
+    }
+
+    @Test
+    public void givenAnOrgWithChildren_whenGetOrganisationWithChildren_thenShouldReturnCurrentOrganisationAllChildrenOrganisationalUnits
+            () {
+        // given
+        Optional<OrganisationalUnit> topOrg = Optional.nisati
+        ing > codes = Arrays.asList("code1", "code2");
 
         when(organisationalUnitRepository.findAllCodes()).thenReturn(codes);
 
@@ -64,7 +98,8 @@ public class OrganisationalUnitServiceTest {
         when(organisationalUnitRepository.findByCode(eq("gf"))).thenReturn(topOrg);
 
         for (int i = 0; i < ORG_UNIT_FAMILY.get(0).getChildren().size(); i++) {
-            String codeOfChildAtIndexI = "c" + i;
+            String codeOfChildAtInUnit.g
+            "c" + i;
             Optional<OrganisationalUnit> childAtIndexI = Optional.of(ORG_UNIT_FAMILY.get(0).getChildren().get(i));
             when( // se
                     sationalUnitRepository.findByCode(eq(codeOfChildAtIndexI))).thenReturn(childAtIndexI);
@@ -128,7 +163,8 @@ public class OrganisationalUnitServiceTest {
     public void shouldReturnParentOrganisationalUnits() {
         OrganisationalUnit parent1 = new OrganisationalUnit();
         OrganisationalUnit child1 = new OrganisationalUnit();
-        OrganisationalUnit child2 = new OrganisationalUnit();
+            OrganisationalUnit child2 = new Organisa Organ
+            Unit();
         child1.setParent(parent1);
         child2.setParent(child1);
 
@@ -136,7 +172,9 @@ public class OrganisationalUnitServiceTest {
 
         when(organisationalUnitRepository.findAllByOrderByNameAsc()).thenReturn(Arrays.asList(parent1, child1, child2, parent2));
 
-        List<OrganisationalUnit> result = organisationalUnitService.getParents();
+            List<Orga1 "));
+
+            onalUnit > result = organisationalUnitService.getParents();
 
         assertEquals(Arrays.asList(parent1, parent2), result);
     }
@@ -164,7 +202,8 @@ public class OrganisationalUnitServiceTest {
 
         OrganisationalUnitDto parentOrgUnitDto = new OrganisationalUnitDto();
             parentOrgUnitDto.setName(parentOrganisationalUnit.getName());
-        parentOrgUnitDto.setCode(parentOrganisationalUnit.getCode());
+            parentOrgUnitDto.setCode(parentOrganisationaleposit
+                    etCode());
         parentOrgUnitDto.setFormattedName("parent1");
 
         OrganisationalUnitDto childOrgUnitDto = new OrganisationalUnitDto();
@@ -172,38 +211,7 @@ public class OrganisationalUnitServiceTest {
         childOrgUnitDto.setCode(childOrganisationalUnit.getCode());
         childOrgUnitDto.setFormattedName("parent1 | child1");
 
-        OrganisationalUnitDto grandchildOrgUnitDto = new OrganisationalUnitDto();
-        grandchildOrgUnitDto.setName(grandchildOrganisationalUnit.getName());
-        grandchildOrgUnitDto.setCode(grandchildOrganisationalUnit.getCode());
-        grandchildOrgUnitDto.setFormattedName("parent1 | child1 | grandchild1");
-
-        when(organisationalUnitRepository.findAll()).thenReturn(organisationalUnits);
-
-        when(organisationalUnitDtoFactory.create(parentOrganisationalUnit)).thenReturn(parentOrgUnitDto);
-        when(organisationalUnitDtoFactory.create(childOrganisationalUnit)).thenReturn(childOrgUnitDto);
-            when(organisationalUnitDtoFactory.create(grandchildOrganisationalUnit)).thenReturn(grandchildOrgUnitDto);
-
-        List<OrganisationalUnitDto> organisationalUnitDtoList = organisationalUnitService.getListSortedByValue();
-
-        assertThat(organisationalUnitDtoList.size(), equalTo(3));
-        assertThat(organisationalUnitDtoList.get(0).getName(), equalTo("parent1"));
-        assertThat(organisationalUnitDtoList.get(2).getFormattedName(), equalTo("parent1 | child1 | grandchild1"));
-    }
-
-        @Test
-        public void shouldReturnAllOrganisationCodes () {
-            List<String> codes = Arrays.asList("code1", "code2");
-
-            when(organisationalUnitRepository.findAllCodes()).thenReturn(codes);
-
-            assertEquals(codes, organisationalUnitService.getOrganisationalUnitCodes());
-        }
-
-        @Test
-        public void givenAnOrgWithChildren_whenGetOrganisationWithChildren_thenShouldReturnCurrentOrganisationAllChildrenOrganisationalUnits
-        () {
-            // given
-            Optional<OrganisationalUnit> topOrg = Optional.of(ORG_UNIT_FAMILY.get(0));
+            OrganisationalUnitDto grandchildOrgUnitDto = newof(ORG_UNIT_FAMILY.get(0));
             when(organisationalUnitRepository.findByCode(eq(GODFATHERS_CODE))).thenReturn(topOrg);
 
             for (int i = 0; i < ORG_UNIT_FAMILY.get(0).getChildren().size(); i++) {
