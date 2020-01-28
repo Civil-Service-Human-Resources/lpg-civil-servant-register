@@ -14,7 +14,6 @@ public class FamilyOrganisationUnits {
 
     private List<OrganisationalUnit> family;
 
-
     public FamilyOrganisationUnits() {
         this.family = buildLargeFamilyOfOrganisationalUnits();
     }
