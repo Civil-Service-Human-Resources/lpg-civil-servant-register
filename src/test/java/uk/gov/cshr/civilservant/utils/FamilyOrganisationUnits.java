@@ -14,12 +14,19 @@ public class FamilyOrganisationUnits {
 
     private List<OrganisationalUnit> family;
 
+    private List<OrganisationalUnit> outsiders;
+
     public FamilyOrganisationUnits() {
         this.family = buildLargeFamilyOfOrganisationalUnits();
+        this.outsiders = buildOutsiders();
     }
 
     public List<OrganisationalUnit> getFamily() {
         return family;
+    }
+
+    public List<OrganisationalUnit> getOutsiders() {
+        return outsiders;
     }
 
     public OrganisationalUnit getTopParent(){
@@ -41,6 +48,35 @@ public class FamilyOrganisationUnits {
         }
 
         return getParentsChildren().get(godFatherChildIndex).getChildren();
+    }
+
+    private List<OrganisationalUnit> buildOutsiders() {
+        List<OrganisationalUnit> outsiders = new ArrayList<>();
+        OrganisationalUnit notRelated0 = new OrganisationalUnit();
+        notRelated0.setId(200l);
+        notRelated0.setName("outsider0");
+        notRelated0.setAbbreviation("O0");
+        notRelated0.setCode("OUT0");
+        OrganisationalUnit notRelated1 = new OrganisationalUnit();
+        notRelated1.setId(201l);
+        notRelated1.setName("outsider1");
+        notRelated1.setAbbreviation("O1");
+        notRelated1.setCode("OUT1");
+        OrganisationalUnit notRelated2 = new OrganisationalUnit();
+        notRelated2.setId(202l);
+        notRelated2.setName("outsider2");
+        notRelated2.setAbbreviation("O2");
+        notRelated2.setCode("OUT2");
+        OrganisationalUnit notRelated3 = new OrganisationalUnit();
+        notRelated3.setId(203l);
+        notRelated3.setName("outsider3");
+        notRelated3.setAbbreviation("O3");
+        notRelated3.setCode("OUT3");
+        outsiders.add(notRelated0);
+        outsiders.add(notRelated1);
+        outsiders.add(notRelated2);
+        outsiders.add(notRelated3);
+        return outsiders;
     }
 
     private static List<OrganisationalUnit> buildLargeFamilyOfOrganisationalUnits() {
