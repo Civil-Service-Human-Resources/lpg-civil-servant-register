@@ -43,9 +43,15 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(organisationalUnits);
     }
 
+<<<<<<< HEAD
     @GetMapping("/flat")
     @Cacheable("organisationalUnitsFlat")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
+=======
+    @GetMapping("/flat/{code}/")
+    public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure(@PathVariable String code) {
+
+>>>>>>> LC-329 - Fixed dot in url truncation
         log.info("Getting org flat");
         List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
 
