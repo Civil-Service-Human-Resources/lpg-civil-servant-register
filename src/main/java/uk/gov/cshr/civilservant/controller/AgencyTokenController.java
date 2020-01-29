@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.cshr.civilservant.dto.CheckValidTokenDTO;
-import uk.gov.cshr.civilservant.dto.UpdateSpacesForAgencyTokenDTO;
+import uk.gov.cshr.civilservant.dto.UpdateSpacesForAgencyTokenRequestDTO;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
@@ -58,21 +58,21 @@ public class AgencyTokenController {
     }
 
     @PutMapping
-    public ResponseEntity updateSpaceAvailable(@RequestBody UpdateSpacesForAgencyTokenDTO updateSpacesForAgencyTokenDTO) {
+    public ResponseEntity updateSpaceAvailable(@RequestBody UpdateSpacesForAgencyTokenRequestDTO updateSpacesForAgencyTokenRequestDTO) {
         try {
-            log.info("Updating agency token with parameters domain=" + updateSpacesForAgencyTokenDTO.getDomain() +
-                    " token=" + updateSpacesForAgencyTokenDTO.getToken() +
-                    " code=" + updateSpacesForAgencyTokenDTO.getCode() +
-                    " isRemoveUser=" + updateSpacesForAgencyTokenDTO.isRemoveUser());
-            agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenDTO.getDomain(), updateSpacesForAgencyTokenDTO.getToken(), updateSpacesForAgencyTokenDTO.getCode(), updateSpacesForAgencyTokenDTO.isRemoveUser());
+            log.info("Updating agency token with parameters domain=" + updateSpacesForAgencyTokenRequestDTO.getDomain() +
+                    " token=" + updateSpacesForAgencyTokenRequestDTO.getToken() +
+                    " code=" + updateSpacesForAgencyTokenRequestDTO.getCode() +
+                    " isRemoveUser=" + updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
+            agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenRequestDTO.getDomain(), updateSpacesForAgencyTokenRequestDTO.getToken(), updateSpacesForAgencyTokenRequestDTO.getCode(), updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
         } catch (TokenDoesNotExistException e) {
-            log.warn("Token not found");
+            log.warn("Token not found", e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } catch (NotEnoughSpaceAvailableException e) {
-            log.warn("Not enough space available for token");
+            log.warn("Not enough space available for token", e);
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         } catch (Exception e) {
-            log.error("An error occurred");
+            log.error("An error occurred", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

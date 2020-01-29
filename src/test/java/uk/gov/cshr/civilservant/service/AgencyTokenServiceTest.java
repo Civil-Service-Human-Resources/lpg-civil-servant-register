@@ -213,6 +213,7 @@ public class AgencyTokenServiceTest {
 
         // given
         when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
+        when(agencyTokenRepository.save(any(AgencyToken.class))).thenReturn(new AgencyToken());
 
         // when
         agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, code, true);
