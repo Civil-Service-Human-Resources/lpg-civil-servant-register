@@ -3,13 +3,19 @@ package uk.gov.cshr.civilservant.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.cshr.civilservant.dto.DomainDTO;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
+import java.net.URI;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -68,7 +74,10 @@ public class IdentityServiceTest {
         String domain = "myDomain";
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(IS_WHITELISTED_URL)
                 .queryParam("domain", domain);
-        when(restOperations.getForObject(builder.toUriString(), Boolean.class)).thenReturn(true);
+        DomainDTO dto = new DomainDTO();
+        dto.setIsWhiteListed("true");
+        ResponseEntity responseEntity = new ResponseEntity<DomainDTO>(dto, HttpStatus.OK);
+        when(restOperations.getForEntity(any(URI.class), any())).thenReturn(responseEntity);
 
         // when
         boolean actual = identityService.isDomainWhiteListed(domain);
@@ -81,9 +90,10 @@ public class IdentityServiceTest {
     public void shouldReturnFalseIfNotWhitelitsed() {
         // given
         String domain = "myDomain";
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(IS_WHITELISTED_URL)
-                .queryParam("domain", domain);
-        when(restOperations.getForObject(builder.toUriString(), Boolean.class)).thenReturn(false);
+        DomainDTO dto = new DomainDTO();
+        dto.setIsWhiteListed("false");
+        ResponseEntity responseEntity = new ResponseEntity<DomainDTO>(dto, HttpStatus.OK);
+        when(restOperations.getForEntity(any(URI.class), any())).thenReturn(responseEntity);
 
         // when
         boolean actual = identityService.isDomainWhiteListed(domain);
@@ -96,9 +106,7 @@ public class IdentityServiceTest {
     public void shouldReturnFalseIfExceptionIsThrown() {
         // given
         String domain = "myDomain";
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(IS_WHITELISTED_URL)
-                .queryParam("domain", domain);
-        when(restOperations.getForObject(builder.toUriString(), Boolean.class)).thenThrow(new RuntimeException());
+        when(restOperations.getForEntity(any(URI.class), any())).thenThrow(new RuntimeException());
 
         // when
         boolean actual = identityService.isDomainWhiteListed(domain);

@@ -5,12 +5,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.dto.DomainDTO;
 import uk.gov.cshr.civilservant.service.exception.UserNotFoundException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Service
 public class IdentityService {
@@ -80,10 +85,22 @@ public class IdentityService {
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityWhiteListUrl)
                 .queryParam("domain", domain);
+        URI uri = null;
+        try {
+            uri = new URI(builder.toUriString());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return false;
+        }
 
         try {
-            Boolean isWhiteListed = restOperations.getForObject(builder.toUriString(), Boolean.class);
-            return isWhiteListed;
+            ResponseEntity<DomainDTO> response = restOperations.getForEntity(uri, DomainDTO.class);
+            if(response.getStatusCode() == HttpStatus.OK) {
+                if(response.getBody().getIsWhiteListed().equals("true")) {
+                    return true;
+                }
+            }
+            return false;
         } catch (Exception e) {
             LOGGER.warn("Error calling identity service");
             return false;
