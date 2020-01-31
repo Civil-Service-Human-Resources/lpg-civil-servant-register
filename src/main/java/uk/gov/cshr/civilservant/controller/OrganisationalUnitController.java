@@ -43,32 +43,11 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(organisationalUnits);
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     @GetMapping("/flat")
     @Cacheable("organisationalUnitsFlat")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
-=======
-=======
-    @GetMapping("/flat")
-    public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
         log.info("Getting org flat");
         List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
-
-        return ResponseEntity.ok(organisationalUnitsMap);
-    }
-
->>>>>>> LC-329 - lpg-management uses all end point
-    @GetMapping("/flat/{code}/")
-    public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructureFilteredByDomain(@PathVariable String code) {
-
-<<<<<<< HEAD
->>>>>>> LC-329 - Fixed dot in url truncation
-        log.info("Getting org flat");
-        List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
-=======
-        log.info("Getting org flat, filtered by domain");
->>>>>>> LC-329 - lpg-management uses all end point
 
         return ResponseEntity.ok(organisationalUnitsMap);
     }

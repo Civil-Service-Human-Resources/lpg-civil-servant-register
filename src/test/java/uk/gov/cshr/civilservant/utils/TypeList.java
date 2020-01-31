@@ -1,6 +1,9 @@
 package uk.gov.cshr.civilservant.utils;
 
+import java.lang.Iterable;
 import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 
 public class TypeList<Type> implements Iterable<Type> {
 
@@ -20,7 +23,11 @@ public class TypeList<Type> implements Iterable<Type> {
 
             @Override
             public boolean hasNext() {
-                return currentIndex < currentSize && arrayList[currentIndex] != null;
+                if(arrayList.length > 0) {
+                    return arrayList[currentIndex] != null && currentIndex < currentSize;
+                } else {
+                    return false;
+                }
             }
 
             @Override
@@ -34,6 +41,16 @@ public class TypeList<Type> implements Iterable<Type> {
             }
         };
         return it;
+    }
+
+    @Override
+    public void forEach(Consumer<? super Type> action) {
+
+    }
+
+    @Override
+    public Spliterator<Type> spliterator() {
+        return null;
     }
 
 }
