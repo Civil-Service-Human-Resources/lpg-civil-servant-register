@@ -21,10 +21,13 @@ public class IdentityService {
 
     private String identityAPIUrl;
 
+    private String identityWhiteListUrl;
+
     @Autowired
-    public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.identityAPIUrl}") String identityAPIUrl) {
+    public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.identityAPIUrl}") String identityAPIUrl, @Value("${identity.identityWhiteListUrl}") String identityWhiteListUrl) {
         this.restOperations = restOperations;
         this.identityAPIUrl = identityAPIUrl;
+        this.identityWhiteListUrl = identityWhiteListUrl;
     }
 
     public IdentityFromService findByEmail(String email) {
@@ -71,4 +74,21 @@ public class IdentityService {
         }
         return null;
     }
+
+    public boolean isDomainWhiteListed(String domain){
+        LOGGER.debug("finding if domain" + domain + " is whitelisted from identity service");
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityWhiteListUrl)
+                .queryParam("domain", domain);
+
+        try {
+            Boolean isWhiteListed = restOperations.getForObject(builder.toUriString(), Boolean.class);
+            return isWhiteListed;
+        } catch (Exception e) {
+            LOGGER.warn("Error calling identity service");
+            return false;
+        }
+
+    }
+
 }
