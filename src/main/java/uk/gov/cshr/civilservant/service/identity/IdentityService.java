@@ -4,14 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.dto.DomainDTO;
 import uk.gov.cshr.civilservant.service.exception.UserNotFoundException;
 
 import java.net.URI;
@@ -81,10 +79,12 @@ public class IdentityService {
     }
 
     public boolean isDomainWhiteListed(String domain){
-        LOGGER.debug("finding if domain" + domain + " is whitelisted from identity service");
+        LOGGER.debug("finding if domain:" + domain + " is whitelisted from identity service");
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityWhiteListUrl)
-                .queryParam("domain", domain);
+        String domainWithSlashAtStartAndEnd = "/" +  domain + "/";
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityWhiteListUrl).path(domainWithSlashAtStartAndEnd);
+
         URI uri = null;
         try {
             uri = new URI(builder.toUriString());
@@ -94,15 +94,15 @@ public class IdentityService {
         }
 
         try {
-            ResponseEntity<DomainDTO> response = restOperations.getForEntity(uri, DomainDTO.class);
-            if(response.getStatusCode() == HttpStatus.OK) {
-                if(response.getBody().getIsWhiteListed().equals("true")) {
-                    return true;
-                }
+            String response = restOperations.getForObject(uri.toURL().toString(), String.class);
+
+            if(response.equals("true")) {
+                return true;
             }
             return false;
+
         } catch (Exception e) {
-            LOGGER.warn("Error calling identity service");
+            LOGGER.warn("Error calling identity service", e);
             return false;
         }
 
