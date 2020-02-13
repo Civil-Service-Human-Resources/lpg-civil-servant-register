@@ -14,6 +14,8 @@ import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
+import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
+import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import javax.validation.Valid;
@@ -30,8 +32,11 @@ public class OrganisationalUnitController {
 
     private OrganisationalUnitService organisationalUnitService;
 
-    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService) {
+    private OrganisationalUnitDtoFactory organisationalUnitDtoFactory;
+
+    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService, OrganisationalUnitDtoFactory organisationalUnitDtoFactory) {
         this.organisationalUnitService = organisationalUnitService;
+        this.organisationalUnitDtoFactory = organisationalUnitDtoFactory;
     }
 
     @GetMapping("/tree")
@@ -50,6 +55,24 @@ public class OrganisationalUnitController {
         List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
 
         return ResponseEntity.ok(organisationalUnitsMap);
+    }
+
+    @GetMapping("/flat/{domain}/")
+    public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructureFilteredByDomainAndCode(@PathVariable String domain) {
+
+        log.info("Getting org flat, filtered by domain");
+        try {
+            List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain);
+            if (!organisationalUnits.isEmpty()) {
+                List<OrganisationalUnitDto> dtos = organisationalUnits.stream().map(ou -> organisationalUnitDtoFactory.create(ou)).collect(Collectors.toList());
+                return ResponseEntity.ok(dtos);
+            } else {
+                throw new NoOrganisationsFoundException(domain);
+            }
+        } catch (NoOrganisationsFoundException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
     }
 
     @GetMapping("/children/{code}")

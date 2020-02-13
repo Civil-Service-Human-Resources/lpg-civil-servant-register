@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.service.exception.UserNotFoundException;
 
 import java.net.URI;
@@ -94,16 +95,18 @@ public class IdentityService {
         }
 
         try {
-            String response = restOperations.getForObject(uri.toURL().toString(), String.class);
+            ResponseEntity<String> response = restOperations.getForEntity(uri, String.class);
 
-            if(response.equals("true")) {
+            if(response.getStatusCode().is2xxSuccessful() && response.getBody().equals("true")) {
                 return true;
+            } else if(response.getStatusCode().is2xxSuccessful() && response.getBody().equals("false")) {
+                return false;
+            } else {
+                throw new NoOrganisationsFoundException(domain);
             }
-            return false;
-
         } catch (Exception e) {
             LOGGER.warn("Error calling identity service", e);
-            return false;
+            throw new NoOrganisationsFoundException(domain);
         }
 
     }
