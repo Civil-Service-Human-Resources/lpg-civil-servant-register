@@ -2,16 +2,21 @@ package uk.gov.cshr.civilservant.service;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mock;
+import org.mockito.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
+
+import java.net.MalformedURLException;
+import java.net.URI;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
@@ -29,6 +34,9 @@ public class IdentityServiceTest {
 
     @Mock
     private OAuth2RestOperations restOperations;
+
+    @Captor
+    private ArgumentCaptor<URI> uriArgumentCaptor;
 
     @Before
     public void setup() {
@@ -69,42 +77,50 @@ public class IdentityServiceTest {
     }
 
     @Test
-    public void shouldReturnTrueIfWhitelitsed() {
+    public void shouldReturnTrueIfWhitelitsed() throws MalformedURLException {
         // given
-        when(restOperations.getForObject(anyString(), any())).thenReturn("true");
+        ResponseEntity responseEntity = new ResponseEntity<String>("true", HttpStatus.OK);
+        when(restOperations.getForEntity(any(URI.class), any())).thenReturn(responseEntity);
 
         // when
         boolean actual = identityService.isDomainWhiteListed(domain);
 
         // then
         assertTrue(actual);
-        verify(restOperations, times(1)).getForObject(eq(EXPECTED_IS_WHITELISTED_URL), any());
+        verify(restOperations, times(1)).getForEntity(uriArgumentCaptor.capture(), ArgumentMatchers.any());
+        URI actualURI = uriArgumentCaptor.getValue();
+        assertThat(actualURI.toURL().toString(), equalTo(EXPECTED_IS_WHITELISTED_URL));
     }
 
     @Test
-    public void shouldReturnFalseIfNotWhitelitsed() {
+    public void shouldReturnFalseIfNotWhitelitsed() throws MalformedURLException {
         // given
-        when(restOperations.getForObject(anyString(), any())).thenReturn("false");
+        ResponseEntity responseEntity = new ResponseEntity<String>("false", HttpStatus.OK);
+        when(restOperations.getForEntity(any(URI.class), any())).thenReturn(responseEntity);
 
         // when
         boolean actual = identityService.isDomainWhiteListed(domain);
 
         // then
         assertFalse(actual);
-        verify(restOperations, times(1)).getForObject(eq(EXPECTED_IS_WHITELISTED_URL), any());
+        verify(restOperations, times(1)).getForEntity(uriArgumentCaptor.capture(), ArgumentMatchers.any());
+        URI actualURI = uriArgumentCaptor.getValue();
+        assertThat(actualURI.toURL().toString(), equalTo(EXPECTED_IS_WHITELISTED_URL));
     }
 
-    @Test
-    public void shouldReturnFalseIfExceptionIsThrown() {
+    @Test (expected = NoOrganisationsFoundException.class)
+    public void shouldReturnFalseIfExceptionIsThrown() throws MalformedURLException {
         // given
-        when(restOperations.getForObject(anyString(), any())).thenThrow(new RuntimeException());
+        when(restOperations.getForEntity(any(URI.class), any())).thenThrow(new RuntimeException());
 
         // when
         boolean actual = identityService.isDomainWhiteListed(domain);
 
         // then
         assertFalse(actual);
-        verify(restOperations, times(1)).getForObject(eq(EXPECTED_IS_WHITELISTED_URL), any());
+        verify(restOperations, times(1)).getForEntity(uriArgumentCaptor.capture(), ArgumentMatchers.any());
+        URI actualURI = uriArgumentCaptor.getValue();
+        assertThat(actualURI.toURL().toString(), equalTo(EXPECTED_IS_WHITELISTED_URL));
     }
 
 }

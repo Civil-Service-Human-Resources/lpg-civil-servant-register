@@ -72,6 +72,7 @@ public class AgencyTokenController {
             for (OrganisationalUnit organisationalUnit : passedOrganisationalUnitList) {
                 organisationalUnitCodeList.add(organisationalUnit.getCode());
             }
+            agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenRequestDTO.getDomain(), updateSpacesForAgencyTokenRequestDTO.getToken(), organisationalUnitCodeList, updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
         } catch (TokenDoesNotExistException e) {
             log.warn("Token not found", e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
