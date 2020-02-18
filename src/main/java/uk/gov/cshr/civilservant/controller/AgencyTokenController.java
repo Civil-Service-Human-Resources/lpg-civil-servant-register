@@ -4,11 +4,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.UpdateSpacesForAgencyTokenRequestDTO;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -62,14 +66,12 @@ public class AgencyTokenController {
                     " code=" + updateSpacesForAgencyTokenRequestDTO.getCode() +
                     " isRemoveUser=" + updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
 
-            List<OrganisationalUnit> PassedOrganisationalUnitList = new ArrayList<>();
-            List<String> OrganisaitnalUnitCodeList = new ArrayList<>();
-//            PassedOrganisationalUnitList = organisationalUnitService.getOrganisationWithParents(updateSpacesForAgencyTokenDTO.getCode());
-//            for (OrganisationalUnit organisationalUnit: PassedOrganisationalUnitList)
-//            {
-//                OrganisaitnalUnitCodeList.add(organisationalUnit.getCode());
-//            }
-
+            List<OrganisationalUnit> passedOrganisationalUnitList = new ArrayList<>();
+            List<String> organisationalUnitCodeList = new ArrayList<>();
+            passedOrganisationalUnitList = organisationalUnitService.getOrganisationWithParents(updateSpacesForAgencyTokenRequestDTO.getCode());
+            for (OrganisationalUnit organisationalUnit : passedOrganisationalUnitList) {
+                organisationalUnitCodeList.add(organisationalUnit.getCode());
+            }
         } catch (TokenDoesNotExistException e) {
             log.warn("Token not found", e);
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
