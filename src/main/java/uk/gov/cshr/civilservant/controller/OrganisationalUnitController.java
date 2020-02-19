@@ -40,7 +40,6 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping("/tree")
-    @Cacheable("organisationalUnitsTree")
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
         log.info("Getting org tree");
         List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParents();
@@ -49,7 +48,6 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping("/flat")
-    @Cacheable("organisationalUnitsFlat")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
         log.info("Getting org flat");
         List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
