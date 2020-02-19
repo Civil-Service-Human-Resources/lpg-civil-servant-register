@@ -23,7 +23,6 @@ public abstract class SelfReferencingEntityService<T extends SelfReferencingEnti
     /**
      * This will return all parent entities with any children as a list
      */
-    @Cacheable("organisationalUnitsTree")
     @Transactional(readOnly = true)
     public List<T> getParents() {
         return repository.findAllByOrderByNameAsc()
@@ -35,7 +34,6 @@ public abstract class SelfReferencingEntityService<T extends SelfReferencingEnti
     /**
      * This will return all Dto entities as a list, sorted by formattedName
      */
-    @Cacheable("organisationalUnitsFlat")
     @Transactional(readOnly = true)
     public List<K> getListSortedByValue() {
         return repository.findAll()
