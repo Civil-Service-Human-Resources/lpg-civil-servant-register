@@ -118,24 +118,16 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     }
 
     @GetMapping("/org")
-    public ResponseEntity<OrgCodeDTO> getOrgCodeForCivilServant(@RequestParam(value = "uid") String uid) {
+    public ResponseEntity getOrgCodeForCivilServant(@RequestParam(value = "uid") String uid) {
         log.debug("Getting civil servant org details for user with uid " + uid);
 
-        Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(uid);
-
-        if (civilServant.isPresent()) {
-            return civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant.get())
-                    .map(orgCodeDTO -> ResponseEntity.ok(orgCodeDTO))
-                    .orElse(buildNotFound(uid));
-        } else {
-            return buildNotFound(uid);
-        }
-
-    }
-
-    private ResponseEntity<OrgCodeDTO> buildNotFound(String uid) {
-        log.warn(String.format("Civil Servant with uid %s not found", uid));
-        return ResponseEntity.notFound().build();
+        return civilServantRepository.findByIdentity(uid)
+                .map(cs -> civilServantResourceFactory.getCivilServantOrganisationalUnitCode(cs))
+                .map(orgCodeDTO -> ResponseEntity.ok(orgCodeDTO))
+                .orElseGet(() -> {
+                    log.warn(String.format("Civil Servant with uid %s not found", uid));
+                    return ResponseEntity.notFound().build();
+                });
     }
 
     @PatchMapping("/org")
@@ -160,7 +152,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
                     }
                     return ResponseEntity.noContent().build();
-                                })
+                })
                 .orElseThrow(() -> new NoOrganisationsFoundException(organisationCode));
     }
 

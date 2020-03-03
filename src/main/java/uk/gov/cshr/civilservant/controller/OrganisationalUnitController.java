@@ -1,7 +1,6 @@
 package uk.gov.cshr.civilservant.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -9,20 +8,18 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.gov.cshr.civilservant.domain.AgencyDomain;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
+import uk.gov.cshr.civilservant.dto.factory.AgencyTokenFactory;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
-import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,9 +31,12 @@ public class OrganisationalUnitController {
 
     private OrganisationalUnitDtoFactory organisationalUnitDtoFactory;
 
-    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService, OrganisationalUnitDtoFactory organisationalUnitDtoFactory) {
+    private AgencyTokenFactory agencyTokenFactory;
+
+    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService, OrganisationalUnitDtoFactory organisationalUnitDtoFactory, AgencyTokenFactory agencyTokenFactory) {
         this.organisationalUnitService = organisationalUnitService;
         this.organisationalUnitDtoFactory = organisationalUnitDtoFactory;
+        this.agencyTokenFactory = agencyTokenFactory;
     }
 
     @GetMapping("/tree")
@@ -57,20 +57,12 @@ public class OrganisationalUnitController {
 
     @GetMapping("/flat/{domain}/")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructureFilteredByDomainAndCode(@PathVariable String domain) {
-
         log.info("Getting org flat, filtered by domain");
-        try {
-            List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain);
-            if (!organisationalUnits.isEmpty()) {
-                List<OrganisationalUnitDto> dtos = organisationalUnits.stream().map(ou -> organisationalUnitDtoFactory.create(ou)).collect(Collectors.toList());
-                return ResponseEntity.ok(dtos);
-            } else {
-                throw new NoOrganisationsFoundException(domain);
-            }
-        } catch (NoOrganisationsFoundException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-
+        List<OrganisationalUnitDto> dtos = organisationalUnitService.getOrganisationsForDomain(domain)
+                .stream()
+                .map(ou -> organisationalUnitDtoFactory.create(ou))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/children/{code}")
@@ -109,7 +101,7 @@ public class OrganisationalUnitController {
     @PostMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyTokenDTO agencyTokenDTO, UriComponentsBuilder builder) {
-        AgencyToken agencyToken = buildAgencyTokenFromAgencyTokenDTO(agencyTokenDTO, true);
+        AgencyToken agencyToken = agencyTokenFactory.buildAgencyTokenFromAgencyTokenDTO(agencyTokenDTO, true);
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.created(builder.path("/organisationalUnits/{organisationalUnitId}/agencyToken").build(organisationalUnit.getId())).build();
@@ -127,7 +119,7 @@ public class OrganisationalUnitController {
     @PatchMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyTokenDTO agencyTokenDTO) {
-        AgencyToken agencyToken = buildAgencyTokenFromAgencyTokenDTO(agencyTokenDTO, false);
+        AgencyToken agencyToken = agencyTokenFactory.buildAgencyTokenFromAgencyTokenDTO(agencyTokenDTO, false);
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.updateAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.ok(agencyToken);
@@ -156,27 +148,4 @@ public class OrganisationalUnitController {
         return errors;
     }
 
-    /* assumes any validation has already happened.*/
-    private AgencyToken buildAgencyTokenFromAgencyTokenDTO(AgencyTokenDTO agencyTokenDTO, boolean isCreateNewToken) {
-        AgencyToken agencytoken = new AgencyToken();
-
-        if (isCreateNewToken) {
-            agencytoken.setCapacityUsed(0);
-        } else {
-            agencytoken.setCapacityUsed(agencyTokenDTO.getCapacityUsed());
-        }
-
-        agencytoken.setToken(agencyTokenDTO.getToken());
-        agencytoken.setCapacity(agencyTokenDTO.getCapacity());
-        Set<AgencyDomain> agencyDomains = agencyTokenDTO.getAgencyDomains().stream().map(dtoDomain -> createAgencyDomain(dtoDomain.getDomain())).collect(Collectors.toSet());
-        agencytoken.setAgencyDomains(agencyDomains);
-        return agencytoken;
-    }
-
-    /* assumes any validation has already happened.*/
-    private AgencyDomain createAgencyDomain(String domain) {
-        AgencyDomain agencyDomain = new AgencyDomain();
-        agencyDomain.setDomain(domain);
-        return agencyDomain;
-    }
 }

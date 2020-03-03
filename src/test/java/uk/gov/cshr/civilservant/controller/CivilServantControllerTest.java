@@ -41,8 +41,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -191,14 +190,15 @@ public class CivilServantControllerTest {
         CivilServant civilServant = createCivilServant("myuid");
 
         when(civilServantRepository.findByIdentity(eq("myuid"))).thenReturn(Optional.of(civilServant));
-        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.empty());
+        when(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(any(CivilServant.class))).thenReturn(Optional.empty());
 
         mockMvc.perform(
                 get("/civilServants/org")
                         .param("uid", "myuid")
                         .accept(APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk())
+                .andExpect(content().string("null"));
     }
 
     @Test
