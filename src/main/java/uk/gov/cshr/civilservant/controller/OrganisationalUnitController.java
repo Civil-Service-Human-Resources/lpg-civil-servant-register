@@ -58,8 +58,13 @@ public class OrganisationalUnitController {
     @GetMapping("/flat/{domain}/")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructureFilteredByDomainAndCode(@PathVariable String domain) {
         log.info("Getting org flat, filtered by domain");
-        List<OrganisationalUnitDto> dtos = organisationalUnitService.getOrganisationsForDomain(domain)
-                .stream()
+
+        List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain);
+        if(organisationalUnits.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<OrganisationalUnitDto> dtos = organisationalUnits.stream()
                 .map(ou -> organisationalUnitDtoFactory.create(ou))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
