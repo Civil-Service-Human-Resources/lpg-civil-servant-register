@@ -59,8 +59,8 @@ govNotify:
 #Validation properties
 agencyToken:
   capacity:
-    max: 1500
-    min: 1
+    max: ${AGENCY_TOKEN_MAX_CAPACITY:1500}
+    min: ${AGENCY_TOKEN_MIN_CAPACITY:1}
 
 ---
 
