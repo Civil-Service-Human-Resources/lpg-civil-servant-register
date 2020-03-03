@@ -11,8 +11,8 @@ import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -66,12 +66,11 @@ public class AgencyTokenController {
                     " code=" + updateSpacesForAgencyTokenRequestDTO.getCode() +
                     " isRemoveUser=" + updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
 
-            List<OrganisationalUnit> passedOrganisationalUnitList = new ArrayList<>();
-            List<String> organisationalUnitCodeList = new ArrayList<>();
-            passedOrganisationalUnitList = organisationalUnitService.getOrganisationWithParents(updateSpacesForAgencyTokenRequestDTO.getCode());
-            for (OrganisationalUnit organisationalUnit : passedOrganisationalUnitList) {
-                organisationalUnitCodeList.add(organisationalUnit.getCode());
-            }
+            List<String> organisationalUnitCodeList = organisationalUnitService.getOrganisationWithParents(updateSpacesForAgencyTokenRequestDTO.getCode())
+                    .stream()
+                    .map(OrganisationalUnit::getCode)
+                    .collect(Collectors.toList());
+
             agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenRequestDTO.getDomain(), updateSpacesForAgencyTokenRequestDTO.getToken(), organisationalUnitCodeList, updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
         } catch (TokenDoesNotExistException e) {
             log.warn("Token not found", e);
