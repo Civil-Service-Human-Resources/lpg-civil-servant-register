@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
@@ -15,10 +16,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateForceOrgChangeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
+import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
@@ -141,28 +144,24 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
         log.info("updating civil servants organisation for organisation=" + updateOrganisationDTO.getOrganisation());
 
-        try {
-            Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
-            if (optionalCivilServant.isPresent()) {
-                Optional<OrganisationalUnit> newOrgUnit = organisationalUnitRepository.findByCode(updateOrganisationDTO.getOrganisation());
-                if (newOrgUnit.isPresent()) {
-                    CivilServant civilServant = optionalCivilServant.get();
-                    civilServant.setOrganisationalUnit(newOrgUnit.get());
-                    civilServantRepository.save(civilServant);
-                    return ResponseEntity.noContent().build();
-                } else {
-                    log.warn(String.format("Organisation to update with code %s has not been found", updateOrganisationDTO.getOrganisation()));
-                    return ResponseEntity.notFound().build();
-                }
+        return civilServantRepository.findByPrincipal()
+                .map(cs -> findOrgUnitAndSave(cs, updateOrganisationDTO.getOrganisation()))
+                .orElseThrow(() -> new ResourceNotFoundException());
+    }
 
-            } else {
-                log.warn("civil servant to update has not been found");
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            log.error("An error occurred updating Civil Servants organisation", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
+    private ResponseEntity findOrgUnitAndSave(CivilServant cs, String organisationCode) {
+        return organisationalUnitRepository.findByCode(organisationCode)
+                .map(orgCode -> {
+                    cs.setOrganisationalUnit(orgCode);
+
+                    try {
+                        civilServantRepository.save(cs);
+                    } catch (Exception e) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+                    }
+                    return ResponseEntity.noContent().build();
+                                })
+                .orElseThrow(() -> new NoOrganisationsFoundException(organisationCode));
     }
 
     @DeleteMapping("/org")
