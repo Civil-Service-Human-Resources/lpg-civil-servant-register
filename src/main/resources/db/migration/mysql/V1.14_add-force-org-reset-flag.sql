@@ -1,1 +1,0 @@
-ALTER TABLE `civil_servant` ADD `force_org_reset` bit(1) DEFAULT FALSE;
