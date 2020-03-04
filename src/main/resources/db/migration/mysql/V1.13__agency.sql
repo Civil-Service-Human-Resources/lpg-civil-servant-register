@@ -37,3 +37,5 @@ ALTER TABLE `organisational_unit`
 ADD CONSTRAINT `FK_organisational_unit_agency_token` FOREIGN KEY (`agency_token_id`) REFERENCES `agency_token` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 SET FOREIGN_KEY_CHECKS=1;
+
+ALTER TABLE `civil_servant` ADD `force_org_reset` bit(1) DEFAULT FALSE;
