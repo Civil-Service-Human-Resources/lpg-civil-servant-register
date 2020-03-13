@@ -49,6 +49,4 @@ public interface AgencyTokenRepository extends CrudRepository<AgencyToken, Long>
             "and ou.code = ?2")
     Optional<AgencyToken> findByDomainAndCode(String domain, String code);
 
-
-
 }

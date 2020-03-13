@@ -1,21 +1,25 @@
 package uk.gov.cshr.civilservant.service;
 
+import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
+import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.AgencyTokenRepository;
-
-import java.util.List;
-import java.util.Optional;
+import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 
 @Service
 public class AgencyTokenService {
-    private AgencyTokenRepository agencyTokenRepository;
 
-    public AgencyTokenService(AgencyTokenRepository agencyTokenRepository) {
+    private AgencyTokenRepository agencyTokenRepository;
+    private OrganisationalUnitRepository organisationalUnitRepository;
+
+    public AgencyTokenService(AgencyTokenRepository agencyTokenRepository, OrganisationalUnitRepository organisationalUnitRepository) {
         this.agencyTokenRepository = agencyTokenRepository;
+        this.organisationalUnitRepository = organisationalUnitRepository;
     }
 
     public Iterable<AgencyToken> getAllAgencyTokens() {
@@ -31,7 +35,33 @@ public class AgencyTokenService {
     }
 
     public Optional<AgencyToken> getAgencyTokenByDomainTokenAndOrganisation(String domain, String token, String code) {
-        return agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code);
+
+        Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainAndToken(domain, token);
+
+        if (agencyToken.isPresent()) {
+            Optional<OrganisationalUnit> tokenOwner = organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken.get());
+
+            if (tokenOwner.isPresent()) {
+                if (organisationContainsCode(tokenOwner.get(), code)) {
+                    return agencyToken;
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private boolean organisationContainsCode(OrganisationalUnit organisationalUnit, String code) {
+        if (organisationalUnit.getCode().equals(code)) {
+            return true;
+        } else if (organisationalUnit.hasChildren()) {
+            for (OrganisationalUnit childUnit : organisationalUnit.getChildren()) {
+                return organisationContainsCode(childUnit, code);
+            }
+        } else {
+            return false;
+        }
+        return false;
     }
 
     public Optional<AgencyToken> getAgencyTokenByDomainAndOrganisation(String domain, String code) {
