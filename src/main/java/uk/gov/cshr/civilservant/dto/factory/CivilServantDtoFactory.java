@@ -8,7 +8,7 @@ import uk.gov.cshr.civilservant.dto.CivilServantDto;
 import java.util.stream.Collectors;
 
 @Component
-public class CivilServantDtoFactory {
+public class CivilServantDtoFactory extends DtoFactory<CivilServantDto, CivilServant>  {
 
     public CivilServantDtoFactory() {
 

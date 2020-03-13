@@ -45,15 +45,27 @@ oauth:
   serviceUrl: ${OAUTH_SERVICE_URL:http://localhost:8080}
   checkTokenEndpointUrl: "${oauth.serviceUrl}/oauth/check_token"
   tokenUrl: "${oauth.serviceUrl}/oauth/token"
+  maxTotalConnections: 200
+  defaultMaxConnectionsPerRoute: 100
+  maxPerServiceUrl: 100
 
 identity:
   identityAPIUrl: "${oauth.serviceUrl}/api/identities"
+  identityWhiteListUrl: "${oauth.serviceUrl}/domain/isWhitelisted"
+  agencyTokenUrl: "${oauth.serviceUrl}/agency/{agencyTokenUid}"
+  identityAgencyTokenUrl: "${oauth.serviceUrl}/api/identity/agency/"
 
 govNotify:
   enabled: ${GOV_NOTIFY_ENABLED:false}
   key: ${GOV_NOTIFY_API_KEY:changeme}
   template:
     lineManager: ${GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID:changeme}
+
+#Validation properties
+agencyToken:
+  capacity:
+    max: ${AGENCY_TOKEN_MAX_CAPACITY:1500}
+    min: ${AGENCY_TOKEN_MIN_CAPACITY:1}
 
 ---
 

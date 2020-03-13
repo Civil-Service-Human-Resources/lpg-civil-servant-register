@@ -1,7 +1,11 @@
 package uk.gov.cshr.civilservant.domain;
 
+import lombok.ToString;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.OneToOne;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +21,9 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
     @Column(name = "payment_methods")
     private String paymentMethods = PaymentMethod.PURCHASE_ORDER.toString();
 
+    @OneToOne(cascade = {CascadeType.ALL})
+    private AgencyToken agencyToken;
+
     public OrganisationalUnit(OrganisationalUnit organisationalUnit) {
         this.id = organisationalUnit.getId();
         this.code = organisationalUnit.getCode();
@@ -25,6 +32,7 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
         this.children = organisationalUnit.getChildren();
         this.abbreviation = organisationalUnit.getAbbreviation();
         this.setPaymentMethods(organisationalUnit.getPaymentMethods());
+        this.agencyToken = organisationalUnit.agencyToken;
     }
 
     public OrganisationalUnit() {
@@ -91,5 +99,13 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
     @Override
     public boolean hasChildren() {
         return !getChildren().isEmpty();
+    }
+
+    public AgencyToken getAgencyToken() {
+        return agencyToken;
+    }
+
+    public void setAgencyToken(AgencyToken agencyToken) {
+        this.agencyToken = agencyToken;
     }
 }
