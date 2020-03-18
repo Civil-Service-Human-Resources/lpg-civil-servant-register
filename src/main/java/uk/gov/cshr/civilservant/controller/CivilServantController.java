@@ -16,9 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.domain.Identity;
-import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
-import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateForceOrgChangeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
@@ -75,6 +72,16 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         log.debug("Getting civil servant details for logged in user");
 
         return civilServantRepository.findByPrincipal().map(
+                civilServant -> ResponseEntity.ok(civilServantResourceFactory.create(civilServant)))
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{uid}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Resource<CivilServantResource>> getByUID(@PathVariable("uid") String uid) {
+        log.debug("Getting civil servant details for uid {}", uid);
+
+        return civilServantRepository.findByIdentity(uid).map(
                 civilServant -> ResponseEntity.ok(civilServantResourceFactory.create(civilServant)))
                 .orElse(ResponseEntity.notFound().build());
     }

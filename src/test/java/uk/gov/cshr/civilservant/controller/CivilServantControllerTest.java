@@ -144,6 +144,7 @@ public class CivilServantControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.lineManagerEmailAddress").value("manager@domain.com"));
+        civilServantResource.setLineManagerEmailAddress(lineManagerEmail);
 
         verify(civilServantRepository).save(any());
         verify(lineManagerService).notifyLineManager(any(), any(), any());
@@ -362,6 +363,30 @@ public class CivilServantControllerTest {
 
         verify(civilServantRepository).findByPrincipal();
         verify(civilServantRepository).save(eq(civilServant));
+    }
+
+    @Test
+    public void shouldReturnOkWhenRequestCivilServantByUid() throws Exception {
+        String uid = "uid";
+        String lineManagerEmail = "manager@domain.com";
+
+        CivilServant civilServant = createCivilServant(uid);
+
+        CivilServantResource civilServantResource = new CivilServantResource();
+        civilServantResource.setLineManagerEmailAddress(lineManagerEmail);
+
+        civilServant.setId(1L);
+
+        when(civilServantRepository.findByIdentity(uid)).thenReturn(Optional.of(civilServant));
+        when(civilServantResourceFactory.create(civilServant)).thenReturn(new Resource<>(civilServantResource));
+
+
+        mockMvc.perform(
+                get("/civilServants/" + uid).with(csrf())
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.lineManagerEmailAddress").value("manager@domain.com"));
     }
 
     private CivilServant createCivilServant(String uid) {
