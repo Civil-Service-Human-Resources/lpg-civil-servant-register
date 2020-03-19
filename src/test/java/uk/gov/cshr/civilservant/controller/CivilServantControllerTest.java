@@ -160,8 +160,7 @@ public class CivilServantControllerTest {
         when(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant)).thenReturn(Optional.of(dto));
 
         mockMvc.perform(
-                get("/civilServants/org")
-                        .param("uid", "myuid")
+                get("/civilServants/org/myuid")
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -174,8 +173,7 @@ public class CivilServantControllerTest {
         when(civilServantRepository.findByIdentity(eq("myuid"))).thenReturn(Optional.empty());
 
         mockMvc.perform(
-                get("/civilServants/org")
-                        .param("uid", "myuid")
+                get("/civilServants/org/myuid")
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -193,8 +191,7 @@ public class CivilServantControllerTest {
         when(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(any(CivilServant.class))).thenReturn(Optional.empty());
 
         mockMvc.perform(
-                get("/civilServants/org")
-                        .param("uid", "myuid")
+                get("/civilServants/org/myuid")
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
