@@ -117,15 +117,16 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         return ResponseEntity.unprocessableEntity().build();
     }
 
-    @GetMapping("/org/{uid}")
-    public ResponseEntity getOrgCodeForCivilServant(@PathVariable("uid") String uid) {
-        log.debug("Getting civil servant org details for user with uid " + uid);
+    @GetMapping("/org")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity getOrgCodeForCivilServant() {
+        log.debug("Getting civil servant org details");
 
-        return civilServantRepository.findByIdentity(uid)
+        return civilServantRepository.findByPrincipal()
                 .map(cs -> civilServantResourceFactory.getCivilServantOrganisationalUnitCode(cs))
                 .map(orgCodeDTO -> ResponseEntity.ok(orgCodeDTO))
                 .orElseGet(() -> {
-                    log.warn(String.format("Civil Servant with uid %s not found", uid));
+                    log.warn(String.format("Civil Servant not found"));
                     return ResponseEntity.notFound().build();
                 });
     }

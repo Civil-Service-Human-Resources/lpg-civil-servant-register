@@ -194,11 +194,11 @@ public class CivilServantControllerTest {
         OrgCodeDTO dto = new OrgCodeDTO();
         dto.setCode("co");
 
-        when(civilServantRepository.findByIdentity(eq("myuid"))).thenReturn(Optional.of(civilServant));
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
         when(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant)).thenReturn(Optional.of(dto));
 
         mockMvc.perform(
-                get("/civilServants/org/myuid")
+                get("/civilServants/org")
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -208,15 +208,15 @@ public class CivilServantControllerTest {
     @Test
     public void givenCivilServantDoesNotExist_shouldReturnNotFound() throws Exception {
 
-        when(civilServantRepository.findByIdentity(eq("myuid"))).thenReturn(Optional.empty());
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.empty());
 
         mockMvc.perform(
-                get("/civilServants/org/myuid")
+                get("/civilServants/org")
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
 
-        verify(civilServantRepository).findByIdentity(anyString());
+        verify(civilServantRepository).findByPrincipal();
         verify(civilServantResourceFactory, never()).getCivilServantOrganisationalUnitCode(any(CivilServant.class));
     }
 
@@ -225,11 +225,11 @@ public class CivilServantControllerTest {
 
         CivilServant civilServant = createCivilServant("myuid");
 
-        when(civilServantRepository.findByIdentity(eq("myuid"))).thenReturn(Optional.of(civilServant));
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
         when(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(any(CivilServant.class))).thenReturn(Optional.empty());
 
         mockMvc.perform(
-                get("/civilServants/org/myuid")
+                get("/civilServants/org")
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
