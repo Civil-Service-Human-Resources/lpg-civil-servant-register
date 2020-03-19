@@ -117,8 +117,8 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         return ResponseEntity.unprocessableEntity().build();
     }
 
-    @GetMapping("/org")
-    public ResponseEntity getOrgCodeForCivilServant(@RequestParam(value = "uid") String uid) {
+    @GetMapping("/org/{uid}")
+    public ResponseEntity getOrgCodeForCivilServant(@PathVariable("uid") String uid) {
         log.debug("Getting civil servant org details for user with uid " + uid);
 
         return civilServantRepository.findByIdentity(uid)
