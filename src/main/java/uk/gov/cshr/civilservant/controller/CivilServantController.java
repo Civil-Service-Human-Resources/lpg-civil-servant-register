@@ -76,7 +76,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/{uid}")
+    @GetMapping("/resource/{uid}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Resource<CivilServantResource>> getByUID(@PathVariable("uid") String uid) {
         log.debug("Getting civil servant details for uid {}", uid);
