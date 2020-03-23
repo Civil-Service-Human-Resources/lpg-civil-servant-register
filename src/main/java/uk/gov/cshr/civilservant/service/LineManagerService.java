@@ -6,9 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.domain.Identity;
+import uk.gov.cshr.civilservant.repository.IdentityRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 import uk.gov.service.notify.NotificationClientException;
+
+import java.util.Optional;
 
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 
@@ -21,13 +25,16 @@ public class LineManagerService {
 
     private IdentityService identityService;
 
+    private IdentityRepository identityRepository;
+
     @Value("${govNotify.template.lineManager}")
     private String govNotifyLineManagerTemplateId;
 
     @Autowired
-    public LineManagerService(IdentityService identityService, NotifyService notifyService) {
+    public LineManagerService(IdentityService identityService, NotifyService notifyService, IdentityRepository identityRepository) {
         this.identityService = identityService;
         this.notifyService = notifyService;
+        this.identityRepository = identityRepository;
     }
 
     public IdentityFromService checkLineManager(String email) {
@@ -45,4 +52,6 @@ public class LineManagerService {
             LOGGER.error("Could not send Line Manager notification", nce);
         }
     }
+
+
 }
