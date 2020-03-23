@@ -35,6 +35,7 @@ import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -202,7 +203,7 @@ public class CivilServantControllerTest {
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("co"));
+                .andExpect(content().string(containsString("co")));
     }
 
     @Test
@@ -232,8 +233,7 @@ public class CivilServantControllerTest {
                 get("/civilServants/org")
                         .accept(APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().string("null"));
+                .andExpect(status().isNotFound());
     }
 
     @Test
