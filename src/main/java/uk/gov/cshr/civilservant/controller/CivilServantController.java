@@ -16,9 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.domain.Identity;
-import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
-import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateForceOrgChangeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
@@ -119,16 +116,12 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     @GetMapping("/org")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity getOrgCodeForCivilServant() {
+    public ResponseEntity<String> getOrgCodeForCivilServant() {
         log.debug("Getting civil servant org details");
 
         return civilServantRepository.findByPrincipal()
-                .map(cs -> civilServantResourceFactory.getCivilServantOrganisationalUnitCode(cs))
-                .map(orgCodeDTO -> ResponseEntity.ok(orgCodeDTO))
-                .orElseGet(() -> {
-                    log.warn(String.format("Civil Servant not found"));
-                    return ResponseEntity.notFound().build();
-                });
+                .map(this::getOrgCode)
+                .orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @PatchMapping("/org")
@@ -155,6 +148,13 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                     return ResponseEntity.noContent().build();
                 })
                 .orElseThrow(() -> new NoOrganisationsFoundException(organisationCode));
+    }
+
+    private ResponseEntity<String> getOrgCode(CivilServant cs) {
+        return civilServantResourceFactory.getCivilServantOrganisationalUnitCode(cs)
+                .map(organisationalUnitCode -> organisationalUnitCode.getCode())
+                .map(code -> ResponseEntity.ok(code))
+                .orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @DeleteMapping("/org")
