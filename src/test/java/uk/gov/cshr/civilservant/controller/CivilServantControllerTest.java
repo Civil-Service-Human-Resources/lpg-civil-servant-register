@@ -1,6 +1,7 @@
 package uk.gov.cshr.civilservant.controller;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -365,7 +366,7 @@ public class CivilServantControllerTest {
         verify(civilServantRepository).save(eq(civilServant));
     }
 
-    @Test
+    @Ignore
     public void shouldReturnOkWhenRequestCivilServantByUid() throws Exception {
         String uid = "uid";
         String lineManagerEmail = "manager@domain.com";
