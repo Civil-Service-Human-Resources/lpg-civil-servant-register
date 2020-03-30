@@ -202,6 +202,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
             Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
             if (optionalCivilServant.isPresent()) {
                 CivilServant civilServant = optionalCivilServant.get();
+                log.info("returning the civil servant org flag value of " + civilServant.getForceOrgReset());
                 return ResponseEntity.ok(civilServant.getForceOrgReset());
             } else {
                 log.warn("civil servant to update has not been found");
