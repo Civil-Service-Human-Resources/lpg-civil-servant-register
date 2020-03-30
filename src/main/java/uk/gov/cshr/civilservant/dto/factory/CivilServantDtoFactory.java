@@ -37,6 +37,12 @@ public class CivilServantDtoFactory extends DtoFactory<CivilServantDto, CivilSer
             civilServantDto.setGrade(civilServant.getGrade().get().getName());
         }
 
+        if(civilServant.getForceOrgReset() == null) {
+            civilServantDto.setForceOrgFlag(false);
+        } else {
+            civilServantDto.setForceOrgFlag(civilServant.getForceOrgReset());
+        }
+
         return civilServantDto;
     }
 }
