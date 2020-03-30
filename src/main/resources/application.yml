@@ -45,6 +45,9 @@ oauth:
   serviceUrl: ${OAUTH_SERVICE_URL:http://localhost:8080}
   checkTokenEndpointUrl: "${oauth.serviceUrl}/oauth/check_token"
   tokenUrl: "${oauth.serviceUrl}/oauth/token"
+  maxTotalConnections: 120
+  defaultMaxConnectionsPerRoute: 5
+  maxPerServiceUrl: 20
 
 identity:
   identityAPIUrl: "${oauth.serviceUrl}/api/identities"
