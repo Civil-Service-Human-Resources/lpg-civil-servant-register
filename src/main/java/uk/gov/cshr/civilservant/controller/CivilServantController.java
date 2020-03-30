@@ -16,6 +16,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.domain.Identity;
+import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateForceOrgChangeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
@@ -115,13 +118,16 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     }
 
     @GetMapping("/org")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> getOrgCodeForCivilServant() {
-        log.debug("Getting civil servant org details");
+    public ResponseEntity getOrgCodeForCivilServant(@RequestParam(value = "uid") String uid) {
+        log.debug("Getting civil servant org details for user with uid " + uid);
 
-        return civilServantRepository.findByPrincipal()
-                .map(this::getOrgCode)
-                .orElseThrow(() -> new ResourceNotFoundException());
+        return civilServantRepository.findByIdentity(uid)
+                .map(cs -> civilServantResourceFactory.getCivilServantOrganisationalUnitCode(cs))
+                .map(orgCodeDTO -> ResponseEntity.ok(orgCodeDTO))
+                .orElseGet(() -> {
+                    log.warn(String.format("Civil Servant with uid %s not found", uid));
+                    return ResponseEntity.notFound().build();
+                });
     }
 
     @PatchMapping("/org")
@@ -150,14 +156,8 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                 .orElseThrow(() -> new NoOrganisationsFoundException(organisationCode));
     }
 
-    private ResponseEntity<String> getOrgCode(CivilServant cs) {
-        return civilServantResourceFactory.getCivilServantOrganisationalUnitCode(cs)
-                .map(organisationalUnitCode -> organisationalUnitCode.getCode())
-                .map(code -> ResponseEntity.ok(code))
-                .orElseThrow(() -> new ResourceNotFoundException());
-    }
-
     @DeleteMapping("/org")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity removeOrganisation() {
         /*
          * separate end point to make the civil servants organisation null.
@@ -171,7 +171,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                 CivilServant civilServant = optionalCivilServant.get();
                 civilServant.setOrganisationalUnit(null);
                 civilServantRepository.save(civilServant);
-                log.info("civil servants organisation has successfully been removed");
                 return ResponseEntity.noContent().build();
             } else {
                 log.warn("civil servant to update has not been found");
@@ -192,13 +191,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/resource/{uid}")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Resource<CivilServantResource>> getByUID(@PathVariable("uid") String uid) {
-        return civilServantRepository.findByIdentity(uid).map(
-                civilServant -> ResponseEntity.ok(civilServantResourceFactory.create(civilServant)))
-                .orElse(ResponseEntity.notFound().build());
-    }
     @GetMapping("/org/reset")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity getForceOrgChangeFlag() {
@@ -209,7 +201,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
             Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
             if (optionalCivilServant.isPresent()) {
                 CivilServant civilServant = optionalCivilServant.get();
-                log.info("returning the civil servant org flag value of " + civilServant.getForceOrgReset());
                 return ResponseEntity.ok(civilServant.getForceOrgReset());
             } else {
                 log.warn("civil servant to update has not been found");

@@ -21,19 +21,13 @@ import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
-import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
-import uk.gov.cshr.civilservant.utils.FamilyOrganisationUnits;
-import uk.gov.cshr.civilservant.utils.JsonUtils;
-import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
+import uk.gov.cshr.civilservant.utils.*;
 
 import java.util.*;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -122,7 +116,7 @@ public class OrganisationalUnitControllerBHTest {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat/code123/")
                         .accept(APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isNotFound());
 
         // then
         verify(organisationalUnitService, times(1)).getOrganisationsForDomain(eq("code123"));

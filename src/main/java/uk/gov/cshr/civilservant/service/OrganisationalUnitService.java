@@ -3,6 +3,7 @@ package uk.gov.cshr.civilservant.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cshr.civilservant.domain.AgencyDomain;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
@@ -13,7 +14,10 @@ import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -62,8 +66,9 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
             Set<OrganisationalUnit> found = findOrganisationsForDomainForAgencyTokenUser(domain, agencyTokens);
             return found.stream().collect(Collectors.toList());
         } else {
-            log.warn("user is not a whitelisted user or an agency token user");
-            return Collections.emptyList();
+            NoOrganisationsFoundException none = new NoOrganisationsFoundException(domain);
+            log.warn("user is not a whitelisted user or an agency token user", none);
+            throw none;
         }
     }
 
@@ -77,27 +82,17 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         // go through all and check if it contains the domain
         // if so put this org into the set to return.
         List<OrganisationalUnit> allOrgs = getAll();
-        Set<OrganisationalUnit> orgUnitsWithAnAgencyTokenForThisDomain = allOrgs.stream()
+        Set<OrganisationalUnit> matchingOrganisationalUnits = allOrgs.stream()
                 .filter(o -> o.getAgencyToken() != null)
                 .filter(o -> !o.getAgencyToken().getAgencyDomains().isEmpty())
                 .filter(o -> containsDomain(domain, o))
                 .collect(Collectors.toSet());
 
-        if(orgUnitsWithAnAgencyTokenForThisDomain.isEmpty()) {
+        if(matchingOrganisationalUnits.isEmpty()) {
             throw new NoOrganisationsFoundException(domain);
+        } else {
+            return matchingOrganisationalUnits;
         }
-
-        log.info("Found " + orgUnitsWithAnAgencyTokenForThisDomain.size() + " org units with an agency token that has this agency domain.");
-
-        Set<OrganisationalUnit> matchingOrganisationalUnitsAndChildrenToBeReturned = new HashSet<>();
-        List<OrganisationalUnit> list = new ArrayList<>();
-
-        for (OrganisationalUnit ou : orgUnitsWithAnAgencyTokenForThisDomain) {
-            List<OrganisationalUnit> currentAndKids = getOrganisationalUnitAndChildren(ou.getCode(), list);
-            matchingOrganisationalUnitsAndChildrenToBeReturned.addAll(currentAndKids);
-        }
-
-        return matchingOrganisationalUnitsAndChildrenToBeReturned;
     }
 
     private boolean containsDomain(String domain, OrganisationalUnit o) {

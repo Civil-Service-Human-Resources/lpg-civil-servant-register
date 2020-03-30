@@ -60,7 +60,7 @@ public class OrganisationalUnitServiceBHTest {
             ALL_ORGS.add(OrganisationalUnitTestUtils.buildOrgUnit("wl", i, "whitelisted-domain"));
         }
         // ensure all orgs list has matching domains to "mydomain"
-     /*   ALL_ORGS.get(5).setAgencyToken(AgencyTokenTestingUtils.createAgencyToken());
+        ALL_ORGS.get(5).setAgencyToken(AgencyTokenTestingUtils.createAgencyToken());
         AgencyDomain agencyDomain = new AgencyDomain();
         agencyDomain.setDomain("mydomain");
         agencyDomain.setId(new Long(1));
@@ -70,7 +70,7 @@ public class OrganisationalUnitServiceBHTest {
         Set<AgencyDomain> unique = new HashSet<>();
         unique.add(agencyDomain);
         unique.add(anotherAgencyDomain);
-        ALL_ORGS.get(5).getAgencyToken().setAgencyDomains(unique);*/
+        ALL_ORGS.get(5).getAgencyToken().setAgencyDomains(unique);
     }
 
     @Before
@@ -323,7 +323,95 @@ public class OrganisationalUnitServiceBHTest {
         assertNull(organisationalUnitService.deleteAgencyToken(organisationalUnit));
     }
 
+    @Test
+    public void givenAWhitelistedDomain_whenGetOrganisationsForDomain_thenReturnAllOrganisations() {
+        // given
+        when(identityService.isDomainWhiteListed(anyString())).thenReturn(true);
 
+        // when
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("mydomain");
+
+        // then
+        assertThat(actual).hasSize(ALL_ORGS.size());
+        verify(organisationalUnitRepository, times(1)).findAll();
+        verifyZeroInteractions(agencyTokenService);
+    }
+
+    @Test
+    public void givenDomainWithAgencyTokens_whenGetOrganisationsForDomain_thenReturnOnlyOrganisationsForThatAgencyToken() {
+        // given
+        when(identityService.isDomainWhiteListed(anyString())).thenReturn(false);
+        AgencyToken[] atArray = new AgencyToken[4];
+        for(int i=0; i<atArray.length; i++) {
+            atArray[i] = AgencyTokenTestingUtils.createAgencyToken();
+        }
+        Iterable<AgencyToken> it = new TypeList<>(atArray);
+        when(agencyTokenService.getAllAgencyTokensByDomain(anyString())).thenReturn(it);
+
+        // when
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("mydomain");
+
+        // then
+        assertThat(actual).hasSize(1);  // domain was only added to one agency token, see static set up method
+        verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("mydomain");
+        verify(organisationalUnitRepository, times(1)).findAll();
+    }
+
+    @Test (expected = NoOrganisationsFoundException.class)
+    public void givenDomainWithNonWhiteListedDomainAndNoAgencyTokens_whenGetOrganisationsForDomain_thenThrowNoOrganisationsFoundException() {
+
+        /*
+        Note: At time of writing, this is a valid scenario.
+        as the SOR for agency token is csrs and the SOR for whitelisted domains is identity service
+        Therefore there is nothing to stop an admin person adding agency tokens to an whitelisted domain.
+         */
+        // given
+        when(identityService.isDomainWhiteListed(anyString())).thenReturn(false);
+        AgencyToken[] atArray = new AgencyToken[0];
+        Iterable<AgencyToken> it = new TypeList<>(atArray);
+        when(agencyTokenService.getAllAgencyTokensByDomain(anyString())).thenReturn(it);
+
+        // when
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("mydomain");
+
+        // then
+        assertThat(actual).hasSize(ALL_ORGS.size());
+        verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("mydomain");
+        verify(organisationalUnitRepository, times(1)).findAll();
+    }
+
+    @Test (expected = NoOrganisationsFoundException.class)
+    public void givenDomainWithNonWhiteListedDomainAndNoOrganisations_whenGetOrganisationsForDomain_thenThrowNoOrganisationsFoundException() {
+
+        /*
+        Note: At time of writing, this is a valid scenario.
+        as the SOR for agency token is csrs and the SOR for whitelisted domains is identity service
+        Therefore there is nothing to stop an admin person adding agency tokens to an whitelisted domain.
+         */
+        // given
+        when(identityService.isDomainWhiteListed(anyString())).thenReturn(false);
+        AgencyToken[] atArray = new AgencyToken[4];
+        for(int i=0; i<atArray.length; i++) {
+            atArray[i] = AgencyTokenTestingUtils.createAgencyToken();
+        }
+        Iterable<AgencyToken> it = new TypeList<>(atArray);
+        when(agencyTokenService.getAllAgencyTokensByDomain(anyString())).thenReturn(it);
+
+        // override static set up method
+        List<OrganisationalUnit> orgs = new ArrayList<>(10);
+        for(int i=0; i<10; i++) {
+            orgs.add(OrganisationalUnitTestUtils.buildOrgUnit("wl", i, "whitelisted-domain"));
+        }
+        when(organisationalUnitRepository.findAll()).thenReturn(orgs);
+
+        // when
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("mydomain");
+
+        // then
+        assertThat(actual).hasSize(1); // domain was only added to one agency token, see static set up method
+        verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("mydomain");
+        verify(organisationalUnitRepository, times(1)).findAll();
+    }
 
 }
 

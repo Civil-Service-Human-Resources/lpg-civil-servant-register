@@ -1,23 +1,5 @@
 package uk.gov.cshr.civilservant.service;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import javax.swing.text.html.Option;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -26,11 +8,21 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
-import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.AgencyTokenRepository;
-import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AgencyTokenServiceTest {
@@ -40,9 +32,6 @@ public class AgencyTokenServiceTest {
 
     @Mock
     private AgencyTokenRepository agencyTokenRepository;
-
-    @Mock
-    private OrganisationalUnitRepository organisationalUnitRepository;
 
     @InjectMocks
     private AgencyTokenService agencyTokenService;
@@ -276,98 +265,4 @@ public class AgencyTokenServiceTest {
         verify(agencyTokenRepository, never()).save(any(AgencyToken.class));
     }
 
-    @Test
-    public void givenCodeIsOwnerOfTokenAndDomain_getAgencyTokenByDomainTokenAndOrganisation_returnAgencyToken() {
-        String domain = "test.domain";
-        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, 0);
-        OrganisationalUnit organisationalUnit = new OrganisationalUnit("org-name", "org-code", "org-abbrv");
-
-        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
-        when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(organisationalUnit));
-
-        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, agencyToken.getToken(), organisationalUnit.getCode());
-
-        assertTrue(returnedToken.isPresent());
-        assertEquals(agencyToken, returnedToken.get());
-    }
-
-    @Test
-    public void givenCodeHasChildOwnerOfTokenAndDomain_getAgencyTokenByDomainTokenAndOrganisation_returnAgencyToken() {
-        String domain = "test.domain";
-        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, 0);
-        OrganisationalUnit parentOrganisationalUnit = new OrganisationalUnit("parent-name", "parent-code", "parent-abbrv");
-        OrganisationalUnit childOrganisationalUnit = new OrganisationalUnit("child-name", "child-code", "child-abbrv");
-        parentOrganisationalUnit.setChildren(Collections.singletonList(childOrganisationalUnit));
-
-        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
-        when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(parentOrganisationalUnit));
-
-        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, agencyToken.getToken(), childOrganisationalUnit.getCode());
-
-        assertTrue(returnedToken.isPresent());
-        assertEquals(agencyToken, returnedToken.get());
-    }
-
-    @Test
-    public void givenCodeHasGrandchildOwnerOfTokenAndDomain_getAgencyTokenByDomainTokenAndOrganisation_returnAgencyToken() {
-        String domain = "test.domain";
-        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, 0);
-        OrganisationalUnit parentOrganisationalUnit = new OrganisationalUnit("parent-name", "parent-code", "parent-abbrv");
-        OrganisationalUnit childOrganisationalUnit = new OrganisationalUnit("child-name", "child-code", "child-abbrv");
-        OrganisationalUnit grandchildOrganisationalUnit = new OrganisationalUnit("grandchild-name", "grandchild-code", "grandchild-abbrv");
-
-        parentOrganisationalUnit.setChildren(Collections.singletonList(childOrganisationalUnit));
-        childOrganisationalUnit.setChildren(Collections.singletonList(grandchildOrganisationalUnit));
-
-        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
-        when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(parentOrganisationalUnit));
-
-        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, agencyToken.getToken(), grandchildOrganisationalUnit.getCode());
-
-        assertTrue(returnedToken.isPresent());
-        assertEquals(agencyToken, returnedToken.get());
-    }
-
-    @Test
-    public void givenTokenDoesntExist_getAgencyTokenByDomainTokenAndOrganisation_returnEmptyOptional() {
-        String domain = "test.domain";
-        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, 0);
-        OrganisationalUnit organisationalUnit = new OrganisationalUnit("org-name", "org-code", "org-abbrv");
-
-        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.empty());
-
-        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, agencyToken.getToken(), organisationalUnit.getCode());
-
-        assertFalse(returnedToken.isPresent());
-    }
-
-    @Test
-    public void givenCodeIsNotOwnerOfTokenAndDomain_getAgencyTokenByDomainTokenAndOrganisation_returnEmptyOptional() {
-        String domain = "test.domain";
-        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, 0);
-        OrganisationalUnit organisationalUnit = new OrganisationalUnit("org-name", "org-code", "org-abbrv");
-
-        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
-        when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(organisationalUnit));
-
-        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, agencyToken.getToken(), "bad-code");
-
-        assertFalse(returnedToken.isPresent());
-    }
-
-    @Test
-    public void givenCodeIsNotOwnerNorHasChildOwnerOfTokenAndDomain_getAgencyTokenByDomainTokenAndOrganisation_returnEmptyOptional() {
-        String domain = "test.domain";
-        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, 0);
-        OrganisationalUnit parentOrganisationalUnit = new OrganisationalUnit("parent-name", "parent-code", "parent-abbrv");
-        OrganisationalUnit childOrganisationalUnit = new OrganisationalUnit("child-name", "child-code", "child-abbrv");
-        parentOrganisationalUnit.setChildren(Collections.singletonList(childOrganisationalUnit));
-
-        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
-        when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(parentOrganisationalUnit));
-
-        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, agencyToken.getToken(), "bad-code");
-
-        assertFalse(returnedToken.isPresent());
-    }
 }

@@ -13,17 +13,15 @@ public class AgencyTokenTestingUtils {
     private AgencyTokenTestingUtils() {
     }
 
-    public static AgencyToken createAgencyToken(int i){
+    public static AgencyToken createAgencyToken(){
         AgencyToken at = new AgencyToken();
-        at.setId(new Long(i));
-        at.setToken("thisisatoken"+i);
+        at.setToken("thisisatoken");
         at.setCapacity(100);
         at.setCapacityUsed(0);
 
         Set<AgencyDomain> domains = new HashSet<AgencyDomain>();
         AgencyDomain domain = new AgencyDomain();
-        domain.setId(new Long(i));
-        domain.setDomain("aDomain"+i);
+        domain.setDomain("aDomain");
         domains.add(domain);
 
         at.setAgencyDomains(domains);
