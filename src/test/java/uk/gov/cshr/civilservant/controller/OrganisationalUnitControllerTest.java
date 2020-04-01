@@ -5,17 +5,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import uk.gov.cshr.civilservant.domain.AgencyToken;
-import org.springframework.validation.Errors;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
@@ -24,9 +19,6 @@ import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
 import uk.gov.cshr.civilservant.utils.JsonUtils;
 import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
-import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
-import uk.gov.cshr.civilservant.utils.JsonUtils;
-import uk.gov.cshr.civilservant.validation.AgencyTokenDTOValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +28,6 @@ import java.util.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -150,17 +140,6 @@ public class OrganisationalUnitControllerTest {
     public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided_capacityTooHigh() throws Exception {
         // must be at least 1 domain
         dto.setAgencyDomains(new HashSet<>());
-        requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
-        //verify(agencyTokenDTOValidator, times(1)).validate(any(), any(Errors.class));
-
-        //assertThat()
-    }
-
-    @Test
-    public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided_capacityUsedGreaterThanCapacity() throws Exception {
-        // capacity must be between 1 and 1500, this should fail validation
-        dto.setCapacity(0);
-        dto.setCapacityUsed(100);
         requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
 
         mockMvc.perform(
