@@ -1,32 +1,36 @@
 package uk.gov.cshr.civilservant.service;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import uk.gov.cshr.civilservant.domain.AgencyDomain;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
+import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
+import uk.gov.cshr.civilservant.service.identity.IdentityService;
+import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
 import uk.gov.cshr.civilservant.utils.FamilyOrganisationUnits;
+import uk.gov.cshr.civilservant.utils.OrganisationalUnitTestUtils;
+import uk.gov.cshr.civilservant.utils.TypeList;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class OrganisationalUnitServiceTest {
+public class OrganisationalUnitServiceBHTest {
 
     private static String GODFATHERS_CODE;
 
@@ -39,40 +43,69 @@ public class OrganisationalUnitServiceTest {
     @Mock
     private AgencyTokenService agencyTokenService;
 
+    @Mock
+    private IdentityService identityService;
+
     @InjectMocks
     private OrganisationalUnitService organisationalUnitService;
 
     private FamilyOrganisationUnits family;
 
+    private static List<OrganisationalUnit> ALL_ORGS;
+
+    @BeforeClass
+    public static void staticsetUp(){
+        ALL_ORGS = new ArrayList<>(10);
+        for(int i=0; i<10; i++) {
+            ALL_ORGS.add(OrganisationalUnitTestUtils.buildOrgUnit("wl", i, "whitelisted-domain"));
+        }
+        // ensure all orgs list has matching domains to "mydomain"
+        ALL_ORGS.get(5).setAgencyToken(AgencyTokenTestingUtils.createAgencyToken());
+        AgencyDomain agencyDomain = new AgencyDomain();
+        agencyDomain.setDomain("mydomain");
+        agencyDomain.setId(new Long(1));
+        AgencyDomain anotherAgencyDomain = new AgencyDomain();
+        anotherAgencyDomain.setDomain("mydomain");
+        anotherAgencyDomain.setId(new Long(2));
+        Set<AgencyDomain> unique = new HashSet<>();
+        unique.add(agencyDomain);
+        unique.add(anotherAgencyDomain);
+        ALL_ORGS.get(5).getAgencyToken().setAgencyDomains(unique);
+    }
+
     @Before
-    public void setUp() {
+    public void setUp(){
+        when(organisationalUnitRepository.findAll()).thenReturn(ALL_ORGS);
 
         family = new FamilyOrganisationUnits();
         GODFATHERS_CODE = family.getTopParent().getCode();
 
-        // mocking for the top parent
+        // mocking for the top parent - first level
         Optional<OrganisationalUnit> topOrg = Optional.of(family.getTopParent());
         when(organisationalUnitRepository.findByCode(eq(GODFATHERS_CODE))).thenReturn(topOrg);
 
-        // mocking for godfathers children - first generation
-        for (int i = 0; i < family.getTopParent().getChildren().size(); i++) {
-            String codeOfChildAtIndexI = "god" + i;
+        // mocking for godfathers children - second level
+        for (int i=0; i<family.getTopParent().getChildren().size(); i++) {
             Optional<OrganisationalUnit> childAtIndexI = Optional.of(family.getTopParent().getChildren().get(i));
-            when(organisationalUnitRepository.findByCode(eq(codeOfChildAtIndexI))).thenReturn(childAtIndexI);
+            if(childAtIndexI.isPresent()) {
+                when(organisationalUnitRepository.findByCode(eq(childAtIndexI.get().getCode()))).thenReturn(childAtIndexI);
+            }
         }
 
         // mocking for godfather children, child 1s children - second generation
-        for (int i = 0; i < family.getTopParent().getChildren().get(1).getChildren().size(); i++) {
-            String codeOfChildAtIndexI = "grandOne" + i;
+        for (int i=0; i<family.getTopParent().getChildren().get(1).getChildren().size(); i++) {
             Optional<OrganisationalUnit> childAtIndexI = Optional.of(family.getTopParent().getChildren().get(1).getChildren().get(i));
-            when(organisationalUnitRepository.findByCode(eq(codeOfChildAtIndexI))).thenReturn(childAtIndexI);
+            if(childAtIndexI.isPresent()) {
+                when(organisationalUnitRepository.findByCode(eq(childAtIndexI.get().getCode()))).thenReturn(childAtIndexI);
+            }
         }
 
         // mocking for godfather children, child 2s children - second generation
-        for (int i = 0; i < family.getTopParent().getChildren().get(2).getChildren().size(); i++) {
-            String codeOfChildAtIndexI = "grandTwo" + i;
+        for (int i=0; i<family.getTopParent().getChildren().get(2).getChildren().size(); i++) {
             Optional<OrganisationalUnit> childAtIndexI = Optional.of(family.getTopParent().getChildren().get(2).getChildren().get(i));
-            when(organisationalUnitRepository.findByCode(eq(codeOfChildAtIndexI))).thenReturn(childAtIndexI);
+            if(childAtIndexI.isPresent()) {
+                when(organisationalUnitRepository.findByCode(eq(childAtIndexI.get().getCode()))).thenReturn(childAtIndexI);
+            }
         }
 
     }
@@ -241,6 +274,7 @@ public class OrganisationalUnitServiceTest {
     }
 
 
+
     @Test
     public void givenAnOrgWithThreeLevelsAndSecondLevelItemsWhichHasFiveChildrenIsRequested_whenGetOrganisationWithChildren_thenShouldReturnOrgUnitsCascadingDownOnly() {
         // given
@@ -289,4 +323,95 @@ public class OrganisationalUnitServiceTest {
         assertNull(organisationalUnitService.deleteAgencyToken(organisationalUnit));
     }
 
+    @Test
+    public void givenAWhitelistedDomain_whenGetOrganisationsForDomain_thenReturnAllOrganisations() {
+        // given
+        when(identityService.isDomainWhiteListed(anyString())).thenReturn(true);
+
+        // when
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("mydomain");
+
+        // then
+        assertThat(actual).hasSize(ALL_ORGS.size());
+        verify(organisationalUnitRepository, times(1)).findAll();
+        verifyZeroInteractions(agencyTokenService);
+    }
+
+    @Test
+    public void givenDomainWithAgencyTokens_whenGetOrganisationsForDomain_thenReturnOnlyOrganisationsForThatAgencyToken() {
+        // given
+        when(identityService.isDomainWhiteListed(anyString())).thenReturn(false);
+        AgencyToken[] atArray = new AgencyToken[4];
+        for(int i=0; i<atArray.length; i++) {
+            atArray[i] = AgencyTokenTestingUtils.createAgencyToken();
+        }
+        Iterable<AgencyToken> it = new TypeList<>(atArray);
+        when(agencyTokenService.getAllAgencyTokensByDomain(anyString())).thenReturn(it);
+
+        // when
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("mydomain");
+
+        // then
+        assertThat(actual).hasSize(1);  // domain was only added to one agency token, see static set up method
+        verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("mydomain");
+        verify(organisationalUnitRepository, times(1)).findAll();
+    }
+
+    @Test (expected = NoOrganisationsFoundException.class)
+    public void givenDomainWithNonWhiteListedDomainAndNoAgencyTokens_whenGetOrganisationsForDomain_thenThrowNoOrganisationsFoundException() {
+
+        /*
+        Note: At time of writing, this is a valid scenario.
+        as the SOR for agency token is csrs and the SOR for whitelisted domains is identity service
+        Therefore there is nothing to stop an admin person adding agency tokens to an whitelisted domain.
+         */
+        // given
+        when(identityService.isDomainWhiteListed(anyString())).thenReturn(false);
+        AgencyToken[] atArray = new AgencyToken[0];
+        Iterable<AgencyToken> it = new TypeList<>(atArray);
+        when(agencyTokenService.getAllAgencyTokensByDomain(anyString())).thenReturn(it);
+
+        // when
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("mydomain");
+
+        // then
+        assertThat(actual).hasSize(ALL_ORGS.size());
+        verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("mydomain");
+        verify(organisationalUnitRepository, times(1)).findAll();
+    }
+
+    @Test (expected = NoOrganisationsFoundException.class)
+    public void givenDomainWithNonWhiteListedDomainAndNoOrganisations_whenGetOrganisationsForDomain_thenThrowNoOrganisationsFoundException() {
+
+        /*
+        Note: At time of writing, this is a valid scenario.
+        as the SOR for agency token is csrs and the SOR for whitelisted domains is identity service
+        Therefore there is nothing to stop an admin person adding agency tokens to an whitelisted domain.
+         */
+        // given
+        when(identityService.isDomainWhiteListed(anyString())).thenReturn(false);
+        AgencyToken[] atArray = new AgencyToken[4];
+        for(int i=0; i<atArray.length; i++) {
+            atArray[i] = AgencyTokenTestingUtils.createAgencyToken();
+        }
+        Iterable<AgencyToken> it = new TypeList<>(atArray);
+        when(agencyTokenService.getAllAgencyTokensByDomain(anyString())).thenReturn(it);
+
+        // override static set up method
+        List<OrganisationalUnit> orgs = new ArrayList<>(10);
+        for(int i=0; i<10; i++) {
+            orgs.add(OrganisationalUnitTestUtils.buildOrgUnit("wl", i, "whitelisted-domain"));
+        }
+        when(organisationalUnitRepository.findAll()).thenReturn(orgs);
+
+        // when
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("mydomain");
+
+        // then
+        assertThat(actual).hasSize(1); // domain was only added to one agency token, see static set up method
+        verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("mydomain");
+        verify(organisationalUnitRepository, times(1)).findAll();
+    }
+
 }
+
