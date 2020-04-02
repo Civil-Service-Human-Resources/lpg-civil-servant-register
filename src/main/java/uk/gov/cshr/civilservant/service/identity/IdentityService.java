@@ -4,13 +4,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.service.exception.UserNotFoundException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Service
 public class IdentityService {
@@ -21,10 +25,13 @@ public class IdentityService {
 
     private String identityAPIUrl;
 
+    private String identityWhiteListUrl;
+
     @Autowired
-    public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.identityAPIUrl}") String identityAPIUrl) {
+    public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.identityAPIUrl}") String identityAPIUrl, @Value("${identity.identityWhiteListUrl}") String identityWhiteListUrl) {
         this.restOperations = restOperations;
         this.identityAPIUrl = identityAPIUrl;
+        this.identityWhiteListUrl = identityWhiteListUrl;
     }
 
     public IdentityFromService findByEmail(String email) {
@@ -71,4 +78,37 @@ public class IdentityService {
         }
         return null;
     }
+
+    public boolean isDomainWhiteListed(String domain){
+        LOGGER.debug("finding if domain:" + domain + " is whitelisted from identity service");
+
+        String domainWithSlashAtStartAndEnd = "/" +  domain + "/";
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityWhiteListUrl).path(domainWithSlashAtStartAndEnd);
+
+        URI uri = null;
+        try {
+            uri = new URI(builder.toUriString());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        try {
+            ResponseEntity<String> response = restOperations.getForEntity(uri, String.class);
+
+            if(response.getStatusCode().is2xxSuccessful() && response.getBody().equals("true")) {
+                return true;
+            } else if(response.getStatusCode().is2xxSuccessful() && response.getBody().equals("false")) {
+                return false;
+            } else {
+                throw new NoOrganisationsFoundException(domain);
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Error calling identity service", e);
+            throw new NoOrganisationsFoundException(domain);
+        }
+
+    }
+
 }
