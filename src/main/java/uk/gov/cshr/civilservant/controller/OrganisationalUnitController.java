@@ -9,7 +9,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import uk.gov.cshr.civilservant.domain.AgencyDomain;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
@@ -22,7 +21,6 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -91,13 +89,6 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(organisationalUnitService.getOrganisationsNormalised());
     }
 
-    @GetMapping("/{organisationalUnitId}/agencyToken")
-    public ResponseEntity getAgencyToken(@PathVariable Long organisationalUnitId) {
-        return organisationalUnitService.getOrganisationalUnit(organisationalUnitId)
-                .map(organisationalUnit -> ResponseEntity.ok(organisationalUnit.getAgencyToken()))
-                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-    }
-
     @GetMapping("/allCodesMap")
     public ResponseEntity<Map<String, List<String>>> getAllCodes() {
         Map<String, List<String>> codeParentCodesMap = new HashMap<>();
@@ -113,6 +104,14 @@ public class OrganisationalUnitController {
         });
 
         return ResponseEntity.ok(codeParentCodesMap);
+    }
+
+    @GetMapping("/{organisationalUnitId}/agencyToken")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity getAgencyToken(@PathVariable Long organisationalUnitId) {
+        return organisationalUnitService.getOrganisationalUnit(organisationalUnitId)
+                .map(organisationalUnit -> ResponseEntity.ok(organisationalUnit.getAgencyToken()))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @PostMapping("/{organisationalUnitId}/agencyToken")
