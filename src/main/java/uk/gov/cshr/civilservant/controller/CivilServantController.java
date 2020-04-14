@@ -158,7 +158,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     }
 
     @DeleteMapping("/org")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity removeOrganisation() {
         /*
          * separate end point to make the civil servants organisation null.
@@ -172,6 +171,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                 CivilServant civilServant = optionalCivilServant.get();
                 civilServant.setOrganisationalUnit(null);
                 civilServantRepository.save(civilServant);
+                log.info("civil servants organisation has successfully been removed");
                 return ResponseEntity.noContent().build();
             } else {
                 log.warn("civil servant to update has not been found");
