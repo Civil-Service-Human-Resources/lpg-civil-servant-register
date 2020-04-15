@@ -79,7 +79,7 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(dtos);
     }
 
-    @GetMapping("organisationalUnits/children/{code}")
+    @GetMapping("/children/{code}")
     public ResponseEntity<List<OrganisationalUnit>> getOrganisationWithChildren(@PathVariable String code) {
         log.info("Getting org for current family only, current and any children");
         return ResponseEntity.ok(organisationalUnitService.getOrganisationWithChildren(code));
