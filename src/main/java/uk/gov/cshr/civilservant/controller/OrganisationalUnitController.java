@@ -10,17 +10,17 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
+import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.AgencyTokenFactory;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
+import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,10 +34,16 @@ public class OrganisationalUnitController {
 
     private AgencyTokenFactory agencyTokenFactory;
 
-    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService, OrganisationalUnitDtoFactory organisationalUnitDtoFactory, AgencyTokenFactory agencyTokenFactory) {
+    private CivilServantRepository civilServantRepository;
+
+    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService,
+                                        OrganisationalUnitDtoFactory organisationalUnitDtoFactory,
+                                        CivilServantRepository civilServantRepository,
+                                        AgencyTokenFactory agencyTokenFactory) {
         this.organisationalUnitService = organisationalUnitService;
         this.organisationalUnitDtoFactory = organisationalUnitDtoFactory;
         this.agencyTokenFactory = agencyTokenFactory;
+        this.civilServantRepository = civilServantRepository;
     }
 
     @GetMapping("/tree")
@@ -73,7 +79,7 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(dtos);
     }
 
-    @GetMapping("/children/{code}")
+    @GetMapping("organisationalUnits/children/{code}")
     public ResponseEntity<List<OrganisationalUnit>> getOrganisationWithChildren(@PathVariable String code) {
         log.info("Getting org for current family only, current and any children");
         return ResponseEntity.ok(organisationalUnitService.getOrganisationWithChildren(code));
@@ -114,6 +120,22 @@ public class OrganisationalUnitController {
             organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.created(builder.path("/organisationalUnits/{organisationalUnitId}/agencyToken").build(organisationalUnit.getId())).build();
         }).orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+    }
+
+    @PostMapping("/addOrganisationReportingPermission/{uid}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity addOrganisationReportingPermission(@PathVariable String uid, @Valid @RequestBody ArrayList<String> organisationIds) {
+        Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(uid);
+        //The below may not be required or if civilservant not present then return null.
+        if (!civilServant.isPresent()) {
+            return ResponseEntity.ok("Civil servant for this UID not found in database");
+
+        }
+        List<String> listOrganisationCodes = organisationalUnitService.getOrganisationalUnitCodesForIds(organisationIds);
+        List<Long> organisationIdWithChildrenIds = organisationalUnitService.getOrganisationIdWithChildrenIds(listOrganisationCodes);
+
+        organisationalUnitService.addOrganisationReportingPermission(civilServant.get().getId(), organisationIdWithChildrenIds);
+        return ResponseEntity.ok(HttpStatus.OK);
     }
 
     @GetMapping("/{organisationalUnitId}/agencyToken")

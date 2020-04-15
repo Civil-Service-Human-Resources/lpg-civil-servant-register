@@ -3,14 +3,15 @@ package uk.gov.cshr.civilservant.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.cshr.civilservant.domain.AgencyDomain;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
+import uk.gov.cshr.civilservant.domain.CivilServantOrganisationReportingPermission;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.exception.TokenAlreadyExistsException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
+import uk.gov.cshr.civilservant.repository.OrganisationReportingPermissionRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
@@ -26,14 +27,21 @@ import java.util.stream.Collectors;
 public class OrganisationalUnitService extends SelfReferencingEntityService<OrganisationalUnit, OrganisationalUnitDto> {
 
     private OrganisationalUnitRepository repository;
+    private OrganisationReportingPermissionRepository organisationReportingPermissionRepository;
     private AgencyTokenService agencyTokenService;
     private IdentityService identityService;
 
-    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository, OrganisationalUnitDtoFactory organisationalUnitDtoFactory, AgencyTokenService agencyTokenService, IdentityService identityService) {
+    public OrganisationalUnitService(
+            OrganisationalUnitRepository organisationalUnitRepository,
+            OrganisationalUnitDtoFactory organisationalUnitDtoFactory,
+            AgencyTokenService agencyTokenService,
+            IdentityService identityService,
+            OrganisationReportingPermissionRepository organisationReportingPermissionRepository) {
         super(organisationalUnitRepository, organisationalUnitDtoFactory);
         this.repository = organisationalUnitRepository;
         this.agencyTokenService = agencyTokenService;
         this.identityService = identityService;
+        this.organisationReportingPermissionRepository = organisationReportingPermissionRepository;
     }
 
     public List<OrganisationalUnit> getOrganisationWithParents(String code) {
@@ -178,5 +186,26 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     @Transactional
     public Optional<OrganisationalUnit> get(Long id) {
         return repository.findById(id);
+    }
+
+    public List<String> getOrganisationalUnitCodesForIds(List<String> organisationIds) {
+        return repository.findAllCodesForIds(organisationIds);
+    }
+
+    public List<Long> getOrganisationIdWithChildrenIds(List<String> listOrganisationCodes) {
+        List<Long> listOrganisationIds = new ArrayList<>();
+        for (String code : listOrganisationCodes) {
+            getOrganisationWithChildren(code).forEach(x -> listOrganisationIds.add(x.getId()));
+        }
+        return listOrganisationIds;
+    }
+
+    public void addOrganisationReportingPermission(Long id, List<Long> organisationIds) {
+        List<CivilServantOrganisationReportingPermission> list = new ArrayList<>();
+        for (Long orgId : organisationIds) {
+            CivilServantOrganisationReportingPermission entity = new CivilServantOrganisationReportingPermission(id, orgId);
+            list.add(entity);
+        }
+        organisationReportingPermissionRepository.saveAll(list);
     }
 }
