@@ -32,4 +32,7 @@ public interface OrganisationalUnitRepository extends SelfReferencingEntityRepos
 
     @Query(value = "select o.code from organisational_unit o", nativeQuery = true)
     List<String> findAllCodes();
+
+    @Query(value = "select o.code from organisational_unit o where o.id in :organisationIds", nativeQuery = true)
+    List<String> findAllCodesForIds(List<String> organisationIds);
 }

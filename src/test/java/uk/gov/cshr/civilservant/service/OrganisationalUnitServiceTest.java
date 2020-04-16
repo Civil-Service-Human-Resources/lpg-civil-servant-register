@@ -7,9 +7,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
+import uk.gov.cshr.civilservant.domain.CivilServantOrganisationReportingPermission;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
+import uk.gov.cshr.civilservant.repository.OrganisationReportingPermissionRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.utils.FamilyOrganisationUnits;
 
@@ -21,9 +23,11 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrganisationalUnitServiceTest {
@@ -32,6 +36,9 @@ public class OrganisationalUnitServiceTest {
 
     @Mock
     private OrganisationalUnitRepository organisationalUnitRepository;
+
+    @Mock
+    private OrganisationReportingPermissionRepository organisationReportingPermissionRepository;
 
     @Mock
     private OrganisationalUnitDtoFactory organisationalUnitDtoFactory;
@@ -146,10 +153,28 @@ public class OrganisationalUnitServiceTest {
     @Test
     public void shouldReturnAllOrganisationCodes() {
         List<String> codes = Arrays.asList("code1", "code2");
+        List<String> orgIds = Arrays.asList("1", "2");
+
+        when(organisationalUnitRepository.findAllCodesForIds(orgIds)).thenReturn(codes);
+
+        assertEquals(codes, organisationalUnitService.getOrganisationalUnitCodesForIds(orgIds));
+        assertEquals(codes.size(), organisationalUnitService.getOrganisationalUnitCodesForIds(orgIds).size());
+    }
+
+    @Test
+    public void shouldReturnOrganisationalUnitCodesForIds() {
+        List<String> codes = Arrays.asList("code1", "code2");
 
         when(organisationalUnitRepository.findAllCodes()).thenReturn(codes);
 
         assertEquals(codes, organisationalUnitService.getOrganisationalUnitCodes());
+    }
+
+    @Test
+    public void shouldAddOrganisationReportingPermission() {
+        List<CivilServantOrganisationReportingPermission> list = new ArrayList<>();
+        organisationalUnitService.addOrganisationReportingPermission(1L, Arrays.asList(1L));
+        verify(organisationReportingPermissionRepository).saveAll(any());
     }
 
     @Test
