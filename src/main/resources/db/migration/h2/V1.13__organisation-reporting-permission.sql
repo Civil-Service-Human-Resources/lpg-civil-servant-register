@@ -1,5 +1,3 @@
-DROP TABLE IF EXISTS `civil_servant_organisation_reporting_permission`;
-
 CREATE TABLE `civil_servant_organisation_reporting_permission` (
   `civil_servant_id` mediumint(8) unsigned NOT NULL,
   `organisation_id` smallint(5) unsigned NOT NULL,
