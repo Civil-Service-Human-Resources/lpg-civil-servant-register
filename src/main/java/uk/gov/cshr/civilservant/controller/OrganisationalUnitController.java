@@ -129,7 +129,6 @@ public class OrganisationalUnitController {
         //The below may not be required or if civilservant not present then return null.
         if (!civilServant.isPresent()) {
             return ResponseEntity.ok("Civil servant for this UID not found in database");
-
         }
         List<String> listOrganisationCodes = organisationalUnitService.getOrganisationalUnitCodesForIds(organisationIds);
         List<Long> organisationIdWithChildrenIds = organisationalUnitService.getOrganisationIdWithChildrenIds(listOrganisationCodes);
