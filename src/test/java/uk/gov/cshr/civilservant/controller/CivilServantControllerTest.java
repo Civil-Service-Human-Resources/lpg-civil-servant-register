@@ -159,6 +159,19 @@ public class CivilServantControllerTest {
                 .andExpect(jsonPath("$.lineManagerEmailAddress").value("manager@domain.com"));
     }
 
+    @Test
+    public void shouldReturnNotFoundWhenRequestCivilServantByUidDoesntExist() throws Exception {
+        String uid = "uid";
+        
+        when(civilServantRepository.findByIdentity(uid)).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                get("/civilServants/" + uid).with(csrf())
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
     private CivilServant createCivilServant(String uid) {
         Identity identity = new Identity(uid);
         return new CivilServant(identity);
