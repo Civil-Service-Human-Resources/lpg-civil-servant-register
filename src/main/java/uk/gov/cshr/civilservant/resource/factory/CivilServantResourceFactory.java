@@ -3,11 +3,8 @@ package uk.gov.cshr.civilservant.resource.factory;
 import org.springframework.hateoas.Resource;
 import org.springframework.stereotype.Component;
 import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
-
-import java.util.Optional;
 
 @Component
 public class CivilServantResourceFactory {
@@ -56,15 +53,4 @@ public class CivilServantResourceFactory {
 
         return resource;
     }
-
-    public Optional<OrgCodeDTO> getCivilServantOrganisationalUnitCode(CivilServant civilServant) {
-        if(civilServant.getOrganisationalUnit().isPresent() && civilServant.getOrganisationalUnit().get().getCode() != null){
-            OrgCodeDTO dto = new OrgCodeDTO();
-            dto.setCode(civilServant.getOrganisationalUnit().get().getCode());
-            return Optional.of(dto);
-        } else {
-            return Optional.empty();
-        }
-    }
-
 }

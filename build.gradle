@@ -106,9 +106,6 @@ dependencies {
     compile group: 'com.microsoft.azure', name: 'applicationinsights-logging-logback', version: '2.5.0'
     compile group: 'com.microsoft.azure', name: 'applicationinsights-spring-boot-starter', version: '2.5.0'
 
-    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-validation
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter-validation'
-
     // https://mvnrepository.com/artifact/com.h2database/h2
     compile group: 'com.h2database', name: 'h2', version: '1.4.197'
 
