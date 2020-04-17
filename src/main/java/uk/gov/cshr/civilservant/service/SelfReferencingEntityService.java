@@ -1,6 +1,5 @@
 package uk.gov.cshr.civilservant.service;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.SelfReferencingEntity;
 import uk.gov.cshr.civilservant.dto.DtoEntity;

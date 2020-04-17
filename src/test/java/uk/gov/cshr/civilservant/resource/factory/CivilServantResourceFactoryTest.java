@@ -6,17 +6,15 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.Resource;
 import uk.gov.cshr.civilservant.domain.*;
-import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
-import java.util.Optional;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -88,43 +86,5 @@ public class CivilServantResourceFactoryTest {
         assertEquals(lineManagerEmail, content.getLineManagerEmailAddress());
         assertEquals(organisationalUnit, content.getOrganisationalUnit());
         assertEquals(profession, content.getProfession());
-    }
-
-    @Test
-    public void givenOrgUnitAndOrgUnitCodeExists_whenGetCivilServantOrganisationalUnitCode_thenOrgCodeShouldReturnOrgCode(){
-        CivilServant civilServant = buildCivilServant();
-
-        Optional<OrgCodeDTO> actual = factory.getCivilServantOrganisationalUnitCode(civilServant);
-
-        assertThat(actual.get().getCode()).isEqualTo("co");
-    }
-
-    @Test
-    public void givenNoOrgUnitCodeExists_whenGetCivilServantOrganisationalUnitCode_thenOrgCodeShouldReturnEmptyString(){
-        CivilServant civilServant = buildCivilServant();
-        civilServant.getOrganisationalUnit().get().setCode(null);
-
-        Optional<OrgCodeDTO> actual = factory.getCivilServantOrganisationalUnitCode(civilServant);
-
-        assertThat(actual).isEmpty();
-    }
-
-    @Test
-    public void givenNoOrgUnit_whenGetCivilServantOrganisationalUnitCode_thenOrgCodeShouldReturnEmptyString(){
-        CivilServant civilServant = buildCivilServant();
-        civilServant.setOrganisationalUnit(null);
-
-        Optional<OrgCodeDTO> actual = factory.getCivilServantOrganisationalUnitCode(civilServant);
-
-        assertThat(actual).isEmpty();
-    }
-
-    private CivilServant buildCivilServant() {
-        OrganisationalUnit organisationalUnit = new OrganisationalUnit();
-        organisationalUnit.setCode("co");
-
-        CivilServant civilServant = new CivilServant();
-        civilServant.setOrganisationalUnit(organisationalUnit);
-        return civilServant;
     }
 }
