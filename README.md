@@ -26,7 +26,7 @@ Run the project with Gradle or ```./gradlew bootRun``` import project into Intel
 The application uses HAL and self exploring.
 `localhost:9002`  
 
+
 ## Requirements
 
 A Backing storage solution is required. 
-
