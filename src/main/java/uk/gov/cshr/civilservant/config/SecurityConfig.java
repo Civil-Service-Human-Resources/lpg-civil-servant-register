@@ -22,7 +22,6 @@ import org.springframework.security.oauth2.client.token.grant.client.ClientCrede
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 
-
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @EnableResourceServer
