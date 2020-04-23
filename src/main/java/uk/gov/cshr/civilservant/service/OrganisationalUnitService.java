@@ -14,10 +14,7 @@ import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -82,16 +79,23 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         // go through all and check if it contains the domain
         // if so put this org into the set to return.
         List<OrganisationalUnit> allOrgs = getAll();
-        Set<OrganisationalUnit> matchingOrganisationalUnits = allOrgs.stream()
+        Set<OrganisationalUnit> orgUnitsWithAnAgencyTokenForThisDomain = allOrgs.stream()
                 .filter(o -> o.getAgencyToken() != null)
                 .filter(o -> !o.getAgencyToken().getAgencyDomains().isEmpty())
                 .filter(o -> containsDomain(domain, o))
                 .collect(Collectors.toSet());
 
-        if(matchingOrganisationalUnits.isEmpty()) {
+        // add the parents to teh set to be returned and for every org unit in org unit set, now find each ones child orgs and add them to a set to be returned
+        Set<OrganisationalUnit> matchingOrganisationalUnitsAndChildrenToBeReturned = new HashSet<>();
+        // add all the parents
+        matchingOrganisationalUnitsAndChildrenToBeReturned.addAll(orgUnitsWithAnAgencyTokenForThisDomain);
+        // add all the children
+        orgUnitsWithAnAgencyTokenForThisDomain.stream().forEach(ou -> matchingOrganisationalUnitsAndChildrenToBeReturned.addAll(ou.getChildren()));
+
+        if(orgUnitsWithAnAgencyTokenForThisDomain.isEmpty()) {
             throw new NoOrganisationsFoundException(domain);
         } else {
-            return matchingOrganisationalUnits;
+            return matchingOrganisationalUnitsAndChildrenToBeReturned;
         }
     }
 
