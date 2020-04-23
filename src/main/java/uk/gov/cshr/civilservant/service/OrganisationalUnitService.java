@@ -90,11 +90,13 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         // add all the parents
         matchingOrganisationalUnitsAndChildrenToBeReturned.addAll(orgUnitsWithAnAgencyTokenForThisDomain);
         // add all the children
-        orgUnitsWithAnAgencyTokenForThisDomain.stream().forEach(ou -> matchingOrganisationalUnitsAndChildrenToBeReturned.addAll(ou.getChildren()));
+        List<OrganisationalUnit> allTheChildren = new ArrayList<>();
+        orgUnitsWithAnAgencyTokenForThisDomain.forEach(ou -> getChildren(ou, allTheChildren));
 
-        if(orgUnitsWithAnAgencyTokenForThisDomain.isEmpty()) {
+        if(allTheChildren.isEmpty()) {
             throw new NoOrganisationsFoundException(domain);
         } else {
+            matchingOrganisationalUnitsAndChildrenToBeReturned.addAll(allTheChildren);
             return matchingOrganisationalUnitsAndChildrenToBeReturned;
         }
     }
