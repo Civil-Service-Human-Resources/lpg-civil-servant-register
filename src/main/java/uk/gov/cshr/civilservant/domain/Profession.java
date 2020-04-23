@@ -1,13 +1,15 @@
 package uk.gov.cshr.civilservant.domain;
 
+import java.util.Collections;
+import java.util.List;
+import javax.persistence.Entity;
+
+import lombok.Builder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import javax.persistence.Entity;
-import java.util.Collections;
-import java.util.List;
-
+@Builder
 @Entity
 public class Profession extends SelfReferencingEntity<Profession> {
     public Profession() {

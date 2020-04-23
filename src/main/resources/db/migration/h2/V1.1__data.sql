@@ -62,5 +62,4 @@ INSERT INTO job_role (name, parent_id) VALUES
   ('Commercial Specialist', SELECT id FROM job_role WHERE name = 'Commercial Strategy'),
   ('Senior Commercial Specialist', SELECT id FROM job_role WHERE name = 'Commercial Strategy');
 
-
 SET FOREIGN_KEY_CHECKS = 1;
