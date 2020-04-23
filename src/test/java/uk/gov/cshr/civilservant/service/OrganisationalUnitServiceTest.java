@@ -526,6 +526,7 @@ public class OrganisationalUnitServiceTest {
 
         ALL_ORGS.add(ayrshireAndArranNHS);
 
+        // TODO - BH - THIS IS WHY ITS FAILING
         Optional<OrganisationalUnit> optNhsGlasgow = Optional.of(greaterGlasgowNHS);
         when(organisationalUnitRepository.findByCode(eq("NHSGLASGOW"))).thenReturn(optNhsGlasgow);
 

@@ -85,20 +85,21 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
                 .filter(o -> containsDomain(domain, o))
                 .collect(Collectors.toSet());
 
-        // add the parents to teh set to be returned and for every org unit in org unit set, now find each ones child orgs and add them to a set to be returned
-        Set<OrganisationalUnit> matchingOrganisationalUnitsAndChildrenToBeReturned = new HashSet<>();
-        // add all the parents
-        matchingOrganisationalUnitsAndChildrenToBeReturned.addAll(orgUnitsWithAnAgencyTokenForThisDomain);
-        // add all the children
-        List<OrganisationalUnit> allTheChildren = new ArrayList<>();
-        orgUnitsWithAnAgencyTokenForThisDomain.forEach(ou -> getChildren(ou, allTheChildren));
-
-        if(allTheChildren.isEmpty()) {
+        if(orgUnitsWithAnAgencyTokenForThisDomain.isEmpty()) {
             throw new NoOrganisationsFoundException(domain);
-        } else {
-            matchingOrganisationalUnitsAndChildrenToBeReturned.addAll(allTheChildren);
-            return matchingOrganisationalUnitsAndChildrenToBeReturned;
         }
+
+        log.info("Found " + orgUnitsWithAnAgencyTokenForThisDomain.size() + " org units with an agency token that has this agency domain.");
+
+        Set<OrganisationalUnit> matchingOrganisationalUnitsAndChildrenToBeReturned = new HashSet<>();
+        List<OrganisationalUnit> list = new ArrayList<>();
+
+        for (OrganisationalUnit ou : orgUnitsWithAnAgencyTokenForThisDomain) {
+            List<OrganisationalUnit> currentAndKids = getOrganisationalUnitAndChildren(ou.getCode(), list);
+            matchingOrganisationalUnitsAndChildrenToBeReturned.addAll(currentAndKids);
+        }
+
+        return matchingOrganisationalUnitsAndChildrenToBeReturned;
     }
 
     private boolean containsDomain(String domain, OrganisationalUnit o) {
