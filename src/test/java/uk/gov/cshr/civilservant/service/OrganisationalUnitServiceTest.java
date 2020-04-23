@@ -335,7 +335,7 @@ public class OrganisationalUnitServiceTest {
     }
 
     @Test
-    public void givenDomainWithOneMatchingAgencyTokens_whenGetOrganisationsForDomain_thenReturnMatchingOrganisationsForThatAgencyTokenIncludingTheirChildren() {
+    public void givenDomainWithOneMatchingAgencyTokens_whenGetOrganisationsForDomain_thenReturnMatchingOrganisationsForThatAgencyTokenIncludingTheirChildrenAndCascadeDownOnly() {
         // given
         when(identityService.isDomainWhiteListed(anyString())).thenReturn(false);
         when(organisationalUnitRepository.findAll()).thenReturn(ALL_ORGS);
@@ -384,7 +384,30 @@ public class OrganisationalUnitServiceTest {
         maryhillNHS.setParent(greaterGlasgowNHS);
         govanNHS.setParent(greaterGlasgowNHS);
 
+        greaterGlasgowNHS.setParent(ALL_ORGS.get(0));
+
         ALL_ORGS.add(greaterGlasgowNHS);
+
+        Optional<OrganisationalUnit> optNhsGlasgow = Optional.of(greaterGlasgowNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSGLASGOW"))).thenReturn(optNhsGlasgow);
+
+        Optional<OrganisationalUnit> optNhsMaryhill = Optional.of(maryhillNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSMARYHILL"))).thenReturn(optNhsMaryhill);
+
+        Optional<OrganisationalUnit> optNhsGovan = Optional.of(govanNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSGOVAN"))).thenReturn(optNhsGovan);
+
+ /*       Optional<OrganisationalUnit> optNhsArran = Optional.of(arranNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSARRAN"))).thenReturn(optNhsArran);
+
+        Optional<OrganisationalUnit> optNhsAyrshire = Optional.of(ayrshireNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSAYRSHIRE"))).thenReturn(optNhsAyrshire);
+
+        Optional<OrganisationalUnit> optNhsAyrshireAndArran = Optional.of(ayrshireAndArranNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSAYRSHIREANDARRAN"))).thenReturn(optNhsAyrshireAndArran);
+
+        Optional<OrganisationalUnit> optNhsLargs = Optional.of(largsNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSLARGS"))).thenReturn(optNhsLargs);*/
 
         // when
         List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("nhsglasgow.gov.uk");
@@ -392,13 +415,13 @@ public class OrganisationalUnitServiceTest {
         // then
         // domain was only added to one agency token, see static set up method
         // org for that at and all orgs children should be returned, i.e. Glasgow and its children maryhill and govan
-        assertThat(actual).hasSize(3);  // domain was only added to one agency token, see static set up method
+        assertThat(actual).extracting("code").containsExactlyInAnyOrder("NHSGLASGOW", "NHSMARYHILL", "NHSGOVAN");
         verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("nhsglasgow.gov.uk");
         verify(organisationalUnitRepository, times(1)).findAll();
     }
 
     @Test
-    public void givenDomainWithMultipleAgencyTokens_whenGetOrganisationsForDomain_thenReturnMatchingOrganisationsForThatAgencyTokenIncludingTheirChildren() {
+    public void givenDomainWithMultipleAgencyTokens_whenGetOrganisationsForDomain_thenReturnMatchingOrganisationsForThatAgencyTokenIncludingTheirChildrenAndCascadeDownOnly() {
         // given
         when(identityService.isDomainWhiteListed(anyString())).thenReturn(false);
         when(organisationalUnitRepository.findAll()).thenReturn(ALL_ORGS);
@@ -467,6 +490,8 @@ public class OrganisationalUnitServiceTest {
         maryhillNHS.setParent(greaterGlasgowNHS);
         govanNHS.setParent(greaterGlasgowNHS);
 
+        greaterGlasgowNHS.setParent(ALL_ORGS.get(0));
+
         ALL_ORGS.add(greaterGlasgowNHS);
 
         // ayrshireandarrans children x 2
@@ -492,7 +517,7 @@ public class OrganisationalUnitServiceTest {
 
         // children of children
         OrganisationalUnit largsNHS = new OrganisationalUnit();
-        largsNHS.setCode("LARGSNHS");
+        largsNHS.setCode("NHSLARGS");
         largsNHS.setParent(ayrshireNHS);
 
         List<OrganisationalUnit> childrenOfAyrshire = new ArrayList<>();
@@ -501,6 +526,28 @@ public class OrganisationalUnitServiceTest {
 
         ALL_ORGS.add(ayrshireAndArranNHS);
 
+        Optional<OrganisationalUnit> optNhsGlasgow = Optional.of(greaterGlasgowNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSGLASGOW"))).thenReturn(optNhsGlasgow);
+
+        Optional<OrganisationalUnit> optNhsMaryhill = Optional.of(maryhillNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSMARYHILL"))).thenReturn(optNhsMaryhill);
+
+        Optional<OrganisationalUnit> optNhsGovan = Optional.of(govanNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSGOVAN"))).thenReturn(optNhsGovan);
+
+        Optional<OrganisationalUnit> optNhsArran = Optional.of(arranNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSARRAN"))).thenReturn(optNhsArran);
+
+        Optional<OrganisationalUnit> optNhsAyrshire = Optional.of(ayrshireNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSAYRSHIRE"))).thenReturn(optNhsAyrshire);
+
+        Optional<OrganisationalUnit> optNhsAyrshireAndArran = Optional.of(ayrshireAndArranNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSAYRSHIREANDARRAN"))).thenReturn(optNhsAyrshireAndArran);
+
+        Optional<OrganisationalUnit> optNhsLargs = Optional.of(largsNHS);
+        when(organisationalUnitRepository.findByCode(eq("NHSLARGS"))).thenReturn(optNhsLargs);
+
+
         // when
         List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("nhsglasgow.gov.uk");
 
@@ -508,7 +555,7 @@ public class OrganisationalUnitServiceTest {
         // domain was only added to one agency token, see static set up method
         // org for that at and all orgs children should be returned, i.e. Glasgow and its children maryhill and govan
         // and AYRSHIRE AND ARRAN, AYRSHIRE, ARRan and largs
-        assertThat(actual).hasSize(7);  // domain was only added to one agency token, see static set up method
+        assertThat(actual).extracting("code").containsExactlyInAnyOrder("NHSGLASGOW", "NHSMARYHILL", "NHSGOVAN", "NHSARRAN", "NHSAYRSHIRE", "NHSAYRSHIREANDARRAN", "NHSLARGS");
         verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("nhsglasgow.gov.uk");
         verify(organisationalUnitRepository, times(1)).findAll();
     }
