@@ -1,0 +1,50 @@
+{
+  "quizResultDto": [
+    {
+      "id": 1,
+      "staffId": "1232",
+      "quizId": 1,
+      "quizName": "Quiz for Analysis",
+      "professionId": 1,
+      "organisationId": 1,
+      "type": "LONG",
+      "result": null,
+      "completedOn": [
+        2020,
+        6,
+        29,
+        11,
+        4,
+        29,
+        438000000
+      ],
+      "correctAnswers": 17,
+      "numberOfQuestions": 20,
+      "score": 85.0,
+      "answers": null
+    },
+    {
+      "id": 2,
+      "staffId": "1232",
+      "quizId": 1,
+      "quizName": "Quiz for Analysis",
+      "professionId": 1,
+      "organisationId": 1,
+      "type": "LONG",
+      "result": null,
+      "completedOn": [
+        2020,
+        6,
+        29,
+        11,
+        4,
+        52,
+        249000000
+      ],
+      "correctAnswers": 16,
+      "numberOfQuestions": 20,
+      "score": 80.0,
+      "answers": null
+    }
+  ]
+}
