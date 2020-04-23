@@ -59,18 +59,6 @@ public class OrganisationalUnitServiceTest {
         for(int i=0; i<10; i++) {
             ALL_ORGS.add(OrganisationalUnitTestUtils.buildOrgUnit("wl", i, "whitelisted-domain"));
         }
-        // ensure all orgs list has matching domains to "mydomain"
-      /*  ALL_ORGS.get(5).setAgencyToken(AgencyTokenTestingUtils.createAgencyToken());
-        AgencyDomain agencyDomain = new AgencyDomain();
-        agencyDomain.setDomain("mydomain");
-        agencyDomain.setId(new Long(1));
-        AgencyDomain anotherAgencyDomain = new AgencyDomain();
-        anotherAgencyDomain.setDomain("mydomain");
-        anotherAgencyDomain.setId(new Long(2));
-        Set<AgencyDomain> unique = new HashSet<>();
-        unique.add(agencyDomain);
-        unique.add(anotherAgencyDomain);
-        ALL_ORGS.get(5).getAgencyToken().setAgencyDomains(unique);*/
     }
 
 
@@ -397,18 +385,6 @@ public class OrganisationalUnitServiceTest {
         Optional<OrganisationalUnit> optNhsGovan = Optional.of(govanNHS);
         when(organisationalUnitRepository.findByCode(eq("NHSGOVAN"))).thenReturn(optNhsGovan);
 
- /*       Optional<OrganisationalUnit> optNhsArran = Optional.of(arranNHS);
-        when(organisationalUnitRepository.findByCode(eq("NHSARRAN"))).thenReturn(optNhsArran);
-
-        Optional<OrganisationalUnit> optNhsAyrshire = Optional.of(ayrshireNHS);
-        when(organisationalUnitRepository.findByCode(eq("NHSAYRSHIRE"))).thenReturn(optNhsAyrshire);
-
-        Optional<OrganisationalUnit> optNhsAyrshireAndArran = Optional.of(ayrshireAndArranNHS);
-        when(organisationalUnitRepository.findByCode(eq("NHSAYRSHIREANDARRAN"))).thenReturn(optNhsAyrshireAndArran);
-
-        Optional<OrganisationalUnit> optNhsLargs = Optional.of(largsNHS);
-        when(organisationalUnitRepository.findByCode(eq("NHSLARGS"))).thenReturn(optNhsLargs);*/
-
         // when
         List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("nhsglasgow.gov.uk");
 
@@ -526,7 +502,6 @@ public class OrganisationalUnitServiceTest {
 
         ALL_ORGS.add(ayrshireAndArranNHS);
 
-        // TODO - BH - THIS IS WHY ITS FAILING
         Optional<OrganisationalUnit> optNhsGlasgow = Optional.of(greaterGlasgowNHS);
         when(organisationalUnitRepository.findByCode(eq("NHSGLASGOW"))).thenReturn(optNhsGlasgow);
 
@@ -547,7 +522,6 @@ public class OrganisationalUnitServiceTest {
 
         Optional<OrganisationalUnit> optNhsLargs = Optional.of(largsNHS);
         when(organisationalUnitRepository.findByCode(eq("NHSLARGS"))).thenReturn(optNhsLargs);
-
 
         // when
         List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("nhsglasgow.gov.uk");
