@@ -53,12 +53,19 @@ oauth:
 
 identity:
   identityAPIUrl: "${oauth.serviceUrl}/api/identities"
+  identityWhiteListUrl: "${oauth.serviceUrl}/domain/isWhitelisted"
 
 govNotify:
   enabled: ${GOV_NOTIFY_ENABLED:false}
   key: ${GOV_NOTIFY_API_KEY:changeme}
   template:
     lineManager: ${GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID:changeme}
+
+#Validation properties
+agencyToken:
+  capacity:
+    max: ${AGENCY_TOKEN_MAX_CAPACITY:1500}
+    min: ${AGENCY_TOKEN_MIN_CAPACITY:1}
 
 ---
 

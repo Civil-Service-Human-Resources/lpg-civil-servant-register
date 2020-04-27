@@ -46,6 +46,9 @@ public class CivilServant implements RegistryEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private CivilServant lineManager;
 
+    @Column
+    private Boolean forceOrgReset;
+
     public CivilServant() {
     }
 
@@ -126,6 +129,14 @@ public class CivilServant implements RegistryEntity {
         this.lineManager = lineManager;
     }
 
+    public Boolean getForceOrgReset() {
+        return forceOrgReset;
+    }
+
+    public void setForceOrgReset(Boolean forceOrgReset) {
+        this.forceOrgReset = forceOrgReset;
+    }
+
     @JsonProperty
     public String getLineManagerName() {
         if (lineManager != null) {
@@ -174,6 +185,7 @@ public class CivilServant implements RegistryEntity {
                 .append("interests", interests)
                 .append("identity", identity)
                 .append("lineManager", lineManager)
+                .append("forceOrgReset", forceOrgReset)
                 .toString();
     }
 
