@@ -189,23 +189,18 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     }
 
     public List<String> getOrganisationalUnitCodesForIds(List<String> organisationIds) {
-        return repository.findAllCodesForIds(organisationIds);
+        return repository.findAllOrganisationCodesForIds(organisationIds);
     }
 
     public List<Long> getOrganisationIdWithChildrenIds(List<String> listOrganisationCodes) {
         List<Long> listOrganisationIds = new ArrayList<>();
-        for (String code : listOrganisationCodes) {
-            getOrganisationWithChildren(code).forEach(x -> listOrganisationIds.add(x.getId()));
-        }
+        listOrganisationCodes.forEach(x -> getOrganisationWithChildren(x).forEach(y -> listOrganisationIds.add(y.getId())));
         return listOrganisationIds;
     }
 
     public void addOrganisationReportingPermission(Long id, List<Long> organisationIds) {
         List<CivilServantOrganisationReportingPermission> list = new ArrayList<>();
-        for (Long orgId : organisationIds) {
-            CivilServantOrganisationReportingPermission entity = new CivilServantOrganisationReportingPermission(id, orgId);
-            list.add(entity);
-        }
+        organisationIds.forEach(x -> list.add(new CivilServantOrganisationReportingPermission(id, x)));
         organisationalReportingPermissionRepository.saveAll(list);
     }
 }

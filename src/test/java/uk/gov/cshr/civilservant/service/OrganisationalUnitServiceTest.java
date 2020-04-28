@@ -153,7 +153,7 @@ public class OrganisationalUnitServiceTest {
         List<String> codes = Arrays.asList("code1", "code2");
         List<String> orgIds = Arrays.asList("1", "2");
 
-        when(organisationalUnitRepository.findAllCodesForIds(orgIds)).thenReturn(codes);
+        when(organisationalUnitRepository.findAllOrganisationCodesForIds(orgIds)).thenReturn(codes);
 
         assertEquals(codes, organisationalUnitService.getOrganisationalUnitCodesForIds(orgIds));
         assertEquals(codes.size(), organisationalUnitService.getOrganisationalUnitCodesForIds(orgIds).size());

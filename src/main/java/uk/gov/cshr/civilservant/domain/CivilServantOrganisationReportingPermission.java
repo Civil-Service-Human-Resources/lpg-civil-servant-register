@@ -1,9 +1,16 @@
 package uk.gov.cshr.civilservant.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 
 @Entity
 @IdClass(CivilServantOrganisationReportingPermissionPK.class)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CivilServantOrganisationReportingPermission {
 
     @Id
@@ -11,12 +18,4 @@ public class CivilServantOrganisationReportingPermission {
 
     @Id
     private Long organisationId;
-
-    public CivilServantOrganisationReportingPermission() {
-    }
-
-    public CivilServantOrganisationReportingPermission(Long civilServantId, Long organisationId) {
-        this.civilServantId = civilServantId;
-        this.organisationId = organisationId;
-    }
 }

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository;
 import uk.gov.cshr.civilservant.domain.*;
 import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
