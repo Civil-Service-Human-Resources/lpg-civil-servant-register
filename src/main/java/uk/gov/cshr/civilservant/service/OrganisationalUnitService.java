@@ -11,7 +11,7 @@ import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.exception.TokenAlreadyExistsException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
-import uk.gov.cshr.civilservant.repository.OrganisationReportingPermissionRepository;
+import uk.gov.cshr.civilservant.repository.OrganisationalReportingPermissionRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class OrganisationalUnitService extends SelfReferencingEntityService<OrganisationalUnit, OrganisationalUnitDto> {
 
     private OrganisationalUnitRepository repository;
-    private OrganisationReportingPermissionRepository organisationReportingPermissionRepository;
+    private OrganisationalReportingPermissionRepository organisationalReportingPermissionRepository;
     private AgencyTokenService agencyTokenService;
     private IdentityService identityService;
 
@@ -36,12 +36,12 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
             OrganisationalUnitDtoFactory organisationalUnitDtoFactory,
             AgencyTokenService agencyTokenService,
             IdentityService identityService,
-            OrganisationReportingPermissionRepository organisationReportingPermissionRepository) {
+            OrganisationalReportingPermissionRepository organisationalReportingPermissionRepository) {
         super(organisationalUnitRepository, organisationalUnitDtoFactory);
         this.repository = organisationalUnitRepository;
         this.agencyTokenService = agencyTokenService;
         this.identityService = identityService;
-        this.organisationReportingPermissionRepository = organisationReportingPermissionRepository;
+        this.organisationalReportingPermissionRepository = organisationalReportingPermissionRepository;
     }
 
     public List<OrganisationalUnit> getOrganisationWithParents(String code) {
@@ -206,6 +206,6 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
             CivilServantOrganisationReportingPermission entity = new CivilServantOrganisationReportingPermission(id, orgId);
             list.add(entity);
         }
-        organisationReportingPermissionRepository.saveAll(list);
+        organisationalReportingPermissionRepository.saveAll(list);
     }
 }

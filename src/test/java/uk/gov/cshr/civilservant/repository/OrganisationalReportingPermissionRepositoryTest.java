@@ -7,19 +7,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.cshr.civilservant.controller.ReportController;
-import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.CivilServantOrganisationReportingPermission;
-import uk.gov.cshr.civilservant.domain.Identity;
-import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertTrue;
 
 @SpringBootTest
@@ -29,7 +22,7 @@ import static org.junit.Assert.assertTrue;
 public class OrganisationalReportingPermissionRepositoryTest {
 
     @Autowired
-    private OrganisationReportingPermissionRepository repository;
+    private OrganisationalReportingPermissionRepository repository;
 
     @Autowired
     private CivilServantRepository civilServantRepository;

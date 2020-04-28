@@ -11,7 +11,7 @@ import java.util.List;
 
 @Repository
 @RepositoryRestResource
-public interface OrganisationReportingPermissionRepository
+public interface OrganisationalReportingPermissionRepository
         extends CrudRepository<CivilServantOrganisationReportingPermission, CivilServantOrganisationReportingPermissionPK> {
 
     @Query("select orp.organisationId from CivilServantOrganisationReportingPermission orp where orp.civilServantId = ?1")
