@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import uk.gov.cshr.civilservant.domain.*;
 import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -91,4 +92,15 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
             "where ou.code = ?1 " +
             "group by c.id ")
     List<CivilServantReportDto> findAllByOrganisationCodeNormalised(String organisationalUnitCode);
+
+    @Query("select new uk.gov.cshr.civilservant.dto.CivilServantReportDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name, group_concat(oaw.name)) " +
+            "from CivilServant c " +
+            "left join OrganisationalUnit ou on ou.id = c.organisationalUnit.id " +
+            "left join Profession p on p.id = c.profession.id " +
+            "left join Identity i on i.id = c.identity.id " +
+            "left join Grade g on g.id = c.grade.id " +
+            "left join c.otherAreasOfWork oaw " +
+            "where ou.id in ?1 " +
+            "group by c.id ")
+    List<CivilServantReportDto> findAllByReportingOrganisationId(List<Long> reportingOrganisationIds);
 }

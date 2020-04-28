@@ -11,7 +11,9 @@ import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.domain.Profession;
+import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -130,5 +132,50 @@ public class CivilServantRepositoryTest {
         assertEquals(2, result.size());
         assertEquals(civilServant1, result.get(0));
         assertEquals(civilServant3, result.get(1));
+    }
+
+    @Test
+    @WithMockUser(authorities = {"INTERNAL", "PROFESSION_MANAGER"})
+    public void shouldFindAllByReportingOrganisationId() {
+        OrganisationalUnit organisationalUnit1 = new OrganisationalUnit();
+        organisationalUnit1.setName("Organisation1");
+        organisationalUnit1.setCode("abc");
+        organisationalUnitRepository.save(organisationalUnit1);
+
+        OrganisationalUnit organisationalUnit2 = new OrganisationalUnit();
+        organisationalUnit2.setName("Organisation2");
+        organisationalUnit2.setCode("bcd");
+        organisationalUnitRepository.save(organisationalUnit2);
+
+        OrganisationalUnit organisationalUnit3 = new OrganisationalUnit();
+        organisationalUnit3.setName("Organisation3");
+        organisationalUnit3.setCode("cde");
+        organisationalUnitRepository.save(organisationalUnit3);
+
+        List<Long> listOrgIds = new ArrayList<>();
+        List<OrganisationalUnit> orgUnits = organisationalUnitRepository.findAll();
+        orgUnits.forEach(x -> listOrgIds.add(x.getId()));
+
+        Identity identity1 = new Identity("1");
+        identityRepository.save(identity1);
+        CivilServant civilServant1 = new CivilServant(identity1);
+        civilServant1.setOrganisationalUnit(organisationalUnit1);
+        civilServantRepository.save(civilServant1);
+
+        Identity identity2 = new Identity("2");
+        identityRepository.save(identity2);
+        CivilServant civilServant2 = new CivilServant(identity2);
+        civilServant2.setOrganisationalUnit(organisationalUnit2);
+        civilServantRepository.save(civilServant2);
+
+        Identity identity3 = new Identity("3");
+        identityRepository.save(identity3);
+        CivilServant civilServant3 = new CivilServant(identity3);
+        civilServant3.setOrganisationalUnit(organisationalUnit3);
+        civilServantRepository.save(civilServant3);
+
+        List<CivilServantReportDto> result = civilServantRepository.findAllByReportingOrganisationId(listOrgIds);
+
+        assertTrue(result.size() > 2);
     }
 }
