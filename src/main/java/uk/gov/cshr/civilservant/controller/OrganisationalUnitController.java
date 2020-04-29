@@ -64,7 +64,7 @@ public class OrganisationalUnitController {
 
         List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain);
         if(organisationalUnits.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok().build();
         }
 
         List<OrganisationalUnitDto> dtos = organisationalUnits.stream()
