@@ -62,7 +62,7 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
             Set<OrganisationalUnit> found = findOrganisationsForDomainForAgencyTokenUser(domain, agencyTokens);
             return found.stream().collect(Collectors.toList());
         } else {
-            log.warn("user is not a whitelisted user or an agency token user", none);
+            log.warn("user is not a whitelisted user or an agency token user");
             return Collections.emptyList();
         }
     }
