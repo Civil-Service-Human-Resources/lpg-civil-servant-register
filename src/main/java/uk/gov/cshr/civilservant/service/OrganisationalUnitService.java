@@ -3,7 +3,6 @@ package uk.gov.cshr.civilservant.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.cshr.civilservant.domain.AgencyDomain;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
@@ -63,9 +62,8 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
             Set<OrganisationalUnit> found = findOrganisationsForDomainForAgencyTokenUser(domain, agencyTokens);
             return found.stream().collect(Collectors.toList());
         } else {
-            NoOrganisationsFoundException none = new NoOrganisationsFoundException(domain);
             log.warn("user is not a whitelisted user or an agency token user", none);
-            throw none;
+            return Collections.emptyList();
         }
     }
 
