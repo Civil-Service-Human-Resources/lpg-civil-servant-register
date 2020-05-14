@@ -102,4 +102,10 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
             "where ou.id in ?1 " +
             "group by c.id ")
     List<CivilServantReportDto> findAllByReportingOrganisationId(List<Long> reportingOrganisationIds);
+
+    @Query("select distinct (i.uid) " +
+            "from CivilServant c " +
+            "join CivilServantOrganisationReportingPermission rp on rp.civilServantId = c.id " +
+            "join Identity i on i.id = c.identity.id")
+    List<String> findCivilServantUID();
 }

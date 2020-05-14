@@ -126,10 +126,6 @@ public class OrganisationalUnitController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity addOrganisationReportingPermission(@PathVariable String uid, @Valid @RequestBody ArrayList<String> organisationIds) {
         Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(uid);
-        //The below may not be required or if civilservant not present then return null.
-        if (!civilServant.isPresent()) {
-            return ResponseEntity.ok("Civil servant for this UID not found in database");
-        }
         List<String> listOrganisationCodes = organisationalUnitService.getOrganisationalUnitCodesForIds(organisationIds);
         List<Long> organisationIdWithChildrenIds = organisationalUnitService.getOrganisationIdWithChildrenIds(listOrganisationCodes);
 

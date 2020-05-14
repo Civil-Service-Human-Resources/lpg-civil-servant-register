@@ -31,6 +31,7 @@ import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -239,5 +240,12 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
         resource.add(ControllerLinkBuilder.linkTo(CivilServantController.class).withRel("civilServants"));
         return resource;
+    }
+
+    @GetMapping("/civilservantwithreportingpermission")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity getCivilServantUIDsWithReportingPermission() {
+        List<String> listUid = civilServantRepository.findCivilServantUID();
+        return ResponseEntity.ok(listUid);
     }
 }
