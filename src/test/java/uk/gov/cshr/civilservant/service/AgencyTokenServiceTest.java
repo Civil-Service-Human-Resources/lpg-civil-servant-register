@@ -2,8 +2,6 @@ package uk.gov.cshr.civilservant.service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -12,21 +10,22 @@ import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.repository.AgencyTokenRepository;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AgencyTokenServiceTest {
-
-    List<String> codes = Arrays.asList("code1", "code2", "123456");
-    @Captor
-    private ArgumentCaptor<AgencyToken> agencyTokenCaptor;
     @Mock
     private AgencyTokenRepository agencyTokenRepository;
+
     @Mock
     private OrganisationalUnitRepository organisationalUnitRepository;
+
     @InjectMocks
     private AgencyTokenService agencyTokenService;
 
@@ -53,7 +52,9 @@ public class AgencyTokenServiceTest {
     public void getAgencyTokenByDomainAndToken() {
         String token = "token123";
         String domain = "example.com";
+
         AgencyToken agencyToken = new AgencyToken();
+
         Optional<AgencyToken> optionalAgencyToken = Optional.of(agencyToken);
 
         when(agencyTokenRepository.findByDomainAndToken(domain, token)).thenReturn(optionalAgencyToken);

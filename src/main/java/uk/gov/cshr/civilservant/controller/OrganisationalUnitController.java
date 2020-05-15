@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
-import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
+import uk.gov.cshr.civilservant.dto.AgencyTokenDto;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.AgencyTokenFactory;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
@@ -108,8 +108,8 @@ public class OrganisationalUnitController {
 
     @PostMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyTokenDTO agencyTokenDTO, UriComponentsBuilder builder) {
-        AgencyToken agencyToken = agencyTokenFactory.buildAgencyTokenFromAgencyTokenDTO(agencyTokenDTO, true);
+    public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyTokenDto agencyTokenDto, UriComponentsBuilder builder) {
+        AgencyToken agencyToken = agencyTokenFactory.buildAgencyTokenFromAgencyTokenDto(agencyTokenDto);
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.created(builder.path("/organisationalUnits/{organisationalUnitId}/agencyToken").build(organisationalUnit.getId())).build();
@@ -126,8 +126,8 @@ public class OrganisationalUnitController {
 
     @PatchMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyTokenDTO agencyTokenDTO) {
-        AgencyToken agencyToken = agencyTokenFactory.buildAgencyTokenFromAgencyTokenDTO(agencyTokenDTO, false);
+    public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyTokenDto agencyTokenDto) {
+        AgencyToken agencyToken = agencyTokenFactory.buildAgencyTokenFromAgencyTokenDto(agencyTokenDto);
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.updateAgencyToken(organisationalUnit, agencyToken);
             return ResponseEntity.ok(agencyToken);
