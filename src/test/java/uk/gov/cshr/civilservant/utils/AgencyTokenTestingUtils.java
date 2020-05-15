@@ -10,6 +10,8 @@ import java.util.Set;
 
 public class AgencyTokenTestingUtils {
 
+    private static final String UID = "UID";
+
     private AgencyTokenTestingUtils() {
     }
 
@@ -18,7 +20,7 @@ public class AgencyTokenTestingUtils {
         at.setId(new Long(i));
         at.setToken("thisisatoken"+i);
         at.setCapacity(100);
-        at.setCapacityUsed(0);
+        at.setUid(UID);
 
         Set<AgencyDomain> domains = new HashSet<AgencyDomain>();
         AgencyDomain domain = new AgencyDomain();

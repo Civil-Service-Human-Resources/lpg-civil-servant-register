@@ -7,17 +7,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
-import uk.gov.cshr.civilservant.dto.UpdateSpacesForAgencyTokenRequestDTO;
-import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
-import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
-import uk.gov.cshr.civilservant.utils.JsonUtils;
 import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
 import java.util.ArrayList;
@@ -25,7 +20,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -37,13 +31,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(username = "user")
 public class AgencyTokenControllerTest {
 
+    List<String> codes = Arrays.asList("code1", "code2", "code3");
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
     private AgencyTokenService agencyTokenService;
-
-    List<String> codes = Arrays.asList("code1", "code2", "code3");
 
     @Before
     public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
@@ -138,92 +130,6 @@ public class AgencyTokenControllerTest {
     }
 
     @Test
-    public void shouldReturnOkIfValidAgencyTokenWithSpacesAvailable() throws Exception {
-        String domain = "example.com";
-        String token = "token123";
-        String code = "code";
-
-        UpdateSpacesForAgencyTokenRequestDTO dto = new UpdateSpacesForAgencyTokenRequestDTO();
-        dto.setDomain(domain);
-        dto.setToken(token);
-        dto.setCode(code);
-
-        AgencyToken agencyToken = new AgencyToken();
-        when(agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, false)).thenReturn(Optional.of(agencyToken));
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
-                .content(JsonUtils.asJsonString(dto))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
-    public void shouldReturnNotFoundIfAgencyTokenNotFound() throws Exception {
-        String domain = "example.com";
-        String token = "token123";
-        String code = "code";
-
-        UpdateSpacesForAgencyTokenRequestDTO dto = new UpdateSpacesForAgencyTokenRequestDTO();
-        dto.setDomain(domain);
-        dto.setToken(token);
-        dto.setCode(code);
-
-        when(agencyTokenService.updateAgencyTokenSpacesAvailable(anyString(), anyString(), anyList(), anyBoolean())).thenThrow(new TokenDoesNotExistException(token));
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
-                .content(JsonUtils.asJsonString(dto))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void shouldReturnConflictIfAgencyTokenHasNoSpacesAvailable() throws Exception {
-        String domain = "example.com";
-        String token = "token123";
-        String code = "code";
-
-        UpdateSpacesForAgencyTokenRequestDTO dto = new UpdateSpacesForAgencyTokenRequestDTO();
-        dto.setDomain(domain);
-        dto.setToken(token);
-        dto.setCode(code);
-
-        when(agencyTokenService.updateAgencyTokenSpacesAvailable(anyString(), anyString(), anyList(), anyBoolean())).thenThrow(new NotEnoughSpaceAvailableException(token));
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
-                .content(JsonUtils.asJsonString(dto))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isConflict());
-    }
-
-    @Test
-    public void shouldReturnOkIfUserIsRemovedFromAValidAgencyToken() throws Exception {
-        String domain = "example.com";
-        String token = "token123";
-        String code = "code";
-
-        UpdateSpacesForAgencyTokenRequestDTO dto = new UpdateSpacesForAgencyTokenRequestDTO();
-        dto.setDomain(domain);
-        dto.setToken(token);
-        dto.setCode(code);
-
-        AgencyToken agencyToken = new AgencyToken();
-        when(agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, false)).thenReturn(Optional.of(agencyToken));
-
-        mockMvc.perform(MockMvcRequestBuilders.put("/agencyTokens")
-                .content(JsonUtils.asJsonString(dto))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isNoContent());
-    }
-
-    @Test
     public void shouldReturnOkIfRequestingAgencyTokensWithDomainOrgParams() throws Exception {
         AgencyToken agencyToken = new AgencyToken();
         String domain = "example.com";
@@ -251,5 +157,4 @@ public class AgencyTokenControllerTest {
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
-
 }

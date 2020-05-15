@@ -17,11 +17,11 @@ public class AgencyToken implements RegistryEntity {
     @Column(nullable = false, length = 20, unique = true)
     private String token;
 
-    @Column(nullable = false)
-    private int capacity;
+    @Column(unique = true, length = 36)
+    private String uid;
 
     @Column(nullable = false)
-    private int capacityUsed;
+    private int capacity;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.ALL})
     private Set<AgencyDomain> agencyDomains;
@@ -29,10 +29,10 @@ public class AgencyToken implements RegistryEntity {
     public AgencyToken() {
     }
 
-    public AgencyToken(long id, String token, int capacity, int capacityUsed) {
+    public AgencyToken(long id, String token, int capacity, String uid) {
         this.id = id;
         this.token = token;
         this.capacity = capacity;
-        this.capacityUsed = capacityUsed;
+        this.uid = uid;
     }
 }

@@ -57,33 +57,4 @@ public class AgencyTokenController {
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
-
-    @PutMapping
-    public ResponseEntity updateSpaceAvailable(@RequestBody UpdateSpacesForAgencyTokenRequestDTO updateSpacesForAgencyTokenRequestDTO) {
-        try {
-            log.info("Updating agency token with parameters domain=" + updateSpacesForAgencyTokenRequestDTO.getDomain() +
-                    " token=" + updateSpacesForAgencyTokenRequestDTO.getToken() +
-                    " code=" + updateSpacesForAgencyTokenRequestDTO.getCode() +
-                    " isRemoveUser=" + updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
-
-            List<String> organisationalUnitCodeList = organisationalUnitService.getOrganisationWithParents(updateSpacesForAgencyTokenRequestDTO.getCode())
-                    .stream()
-                    .map(OrganisationalUnit::getCode)
-                    .collect(Collectors.toList());
-
-            agencyTokenService.updateAgencyTokenSpacesAvailable(updateSpacesForAgencyTokenRequestDTO.getDomain(), updateSpacesForAgencyTokenRequestDTO.getToken(), organisationalUnitCodeList, updateSpacesForAgencyTokenRequestDTO.isRemoveUser());
-        } catch (TokenDoesNotExistException e) {
-            log.warn("Token not found", e);
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        } catch (NotEnoughSpaceAvailableException e) {
-            log.warn("Not enough space available for token", e);
-            return new ResponseEntity<>(HttpStatus.CONFLICT);
-        } catch (Exception e) {
-            log.error("An error occurred", e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
 }

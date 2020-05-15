@@ -11,15 +11,8 @@ import java.util.stream.Collectors;
 @Component
 public class AgencyTokenFactory {
 
-    /* assumes any validation has already happened.*/
     public AgencyToken buildAgencyTokenFromAgencyTokenDTO(AgencyTokenDTO agencyTokenDTO, boolean isCreateNewToken) {
         AgencyToken agencytoken = new AgencyToken();
-
-        if (isCreateNewToken) {
-            agencytoken.setCapacityUsed(0);
-        } else {
-            agencytoken.setCapacityUsed(agencyTokenDTO.getCapacityUsed());
-        }
 
         agencytoken.setToken(agencyTokenDTO.getToken());
         agencytoken.setCapacity(agencyTokenDTO.getCapacity());
@@ -28,11 +21,9 @@ public class AgencyTokenFactory {
         return agencytoken;
     }
 
-    /* assumes any validation has already happened.*/
     private AgencyDomain createAgencyDomain(String domain) {
         AgencyDomain agencyDomain = new AgencyDomain();
         agencyDomain.setDomain(domain);
         return agencyDomain;
     }
-
 }
