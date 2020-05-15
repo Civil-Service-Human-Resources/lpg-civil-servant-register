@@ -21,13 +21,28 @@ import java.util.Optional;
 public interface CivilServantRepository extends JpaRepository<CivilServant, Long> {
 
     @RestResource(exported = false)
-    @Query("select c from CivilServant c where c.identity.uid = ?#{principal}")
+    @Query("select c from CivilServant c " +
+            "LEFT JOIN FETCH c.organisationalUnit " +
+            "LEFT JOIN FETCH c.profession " +
+            "LEFT JOIN FETCH c.lineManager " +
+            "LEFT JOIN FETCH c.grade " +
+            "LEFT JOIN FETCH c.otherAreasOfWork " +
+            "LEFT JOIN FETCH c.interests " +
+            "WHERE c.identity.uid = ?#{principal}")
     Optional<CivilServant> findByPrincipal();
 
     @PreAuthorize("#civilServant.identity.uid eq principal || hasAuthority('INTERNAL')")
     CivilServant save(@Param("civilServant") CivilServant civilServant);
 
     @PostAuthorize("returnObject.isPresent() && returnObject.get().identity.uid eq principal")
+    @Query("select c from CivilServant c " +
+            "LEFT JOIN FETCH c.organisationalUnit " +
+            "LEFT JOIN FETCH c.profession " +
+            "LEFT JOIN FETCH c.lineManager " +
+            "LEFT JOIN FETCH c.grade " +
+            "LEFT JOIN FETCH c.otherAreasOfWork " +
+            "LEFT JOIN FETCH c.interests " +
+            "WHERE c.id = ?1")
     Optional<CivilServant> findById(@Param("id") Long id);
 
     @RestResource(path = "findByIdentity", rel = "findByIdentity")

@@ -5,6 +5,7 @@ spring:
   jackson:
     serialization:
       write_dates_as_timestamps: false
+      fail-on-empty-beans: false
     default-property-inclusion: non_null
   resources:
     add-mappings: false
@@ -30,6 +31,7 @@ spring:
 
 server:
   port: 9002
+  requestLogginFilterEnabled: ${REQUEST_LOGGING_FILTER_ENABLED:false}
 
 logging:
   pattern:
