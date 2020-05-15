@@ -1,97 +1,88 @@
 package uk.gov.cshr.civilservant.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
-import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
-import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
+import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
+import uk.gov.cshr.civilservant.dto.factory.AgencyTokenResponseDtoFactory;
+import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
 import uk.gov.cshr.civilservant.repository.AgencyTokenRepository;
+import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
+import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
 public class AgencyTokenService {
+
     private AgencyTokenRepository agencyTokenRepository;
+    private OrganisationalUnitRepository organisationalUnitRepository;
+    private AgencyTokenResponseDtoFactory agencyTokenResponseDtoFactory;
+    private IdentityService identityService;
 
-    public AgencyTokenService(AgencyTokenRepository agencyTokenRepository) {
+    public AgencyTokenService(AgencyTokenRepository agencyTokenRepository,
+                              OrganisationalUnitRepository organisationalUnitRepository,
+                              AgencyTokenResponseDtoFactory agencyTokenResponseDtoFactory,
+                              IdentityService identityService) {
         this.agencyTokenRepository = agencyTokenRepository;
-    }
-
-    public Iterable<AgencyToken> getAllAgencyTokens() {
-        return agencyTokenRepository.findAll();
+        this.organisationalUnitRepository = organisationalUnitRepository;
+        this.agencyTokenResponseDtoFactory = agencyTokenResponseDtoFactory;
+        this.identityService = identityService;
     }
 
     public Iterable<AgencyToken> getAllAgencyTokensByDomain(String domain) {
         return agencyTokenRepository.findAllByDomain(domain);
     }
 
-    public Optional<AgencyToken> getAgencyTokenByDomainAndToken(String domain, String token) {
-        return agencyTokenRepository.findByDomainAndToken(domain, token);
-    }
+    public Optional<AgencyToken> getAgencyTokenByDomainTokenCodeAndOrg(String domain, String token, String code) {
 
-    public Optional<AgencyToken> getAgencyTokenByDomainTokenAndOrganisation(String domain, String token, String code) {
-        return agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code);
-    }
+        Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainAndToken(domain, token);
 
-    public Optional<AgencyToken> getAgencyTokenByDomainAndOrganisation(String domain, String code) {
-        return agencyTokenRepository.findByDomainAndCode(domain, code);
-    }
+        if (agencyToken.isPresent()) {
+            Optional<OrganisationalUnit> tokenOwner = organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken.get());
 
-    @Transactional
-    public Optional<AgencyToken> updateAgencyTokenSpacesAvailable(String domain, String token, List<String> codes, boolean isRemoveUser) {
-        for (String code: codes)
-        {
-            Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code);
-            if (agencyToken.isPresent()) {
-                // if it exists - do update
-                updateSpacesAvailable(agencyToken.get(), isRemoveUser);
-                return agencyToken;
+            if (tokenOwner.isPresent()) {
+                if (organisationContainsCode(tokenOwner.get(), code)) {
+                    return agencyToken;
+                }
             }
         }
 
-        throw new TokenDoesNotExistException(domain);
+        return Optional.empty();
+    }
+
+    private boolean organisationContainsCode(OrganisationalUnit organisationalUnit, String code) {
+        if (organisationalUnit.getCode().equals(code)) {
+            return true;
+        } else if (organisationalUnit.hasChildren()) {
+            for (OrganisationalUnit childUnit : organisationalUnit.getChildren()) {
+                return organisationContainsCode(childUnit, code);
+            }
+        } else {
+            return false;
+        }
+        return false;
+    }
+
+    public Optional<AgencyToken> getAgencyTokenByDomainAndToken(String domain, String token) {
+        return agencyTokenRepository.findByDomainAndToken(domain, token);
     }
 
     public void deleteAgencyToken(AgencyToken agencyToken) {
         agencyTokenRepository.delete(agencyToken);
     }
 
-    private AgencyToken updateSpacesAvailable(AgencyToken agencyToken, boolean isRemoveUser) {
-        if (isRemoveUser) {
-            return removeUserFromAgencyTokenUpdateSpacesAvailable(agencyToken);
-        } else {
-            return addUserToAgencyTokenUpdateSpacesAvailable(agencyToken);
-        }
-
+    public boolean isDomainInAgency(String domain) {
+        return agencyTokenRepository.existsByDomain(domain);
     }
 
-    private AgencyToken removeUserFromAgencyTokenUpdateSpacesAvailable(AgencyToken agencyToken) {
-        // check capacity used doesn't go less than zero
-        // unlikely scenario but could happen theoretically
-        if((agencyToken.getCapacityUsed() - 1) < 0){
-            throw new NotEnoughSpaceAvailableException(agencyToken.getToken());
-        }
-
-        // update
-        int newCapacityUsed = agencyToken.getCapacityUsed() - 1;
-        agencyToken.setCapacityUsed(newCapacityUsed);
-        return agencyTokenRepository.save(agencyToken);
+    public Optional<AgencyToken> getAgencyTokenByUid(String uid) {
+        return agencyTokenRepository.findByUid(uid);
     }
 
-    private AgencyToken addUserToAgencyTokenUpdateSpacesAvailable(AgencyToken agencyToken) {
-        // check existing quota
-        int existing = agencyToken.getCapacityUsed();
-
-        // check if enough
-        if (existing + 1 > agencyToken.getCapacity()) {
-            throw new NotEnoughSpaceAvailableException(agencyToken.getToken());
-        }
-
-        // update
-        int newCapacityUsed = agencyToken.getCapacityUsed() + 1;
-        agencyToken.setCapacityUsed(newCapacityUsed);
-        return agencyTokenRepository.save(agencyToken);
+    public AgencyTokenResponseDto getAgencyTokenResponseDto(AgencyToken agencyToken) throws CSRSApplicationException {
+        int capacityUsed = identityService.getSpacesUsedForAgencyToken(agencyToken.getUid());
+        return agencyTokenResponseDtoFactory.buildDto(agencyToken, capacityUsed);
     }
 
 }

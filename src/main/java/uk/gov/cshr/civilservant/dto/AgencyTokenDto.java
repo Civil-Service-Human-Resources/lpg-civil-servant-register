@@ -7,12 +7,11 @@ import uk.gov.cshr.civilservant.validation.ValidCapacity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.Set;
 
 @NoArgsConstructor
 @Data
-public class AgencyTokenDTO {
+public class AgencyTokenDto {
 
     @NotEmpty(message = "token cannot be empty")
     @NotBlank(message = "token cannot be blank")
@@ -22,8 +21,7 @@ public class AgencyTokenDTO {
     @ValidCapacity
     private int capacity;
 
-    @PositiveOrZero
-    private int capacityUsed;
+    private String uid;
 
     @NotEmpty
     private Set<AgencyDomainDTO> agencyDomains;

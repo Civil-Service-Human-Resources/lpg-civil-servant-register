@@ -2,50 +2,34 @@ package uk.gov.cshr.civilservant.service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
-import uk.gov.cshr.civilservant.exception.NotEnoughSpaceAvailableException;
-import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
+import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.repository.AgencyTokenRepository;
+import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AgencyTokenServiceTest {
-
-    @Captor
-    private ArgumentCaptor<AgencyToken> agencyTokenCaptor;
+    private static final String EXAMPLE_DOMAIN = "example.com";
 
     @Mock
     private AgencyTokenRepository agencyTokenRepository;
 
+    @Mock
+    private OrganisationalUnitRepository organisationalUnitRepository;
+
     @InjectMocks
     private AgencyTokenService agencyTokenService;
-
-    List<String> codes = Arrays.asList("code1", "code2", "123456");
-
-    @Test
-    public void getAllAgencyTokens() {
-        List<AgencyToken> agencyTokens = new ArrayList<>();
-
-        when(agencyTokenRepository.findAll()).thenReturn(agencyTokens);
-
-        assertEquals(agencyTokens, agencyTokenService.getAllAgencyTokens());
-    }
 
     @Test
     public void getAllAgencyTokensByDomain() {
@@ -61,7 +45,9 @@ public class AgencyTokenServiceTest {
     public void getAgencyTokenByDomainAndToken() {
         String token = "token123";
         String domain = "example.com";
+
         AgencyToken agencyToken = new AgencyToken();
+
         Optional<AgencyToken> optionalAgencyToken = Optional.of(agencyToken);
 
         when(agencyTokenRepository.findByDomainAndToken(domain, token)).thenReturn(optionalAgencyToken);
@@ -70,199 +56,109 @@ public class AgencyTokenServiceTest {
     }
 
     @Test
-    public void givenAValidAgencyTokenWithSpaceAvailable_whenIUpdateAgencyTokenSpacesAvailable_thenReturnsSuccessfully() {
-        String token = "token123";
-        String domain = "example.com";
-        String code = "123456";
-        List<String> codes = Arrays.asList("code1", "code2", "123456");
+    public void givenCodeIsOwnerOfTokenAndDomain_getAgencyTokenByDomainTokenAndOrganisation_returnAgencyToken() {
+        String domain = "test.domain";
+        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, "uid");
+        OrganisationalUnit organisationalUnit = new OrganisationalUnit("org-name", "org-code", "org-abbrv");
 
-        AgencyToken agencyToken = new AgencyToken();
-        agencyToken.setToken("thisisatoken");
+        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
+        when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(organisationalUnit));
 
-        int capacity = 100;
-        int capacityUsed = 50;
-        agencyToken.setCapacity(capacity);
-        agencyToken.setCapacityUsed(capacityUsed);
-        Optional<AgencyToken> optionalAgencyToken = Optional.of(agencyToken);
+        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), organisationalUnit.getCode());
 
-        int expectedNewCapacityUsed = capacityUsed + 1;
-
-        // given
-        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
-        when(agencyTokenRepository.save(any(AgencyToken.class))).thenReturn(new AgencyToken());
-
-        // when
-        agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, false);
-
-        // then
-        verify(agencyTokenRepository, times(1)).save(agencyTokenCaptor.capture());
-
-        AgencyToken actualAgencyTokenSavedToDatabase = agencyTokenCaptor.getValue();
-        assertThat(actualAgencyTokenSavedToDatabase.getCapacityUsed(), equalTo(expectedNewCapacityUsed));
-        assertThat(actualAgencyTokenSavedToDatabase.getCapacity(), equalTo(capacity));
-        assertThat(actualAgencyTokenSavedToDatabase.getToken(), equalTo("thisisatoken"));
+        assertTrue(returnedToken.isPresent());
+        assertEquals(agencyToken, returnedToken.get());
     }
 
     @Test
-    public void givenAValidAgencyAndIsARemoveUser_whenIUpdateAgencyTokenSpacesAvailable_thenReturnsSuccessfully() {
-        String token = "token123";
-        String domain = "example.com";
-        String code = "123456";
-        List<String> codes = Arrays.asList("code1", "123456", "code3");
+    public void givenCodeHasChildOwnerOfTokenAndDomain_getAgencyTokenByDomainTokenAndOrganisation_returnAgencyToken() {
+        String domain = "test.domain";
+        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, "uid");
+        OrganisationalUnit parentOrganisationalUnit = new OrganisationalUnit("parent-name", "parent-code", "parent-abbrv");
+        OrganisationalUnit childOrganisationalUnit = new OrganisationalUnit("child-name", "child-code", "child-abbrv");
+        parentOrganisationalUnit.setChildren(Collections.singletonList(childOrganisationalUnit));
 
-        AgencyToken agencyToken = new AgencyToken();
-        agencyToken.setToken("thisisatoken");
+        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
+        when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(parentOrganisationalUnit));
 
-        int capacity = 100;
-        int capacityUsed = 50;
-        agencyToken.setCapacity(capacity);
-        agencyToken.setCapacityUsed(capacityUsed);
-        Optional<AgencyToken> optionalAgencyToken = Optional.of(agencyToken);
+        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), childOrganisationalUnit.getCode());
 
-        // should free up capacity by 1
-        int expectedNewCapacityUsed = capacityUsed - 1;
-
-        // given
-        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
-        when(agencyTokenRepository.save(any(AgencyToken.class))).thenReturn(new AgencyToken());
-
-        // when
-        agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, true);
-
-        // then
-        verify(agencyTokenRepository, times(1)).save(agencyTokenCaptor.capture());
-
-        AgencyToken actualAgencyTokenSavedToDatabase = agencyTokenCaptor.getValue();
-        assertThat(actualAgencyTokenSavedToDatabase.getCapacityUsed(), equalTo(expectedNewCapacityUsed));
-        assertThat(actualAgencyTokenSavedToDatabase.getCapacity(), equalTo(capacity));
-        assertThat(actualAgencyTokenSavedToDatabase.getToken(), equalTo("thisisatoken"));
+        assertTrue(returnedToken.isPresent());
+        assertEquals(agencyToken, returnedToken.get());
     }
 
     @Test
-    public void givenANotInExistanceAgencyToken_whenIUpdateAgencyTokenSpacesAvailable_thenTokenDoesNotExistExceptionShouldBeThrown() {
-        String token = "token123";
-        String domain = "example.com";
-        String code = "123456";
-        List<String> codes = Arrays.asList("code1", "code2", "123456");
+    public void givenCodeHasGrandchildOwnerOfTokenAndDomain_getAgencyTokenByDomainTokenAndOrganisation_returnAgencyToken() {
+        String domain = "test.domain";
+        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, "uid");
+        OrganisationalUnit parentOrganisationalUnit = new OrganisationalUnit("parent-name", "parent-code", "parent-abbrv");
+        OrganisationalUnit childOrganisationalUnit = new OrganisationalUnit("child-name", "child-code", "child-abbrv");
+        OrganisationalUnit grandchildOrganisationalUnit = new OrganisationalUnit("grandchild-name", "grandchild-code", "grandchild-abbrv");
 
-        // given
-        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenThrow(new TokenDoesNotExistException(domain));
+        parentOrganisationalUnit.setChildren(Collections.singletonList(childOrganisationalUnit));
+        childOrganisationalUnit.setChildren(Collections.singletonList(grandchildOrganisationalUnit));
 
-        // when
-        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, false))
-                .isInstanceOf(TokenDoesNotExistException.class);
+        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
+        when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(parentOrganisationalUnit));
 
-        // then
-        verify(agencyTokenRepository, never()).save(any(AgencyToken.class));
+        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), grandchildOrganisationalUnit.getCode());
+
+        assertTrue(returnedToken.isPresent());
+        assertEquals(agencyToken, returnedToken.get());
     }
 
     @Test
-    public void givenAValidAgencyTokenWithNoSpacesAvailable_whenIUpdateAgencyTokenSpacesAvailable_thenNotEnoughSpaceAvailableExceptionShouldBeThrown() {
-        String token = "token123";
-        String domain = "example.com";
-        String code = "123456";
-        List<String> codes = Arrays.asList("code1", "123456", "code3");
+    public void givenTokenDoesntExist_getAgencyTokenByDomainTokenAndOrganisation_returnEmptyOptional() {
+        String domain = "test.domain";
+        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, "uid");
+        OrganisationalUnit organisationalUnit = new OrganisationalUnit("org-name", "org-code", "org-abbrv");
 
-        AgencyToken agencyToken = new AgencyToken();
-        agencyToken.setToken("thisisatoken");
+        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.empty());
 
-        int capacity = 100;
-        int capacityUsed = 100;
-        agencyToken.setCapacity(capacity);
-        agencyToken.setCapacityUsed(capacityUsed);
-        Optional<AgencyToken> optionalAgencyToken = Optional.of(agencyToken);
+        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), organisationalUnit.getCode());
 
-        // given
-        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
-
-        // when
-        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, false))
-                .isInstanceOf(NotEnoughSpaceAvailableException.class);
-
-        // then
-        verify(agencyTokenRepository, never()).save(any(AgencyToken.class));
+        assertFalse(returnedToken.isPresent());
     }
 
     @Test
-    public void givenADatabaseError_whenIUpdateAgencyTokenSpacesAvailable_thenExceptionShouldBeThrown() {
-        String token = "token123";
-        String domain = "example.com";
-        String code = "123456";
-        List<String> codes = Arrays.asList("code1", "code2", "123456");
+    public void givenCodeIsNotOwnerOfTokenAndDomain_getAgencyTokenByDomainTokenAndOrganisation_returnEmptyOptional() {
+        String domain = "test.domain";
+        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, "uid");
+        OrganisationalUnit organisationalUnit = new OrganisationalUnit("org-name", "org-code", "org-abbrv");
 
+        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
+        when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(organisationalUnit));
 
-        // given
-        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenThrow(new RuntimeException());
+        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), "bad-code");
 
-        // when
-        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, false))
-                .isInstanceOf(Exception.class);
-
-        // then
-        verify(agencyTokenRepository, never()).save(any(AgencyToken.class));
+        assertFalse(returnedToken.isPresent());
     }
 
     @Test
-    public void givenAValidAgencyTokenWithOnlyOneSpaceAvailableAndIsRemoveAUser_whenIUpdateAgencyTokenSpacesAvailable_thenReturnsSuccessfully() {
-        String token = "token123";
-        String domain = "example.com";
-        String code = "123456";
-        List<String> codes = Arrays.asList("123456", "code2", "code3");
+    public void givenCodeIsNotOwnerNorHasChildOwnerOfTokenAndDomain_getAgencyTokenByDomainTokenAndOrganisation_returnEmptyOptional() {
+        String domain = "test.domain";
+        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, "uid");
+        OrganisationalUnit parentOrganisationalUnit = new OrganisationalUnit("parent-name", "parent-code", "parent-abbrv");
+        OrganisationalUnit childOrganisationalUnit = new OrganisationalUnit("child-name", "child-code", "child-abbrv");
+        parentOrganisationalUnit.setChildren(Collections.singletonList(childOrganisationalUnit));
 
+        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
+        when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(parentOrganisationalUnit));
 
-        AgencyToken agencyToken = new AgencyToken();
-        agencyToken.setToken("thisisatoken");
+        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), "bad-code");
 
-        int capacity = 100;
-        int capacityUsed = 1;
-        agencyToken.setCapacity(capacity);
-        agencyToken.setCapacityUsed(capacityUsed);
-        Optional<AgencyToken> optionalAgencyToken = Optional.of(agencyToken);
-
-        // should free up capacity by 1
-        int expectedNewCapacityUsed = 0;
-
-        // given
-        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
-        when(agencyTokenRepository.save(any(AgencyToken.class))).thenReturn(new AgencyToken());
-
-        // when
-        agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, true);
-
-        // then
-        verify(agencyTokenRepository, times(1)).save(agencyTokenCaptor.capture());
-
-        AgencyToken actualAgencyTokenSavedToDatabase = agencyTokenCaptor.getValue();
-        assertThat(actualAgencyTokenSavedToDatabase.getCapacityUsed(), equalTo(expectedNewCapacityUsed));
-        assertThat(actualAgencyTokenSavedToDatabase.getCapacity(), equalTo(capacity));
-        assertThat(actualAgencyTokenSavedToDatabase.getToken(), equalTo("thisisatoken"));
+        assertFalse(returnedToken.isPresent());
     }
 
     @Test
-    public void givenAValidAgencyTokenWithZeroSpaceAvailableAndIsRemoveAUser_whenIUpdateAgencyTokenSpacesAvailable_thenExceptionShouldBeThrown() {
-        String token = "token123";
-        String domain = "example.com";
-        String code = "123456";
-        List<String> codes = Arrays.asList("123456", "code2", "code3");
-
-        AgencyToken agencyToken = new AgencyToken();
-        agencyToken.setToken("thisisatoken");
-
-        int capacity = 100;
-        int capacityUsed = 0;
-        agencyToken.setCapacity(capacity);
-        agencyToken.setCapacityUsed(capacityUsed);
-        Optional<AgencyToken> optionalAgencyToken = Optional.of(agencyToken);
-
-        // given
-        when(agencyTokenRepository.findByDomainTokenAndCodeIncludingAgencyDomains(domain, token, code)).thenReturn(optionalAgencyToken);
-
-        // when
-        assertThatThrownBy(() -> agencyTokenService.updateAgencyTokenSpacesAvailable(domain, token, codes, true))
-                .isInstanceOf(NotEnoughSpaceAvailableException.class);
-
-        // then
-        verify(agencyTokenRepository, never()).save(any(AgencyToken.class));
+    public void shouldReturnTrueIfDomainInAgency() {
+        when(agencyTokenRepository.existsByDomain(EXAMPLE_DOMAIN)).thenReturn(true);
+        assertTrue(agencyTokenService.isDomainInAgency(EXAMPLE_DOMAIN));
     }
 
+    @Test
+    public void shouldReturnFalseIfDomainNotInAgency() {
+        when(agencyTokenRepository.existsByDomain(EXAMPLE_DOMAIN)).thenReturn(false);
+        assertFalse(agencyTokenService.isDomainInAgency(EXAMPLE_DOMAIN));
+    }
 }

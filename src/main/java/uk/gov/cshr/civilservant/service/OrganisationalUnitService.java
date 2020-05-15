@@ -6,8 +6,10 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.AgencyDomain;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
+import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.exception.TokenAlreadyExistsException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
@@ -179,4 +181,13 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     public Optional<OrganisationalUnit> get(Long id) {
         return repository.findById(id);
     }
+
+    public AgencyTokenResponseDto getAgencyToken(Long organisationalUnitId) throws CSRSApplicationException {
+        AgencyToken agencyToken = getOrganisationalUnit(organisationalUnitId)
+                .map(OrganisationalUnit::getAgencyToken)
+                .orElseThrow(TokenDoesNotExistException::new);
+
+        return agencyTokenService.getAgencyTokenResponseDto(agencyToken);
+    }
+
 }

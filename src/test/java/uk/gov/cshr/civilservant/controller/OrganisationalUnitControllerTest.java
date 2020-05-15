@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
-import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
+import uk.gov.cshr.civilservant.dto.AgencyTokenDto;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
@@ -44,7 +44,7 @@ public class OrganisationalUnitControllerTest {
 
     private String requestBodyAgencyTokenAsAString;
 
-    private AgencyTokenDTO dto;
+    private AgencyTokenDto dto;
 
     @Before
     public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
@@ -104,23 +104,6 @@ public class OrganisationalUnitControllerTest {
     public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided_capacityLessThan1() throws Exception {
         // capacity must be between 1 and 1500, this should fail validation
         dto.setCapacity(0);
-        requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.post("/organisationalUnits/123/agencyToken").contentType(APPLICATION_JSON)
-                        .accept(APPLICATION_JSON).content(requestBodyAgencyTokenAsAString))
-                .andDo(print())
-                .andExpect(status().isBadRequest());
-
-        verify(organisationalUnitService, never()).getOrganisationalUnit(anyLong());
-        verify(organisationalUnitService, never()).setAgencyToken(any(OrganisationalUnit.class), any(AgencyToken.class));
-    }
-
-    @Test
-    public void shouldNotSaveAgencyTokenIfInvalidAgencyTokenDTOIsProvided_capacityUsedGreaterThanCapacity() throws Exception {
-        // this should fail validation
-        dto.setCapacity(0);
-        dto.setCapacityUsed(100);
         requestBodyAgencyTokenAsAString = JsonUtils.asJsonString(dto);
 
         mockMvc.perform(
