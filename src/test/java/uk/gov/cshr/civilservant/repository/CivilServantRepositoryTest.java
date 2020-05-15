@@ -131,4 +131,25 @@ public class CivilServantRepositoryTest {
         assertEquals(civilServant1, result.get(0));
         assertEquals(civilServant3, result.get(1));
     }
+
+    @Test
+    public void shouldFindCivilServantCountByIdentityUUID() {
+        final Identity identity = new Identity("1");
+        final CivilServant civilServant = new CivilServant(identity);
+
+        identityRepository.save(identity);
+        civilServantRepository.save(civilServant);
+
+        boolean exists = civilServantRepository.existsByIdentityUUID(identity.getUid());
+        assertTrue(exists);
+    }
+
+    @Test
+    public void shouldNotFindCivilServantCountByIdentityUUID() {
+        final Identity identity = new Identity("1");
+        identityRepository.save(identity);
+
+        boolean exists = civilServantRepository.existsByIdentityUUID(identity.getUid());
+        assertFalse(exists);
+    }
 }

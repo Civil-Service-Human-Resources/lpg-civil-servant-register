@@ -6,11 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.intercept.RunAsUserToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.common.exceptions.InvalidTokenException;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.RemoteTokenServices;
 import org.springframework.stereotype.Service;
@@ -60,13 +58,11 @@ public class IdentityTokenServices extends RemoteTokenServices {
             return identityRepository.save(newIdentity);
         });
 
-        Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(storedIdentity);
-
-        civilServant.orElseGet(() -> {
+        if (!civilServantRepository.existsByIdentityUUID(identityId)) {
             LOGGER.debug("No civil servant exists for identity {}, creating.", identity);
             CivilServant newCivilServant = new CivilServant(storedIdentity);
-            return civilServantRepository.save(newCivilServant);
-        });
+            civilServantRepository.save(newCivilServant);
+        }
 
         return authentication;
     }
