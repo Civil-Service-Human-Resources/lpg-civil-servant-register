@@ -35,4 +35,17 @@ public class AgencyToken implements RegistryEntity {
         this.capacity = capacity;
         this.uid = uid;
     }
+
+    public AgencyToken(String uid, int capacity, Set<AgencyDomain> agencyDomains) {
+        this.uid = uid;
+        this.capacity = capacity;
+        this.agencyDomains = agencyDomains;
+    }
+
+    public AgencyToken(String token, String uid, int capacity, Set<AgencyDomain> agencyDomains) {
+        this.token = token;
+        this.uid = uid;
+        this.capacity = capacity;
+        this.agencyDomains = agencyDomains;
+    }
 }

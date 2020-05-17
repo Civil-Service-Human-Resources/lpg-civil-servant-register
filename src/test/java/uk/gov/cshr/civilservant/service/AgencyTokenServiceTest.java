@@ -20,6 +20,8 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AgencyTokenServiceTest {
+    private static final String EXAMPLE_DOMAIN = "example.com";
+
     @Mock
     private AgencyTokenRepository agencyTokenRepository;
 
@@ -28,15 +30,6 @@ public class AgencyTokenServiceTest {
 
     @InjectMocks
     private AgencyTokenService agencyTokenService;
-
-    @Test
-    public void getAllAgencyTokens() {
-        List<AgencyToken> agencyTokens = new ArrayList<>();
-
-        when(agencyTokenRepository.findAll()).thenReturn(agencyTokens);
-
-        assertEquals(agencyTokens, agencyTokenService.getAllAgencyTokens());
-    }
 
     @Test
     public void getAllAgencyTokensByDomain() {
@@ -71,7 +64,7 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
         when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(organisationalUnit));
 
-        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, agencyToken.getToken(), organisationalUnit.getCode());
+        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), organisationalUnit.getCode());
 
         assertTrue(returnedToken.isPresent());
         assertEquals(agencyToken, returnedToken.get());
@@ -88,7 +81,7 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
         when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(parentOrganisationalUnit));
 
-        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, agencyToken.getToken(), childOrganisationalUnit.getCode());
+        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), childOrganisationalUnit.getCode());
 
         assertTrue(returnedToken.isPresent());
         assertEquals(agencyToken, returnedToken.get());
@@ -108,7 +101,7 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
         when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(parentOrganisationalUnit));
 
-        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, agencyToken.getToken(), grandchildOrganisationalUnit.getCode());
+        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), grandchildOrganisationalUnit.getCode());
 
         assertTrue(returnedToken.isPresent());
         assertEquals(agencyToken, returnedToken.get());
@@ -122,7 +115,7 @@ public class AgencyTokenServiceTest {
 
         when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.empty());
 
-        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, agencyToken.getToken(), organisationalUnit.getCode());
+        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), organisationalUnit.getCode());
 
         assertFalse(returnedToken.isPresent());
     }
@@ -136,7 +129,7 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
         when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(organisationalUnit));
 
-        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, agencyToken.getToken(), "bad-code");
+        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), "bad-code");
 
         assertFalse(returnedToken.isPresent());
     }
@@ -152,8 +145,20 @@ public class AgencyTokenServiceTest {
         when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
         when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(parentOrganisationalUnit));
 
-        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, agencyToken.getToken(), "bad-code");
+        Optional<AgencyToken> returnedToken = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), "bad-code");
 
         assertFalse(returnedToken.isPresent());
+    }
+
+    @Test
+    public void shouldReturnTrueIfDomainInAgency() {
+        when(agencyTokenRepository.existsByDomain(EXAMPLE_DOMAIN)).thenReturn(true);
+        assertTrue(agencyTokenService.isDomainInAgency(EXAMPLE_DOMAIN));
+    }
+
+    @Test
+    public void shouldReturnFalseIfDomainNotInAgency() {
+        when(agencyTokenRepository.existsByDomain(EXAMPLE_DOMAIN)).thenReturn(false);
+        assertFalse(agencyTokenService.isDomainInAgency(EXAMPLE_DOMAIN));
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.controller;
 
+import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,14 +16,12 @@ import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
 import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -31,9 +30,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WithMockUser(username = "user")
 public class AgencyTokenControllerTest {
 
-    List<String> codes = Arrays.asList("code1", "code2", "code3");
+    private static final String DOMAIN = "example.com";
+    private static final String UID = "UID";
+    private static final String TOKEN = "TOKEN";
+
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private Gson gson;
+
     @MockBean
     private AgencyTokenService agencyTokenService;
 
@@ -43,59 +49,28 @@ public class AgencyTokenControllerTest {
     }
 
     @Test
-    public void shouldReturnOkIfRequestingAgencyTokens() throws Exception {
-        Iterable<AgencyToken> agencyTokens = new ArrayList<>();
-
-        when(agencyTokenService.getAllAgencyTokens()).thenReturn(agencyTokens);
+    public void shouldReturnTrueIfRequestingAgencyTokensWithDomainIfExists() throws Exception {
+        when(agencyTokenService.isDomainInAgency(DOMAIN)).thenReturn(true);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get("/agencyTokens")
+                MockMvcRequestBuilders.get(String.format("/agencyTokens?domain=%s", DOMAIN))
                         .accept(APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"));
+
     }
 
     @Test
-    public void shouldReturnOkIfRequestingAgencyTokensWithDomainParam() throws Exception {
-        String domain = "example.com";
-        Iterable<AgencyToken> agencyTokens = new ArrayList<>();
-
-        when(agencyTokenService.getAllAgencyTokensByDomain(domain)).thenReturn(agencyTokens);
+    public void shouldReturnFalseIfRequestingAgencyTokensWithDomainIfNotExists() throws Exception {
+        when(agencyTokenService.isDomainInAgency(DOMAIN)).thenReturn(false);
 
         mockMvc.perform(
-                MockMvcRequestBuilders.get(String.format("/agencyTokens?domain=%s", domain))
+                MockMvcRequestBuilders.get(String.format("/agencyTokens?domain=%s", DOMAIN))
                         .accept(APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    public void shouldReturnOkIfRequestingAgencyTokensWithDomainTokenParams() throws Exception {
-        AgencyToken agencyToken = new AgencyToken();
-        String domain = "example.com";
-        String token = "token123";
-
-        when(agencyTokenService.getAgencyTokenByDomainAndToken(domain, token)).thenReturn(Optional.of(agencyToken));
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.get(String.format("/agencyTokens?domain=%s&token=%s", domain, token))
-                        .accept(APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    public void shouldReturnNotFoundIfRequestingAgencyTokensWithDomainTokenParams() throws Exception {
-        String domain = "example.com";
-        String token = "token123";
-
-        when(agencyTokenService.getAgencyTokenByDomainAndToken(domain, token)).thenReturn(Optional.empty());
-
-        mockMvc.perform(
-                MockMvcRequestBuilders.get(String.format("/agencyTokens?domain=%s&token=%s", domain, token))
-                        .accept(APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk())
+                .andExpect(content().string("false"));
     }
 
     @Test
@@ -105,7 +80,7 @@ public class AgencyTokenControllerTest {
         String token = "token123";
         String code = "code";
 
-        when(agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, token, code)).thenReturn(Optional.of(agencyToken));
+        when(agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, token, code)).thenReturn(Optional.of(agencyToken));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get(String.format("/agencyTokens?domain=%s&token=%s&code=%s", domain, token, code))
@@ -120,7 +95,7 @@ public class AgencyTokenControllerTest {
         String token = "token123";
         String code = "code";
 
-        when(agencyTokenService.getAgencyTokenByDomainTokenAndOrganisation(domain, token, code)).thenReturn(Optional.empty());
+        when(agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, token, code)).thenReturn(Optional.empty());
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get(String.format("/agencyTokens?domain=%s&token=%s&code=%s", domain, token, code))
@@ -130,29 +105,29 @@ public class AgencyTokenControllerTest {
     }
 
     @Test
-    public void shouldReturnOkIfRequestingAgencyTokensWithDomainOrgParams() throws Exception {
+    public void shouldReturnAgencyTokenIfGetByUidExists() throws Exception {
         AgencyToken agencyToken = new AgencyToken();
-        String domain = "example.com";
-        String code = "code";
+        agencyToken.setUid(UID);
+        agencyToken.setToken(TOKEN);
 
-        when(agencyTokenService.getAgencyTokenByDomainAndOrganisation(domain, code)).thenReturn(Optional.of(agencyToken));
-
+        when(agencyTokenService.getAgencyTokenByUid(UID)).thenReturn(Optional.of(agencyToken));
         mockMvc.perform(
-                MockMvcRequestBuilders.get(String.format("/agencyTokens?domain=%s&code=%s", domain, code))
+                MockMvcRequestBuilders.get(String.format("/agencyTokens?uid=%s", UID))
                         .accept(APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().json(gson.toJson(agencyToken)));
     }
 
     @Test
-    public void shouldReturnNotFoundIfRequestingAgencysWithDomainOrgParams() throws Exception {
-        String domain = "example.com";
-        String code = "code";
+    public void shouldReturnNotFoundIfGetByUidDoesNotExist() throws Exception {
+        AgencyToken agencyToken = new AgencyToken();
+        agencyToken.setUid(UID);
+        agencyToken.setToken(TOKEN);
 
-        when(agencyTokenService.getAgencyTokenByDomainAndOrganisation(domain, code)).thenReturn(Optional.empty());
-
+        when(agencyTokenService.getAgencyTokenByUid(UID)).thenReturn(Optional.empty());
         mockMvc.perform(
-                MockMvcRequestBuilders.get(String.format("/agencyTokens?domain=%s&code=%s", domain, code))
+                MockMvcRequestBuilders.get(String.format("/agencyTokens?uid=%s", UID))
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());

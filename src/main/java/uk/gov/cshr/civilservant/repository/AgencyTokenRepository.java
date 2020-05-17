@@ -17,6 +17,12 @@ public interface AgencyTokenRepository extends CrudRepository<AgencyToken, Long>
             "where d.domain = ?1 ")
     List<AgencyToken> findAllByDomain(String domain);
 
+    @Query("select case when count(c)> 0 then true else false end  " +
+            "from AgencyToken a " +
+            "left join a.agencyDomains d " +
+            "where d.domain = ?1 ")
+    boolean existsByDomain(String domain);
+
     @Query("select new uk.gov.cshr.civilservant.domain.AgencyToken(a.id, a.token, a.capacity, a.uid) " +
             "from AgencyToken a " +
             "left join a.agencyDomains d " +
@@ -49,4 +55,5 @@ public interface AgencyTokenRepository extends CrudRepository<AgencyToken, Long>
             "and ou.code = ?2")
     Optional<AgencyToken> findByDomainAndCode(String domain, String code);
 
+    Optional<AgencyToken> findByUid(String uid);
 }

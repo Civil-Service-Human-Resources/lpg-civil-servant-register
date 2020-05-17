@@ -19,19 +19,11 @@ public class AgencyTokenService {
         this.organisationalUnitRepository = organisationalUnitRepository;
     }
 
-    public Iterable<AgencyToken> getAllAgencyTokens() {
-        return agencyTokenRepository.findAll();
-    }
-
     public Iterable<AgencyToken> getAllAgencyTokensByDomain(String domain) {
         return agencyTokenRepository.findAllByDomain(domain);
     }
 
-    public Optional<AgencyToken> getAgencyTokenByDomainAndToken(String domain, String token) {
-        return agencyTokenRepository.findByDomainAndToken(domain, token);
-    }
-
-    public Optional<AgencyToken> getAgencyTokenByDomainTokenAndOrganisation(String domain, String token, String code) {
+    public Optional<AgencyToken> getAgencyTokenByDomainTokenCodeAndOrg(String domain, String token, String code) {
 
         Optional<AgencyToken> agencyToken = agencyTokenRepository.findByDomainAndToken(domain, token);
 
@@ -61,11 +53,19 @@ public class AgencyTokenService {
         return false;
     }
 
-    public Optional<AgencyToken> getAgencyTokenByDomainAndOrganisation(String domain, String code) {
-        return agencyTokenRepository.findByDomainAndCode(domain, code);
+    public Optional<AgencyToken> getAgencyTokenByDomainAndToken(String domain, String token) {
+        return agencyTokenRepository.findByDomainAndToken(domain, token);
     }
 
     public void deleteAgencyToken(AgencyToken agencyToken) {
         agencyTokenRepository.delete(agencyToken);
+    }
+
+    public boolean isDomainInAgency(String domain) {
+        return agencyTokenRepository.existsByDomain(domain);
+    }
+
+    public Optional<AgencyToken> getAgencyTokenByUid(String uid) {
+        return agencyTokenRepository.findByUid(uid);
     }
 }
