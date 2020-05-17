@@ -24,7 +24,7 @@ public class AgencyTokenController {
     }
 
     @GetMapping(params = {"domain"})
-    public ResponseEntity<Boolean> getAgencyTokensByDomain(@RequestParam String domain) {
+    public ResponseEntity<Boolean> isDomainInAgency(@RequestParam String domain) {
         return ResponseEntity.ok(agencyTokenService.isDomainInAgency(domain));
     }
 
