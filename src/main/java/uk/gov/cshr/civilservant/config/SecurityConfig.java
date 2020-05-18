@@ -6,6 +6,8 @@ import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -21,6 +23,8 @@ import org.springframework.security.oauth2.client.token.DefaultAccessTokenReques
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
+import org.springframework.security.web.access.channel.ChannelProcessingFilter;
+import uk.gov.cshr.civilservant.filter.AccessLogFilter;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -28,9 +32,22 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.R
 @EnableWebSecurity
 public class SecurityConfig extends ResourceServerConfigurerAdapter {
 
+    @Autowired
+    private AccessLogFilter accessLogFilter;
+
+    @Value("${server.requestLogginFilterEnabled}")
+    private boolean requestLogginFilterEnabled;
+
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests().anyRequest().permitAll();
+        if (requestLogginFilterEnabled) {
+            http.addFilterBefore(accessLogFilter, ChannelProcessingFilter.class);
+        }
+
+        http
+            .authorizeRequests()
+            .anyRequest()
+            .permitAll();
     }
 
     @Bean

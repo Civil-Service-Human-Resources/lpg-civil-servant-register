@@ -1,5 +1,6 @@
 # Civil Servant Registry Service
 
+
 CRUD services to hold employment and personal details of civil servants.
 
 Service uses [spring-data-rest](https://projects.spring.io/spring-data-rest/) to expose resources.
