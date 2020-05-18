@@ -52,6 +52,7 @@ oauth:
 identity:
   identityAPIUrl: "${oauth.serviceUrl}/api/identities"
   identityWhiteListUrl: "${oauth.serviceUrl}/domain/isWhitelisted"
+  agencyTokenUrl: "${oauth.serviceUrl}/agency/%s"
 
 govNotify:
   enabled: ${GOV_NOTIFY_ENABLED:false}

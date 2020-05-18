@@ -1,25 +1,26 @@
 package uk.gov.cshr.civilservant.service.identity;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
+import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.exception.UserNotFoundException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
+@Slf4j
 @Service
 public class IdentityService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(IdentityService.class);
 
     private OAuth2RestOperations restOperations;
 
@@ -27,11 +28,16 @@ public class IdentityService {
 
     private String identityWhiteListUrl;
 
+    private String identityAgencyTokenUrl;
+
     @Autowired
-    public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.identityAPIUrl}") String identityAPIUrl, @Value("${identity.identityWhiteListUrl}") String identityWhiteListUrl) {
+    public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.identityAPIUrl}") String identityAPIUrl,
+                           @Value("${identity.identityWhiteListUrl}") String identityWhiteListUrl,
+                           @Value("${identity.agencyTokenUrl}") String identityAgencyTokenUrl) {
         this.restOperations = restOperations;
         this.identityAPIUrl = identityAPIUrl;
         this.identityWhiteListUrl = identityWhiteListUrl;
+        this.identityAgencyTokenUrl = identityAgencyTokenUrl;
     }
 
     public IdentityFromService findByEmail(String email) {
@@ -39,7 +45,7 @@ public class IdentityService {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl)
                 .queryParam("emailAddress", email);
 
-        LOGGER.debug(" Checking email {}", email);
+        log.debug(" Checking email {}", email);
         IdentityFromService identity;
 
         try {
@@ -48,7 +54,7 @@ public class IdentityService {
             if (http.getStatusCode() == HttpStatus.NOT_FOUND) {
                 return null; // we kind of have to assume 403 is email not found rather than service not there ...
             }
-            LOGGER.error(" Error with findByEmail when contacting identity service {}", builder.toUriString());
+            log.error(" Error with findByEmail when contacting identity service {}", builder.toUriString());
             return null;
         }
 
@@ -57,7 +63,7 @@ public class IdentityService {
 
     public String getEmailAddress(CivilServant civilServant) {
 
-        LOGGER.debug("Getting email address for civil servant {}", civilServant);
+        log.debug("Getting email address for civil servant {}", civilServant);
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAPIUrl)
                 .queryParam("uid", civilServant.getIdentity().getUid());
@@ -80,7 +86,7 @@ public class IdentityService {
     }
 
     public boolean isDomainWhiteListed(String domain){
-        LOGGER.debug("finding if domain:" + domain + " is whitelisted from identity service");
+        log.debug("finding if domain:" + domain + " is whitelisted from identity service");
 
         String domainWithSlashAtStartAndEnd = "/" +  domain + "/";
 
@@ -105,8 +111,30 @@ public class IdentityService {
                 throw new NoOrganisationsFoundException(domain);
             }
         } catch (Exception e) {
-            LOGGER.warn("Error calling identity service", e);
+            log.warn("Error calling identity service", e);
             throw new NoOrganisationsFoundException(domain);
+        }
+
+    }
+
+    public int getSpacesUsedForAgencyToken(String uid) throws CSRSApplicationException {
+        log.debug("Getting the spaces used");
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAgencyTokenUrl).path("/" + uid);
+
+        try {
+            return restOperations.getForObject(builder.toUriString(), Integer.class);
+        } catch (HttpClientErrorException clientError) {
+            if(clientError.getStatusCode() == HttpStatus.NOT_FOUND) {
+                log.warn("Token for uid " + uid + " does not exist");
+                throw new TokenDoesNotExistException(uid);
+            } else {
+                throw new CSRSApplicationException("Error calling identity service: get Agency Tokens Spaces Used", clientError);
+            }
+        } catch (HttpServerErrorException serverError) {
+            throw new CSRSApplicationException("Server error calling identity service: get Agency Tokens Spaces Used", serverError);
+
+        } catch (Exception e) {
+            throw new CSRSApplicationException("Unexpected error calling identity service: get Agency Tokens Spaces Used", e);
         }
 
     }
