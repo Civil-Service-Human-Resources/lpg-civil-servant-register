@@ -17,13 +17,14 @@ import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.AgencyTokenFactory;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
 import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
+import uk.gov.cshr.civilservant.exception.CivilServantNotFoundException;
+import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
+import uk.gov.cshr.civilservant.service.CivilServantService;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,10 +38,16 @@ public class OrganisationalUnitController {
 
     private AgencyTokenFactory agencyTokenFactory;
 
-    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService, OrganisationalUnitDtoFactory organisationalUnitDtoFactory, AgencyTokenFactory agencyTokenFactory) {
+    private CivilServantService civilServantService;
+
+    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService,
+                                        OrganisationalUnitDtoFactory organisationalUnitDtoFactory,
+                                        AgencyTokenFactory agencyTokenFactory,
+                                        CivilServantService civilServantService) {
         this.organisationalUnitService = organisationalUnitService;
         this.organisationalUnitDtoFactory = organisationalUnitDtoFactory;
         this.agencyTokenFactory = agencyTokenFactory;
+        this.civilServantService = civilServantService;
     }
 
     @GetMapping("/tree")
@@ -62,18 +69,30 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping("/flat/{domain}/")
-    public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructureFilteredByDomainAndCode(@PathVariable String domain) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructureFilteredByDomain(@PathVariable String domain) {
         log.info("Getting org flat, filtered by domain");
-
-        List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain);
-        if(organisationalUnits.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        List<OrganisationalUnit> organisationalUnits;
+        try {
+            String uid = civilServantService.getCivilServantUid();
+            try {
+                organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain, uid);
+            } catch (NoOrganisationsFoundException e) {
+                return ResponseEntity.ok(Collections.EMPTY_LIST);
+            }
+            if(organisationalUnits.isEmpty()) {
+                return ResponseEntity.ok(Collections.EMPTY_LIST);
+            }
+            List<OrganisationalUnitDto> dtos = organisationalUnits.stream()
+                    .map(ou -> organisationalUnitDtoFactory.create(ou))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(dtos);
+        } catch(CivilServantNotFoundException | TokenDoesNotExistException e) {
+            return ResponseEntity.ok(Collections.EMPTY_LIST);
+        } catch(Exception e) {
+            log.error("Unexpected error occurred getting orgs filtered by domain", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        List<OrganisationalUnitDto> dtos = organisationalUnits.stream()
-                .map(ou -> organisationalUnitDtoFactory.create(ou))
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/children/{code}")
@@ -145,10 +164,19 @@ public class OrganisationalUnitController {
     @DeleteMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity deleteAgencyToken(@PathVariable Long organisationalUnitId) {
-        return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
-            organisationalUnitService.deleteAgencyToken(organisationalUnit);
-            return ResponseEntity.ok(organisationalUnit);
-        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        Optional<OrganisationalUnit> organisationalUnit = organisationalUnitService.getOrganisationalUnit(organisationalUnitId);
+
+        if (organisationalUnit.isPresent()) {
+           OrganisationalUnit updatedOrgUnit = organisationalUnitService.deleteAgencyToken(organisationalUnit.get());
+           if (updatedOrgUnit != null) {
+               return new ResponseEntity(HttpStatus.OK);
+           } else {
+               return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+           }
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

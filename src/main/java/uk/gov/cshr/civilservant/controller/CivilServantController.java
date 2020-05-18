@@ -16,10 +16,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.domain.Identity;
-import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
-import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
-import uk.gov.cshr.civilservant.dto.UpdateForceOrgChangeDTO;
 import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
@@ -118,16 +114,13 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     }
 
     @GetMapping("/org")
-    public ResponseEntity getOrgCodeForCivilServant(@RequestParam(value = "uid") String uid) {
-        log.debug("Getting civil servant org details for user with uid " + uid);
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> getOrgCodeForCivilServant() {
+        log.debug("Getting civil servant org details");
 
-        return civilServantRepository.findByIdentity(uid)
-                .map(cs -> civilServantResourceFactory.getCivilServantOrganisationalUnitCode(cs))
-                .map(orgCodeDTO -> ResponseEntity.ok(orgCodeDTO))
-                .orElseGet(() -> {
-                    log.warn(String.format("Civil Servant with uid %s not found", uid));
-                    return ResponseEntity.notFound().build();
-                });
+        return civilServantRepository.findByPrincipal()
+                .map(this::getOrgCode)
+                .orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @PatchMapping("/org")
@@ -156,8 +149,14 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                 .orElseThrow(() -> new NoOrganisationsFoundException(organisationCode));
     }
 
+    private ResponseEntity<String> getOrgCode(CivilServant cs) {
+        return civilServantResourceFactory.getCivilServantOrganisationalUnitCode(cs)
+                .map(organisationalUnitCode -> organisationalUnitCode.getCode())
+                .map(code -> ResponseEntity.ok(code))
+                .orElseThrow(() -> new ResourceNotFoundException());
+    }
+
     @DeleteMapping("/org")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity removeOrganisation() {
         /*
          * separate end point to make the civil servants organisation null.
@@ -171,6 +170,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
                 CivilServant civilServant = optionalCivilServant.get();
                 civilServant.setOrganisationalUnit(null);
                 civilServantRepository.save(civilServant);
+                log.info("civil servants organisation has successfully been removed");
                 return ResponseEntity.noContent().build();
             } else {
                 log.warn("civil servant to update has not been found");
@@ -189,50 +189,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         civilServantRepository.findByIdentity(uid).ifPresent(civilServant -> civilServantRepository.delete(civilServant));
 
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/org/reset")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity getForceOrgChangeFlag() {
-
-        log.info("getting civil servants force org change flag");
-
-        try {
-            Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
-            if (optionalCivilServant.isPresent()) {
-                CivilServant civilServant = optionalCivilServant.get();
-                return ResponseEntity.ok(civilServant.getForceOrgReset());
-            } else {
-                log.warn("civil servant to update has not been found");
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            log.error("An error occurred updating Civil Servants force org change flag", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-
-    @PatchMapping("/org/reset")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity updateForceOrgChangeFlag(@Valid @RequestBody UpdateForceOrgChangeDTO updateForceOrgChangeDTO) {
-
-        log.info("updating civil servants force org change flag to=" + updateForceOrgChangeDTO.isForceOrgChange());
-
-        try {
-            Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
-            if (optionalCivilServant.isPresent()) {
-                CivilServant civilServant = optionalCivilServant.get();
-                civilServant.setForceOrgReset(updateForceOrgChangeDTO.isForceOrgChange());
-                civilServantRepository.save(civilServant);
-                return ResponseEntity.noContent().build();
-            } else {
-                log.warn("civil servant to update has not been found");
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            log.error("An error occurred updating Civil Servants force org change flag", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
     }
 
     @Override
