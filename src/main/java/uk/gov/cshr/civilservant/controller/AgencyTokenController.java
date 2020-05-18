@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.cshr.civilservant.dto.AgencyTokenUidDto;
 import uk.gov.cshr.civilservant.service.AgencyTokenService;
 
 import static org.springframework.http.HttpStatus.OK;
@@ -33,7 +34,10 @@ public class AgencyTokenController {
                                                                               @RequestParam String token,
                                                                               @RequestParam String code) {
         return agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, token, code)
-                .map(agencyToken -> new ResponseEntity<>(agencyToken.getUid(), OK))
+                .map(agencyToken -> {
+                    AgencyTokenUidDto agencyTokenUidDto = new AgencyTokenUidDto(agencyToken.getUid(), agencyToken.getCapacity());
+                    return new ResponseEntity<>(agencyTokenUidDto, OK);
+                })
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
