@@ -1,9 +1,7 @@
 package uk.gov.cshr.civilservant.service;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -11,9 +9,13 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cshr.civilservant.domain.AgencyDomain;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.dto.AgencyDomainDTO;
+import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
+import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
+import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
@@ -24,6 +26,8 @@ import uk.gov.cshr.civilservant.utils.TypeList;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -46,6 +50,9 @@ public class OrganisationalUnitServiceTest {
     @InjectMocks
     private OrganisationalUnitService organisationalUnitService;
     private FamilyOrganisationUnits family;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
     public static void staticSetUp(){
@@ -583,6 +590,76 @@ public class OrganisationalUnitServiceTest {
         assertThat(actual).hasSize(1); // domain was only added to one agency token, see static set up method
         verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("mydomain");
         verify(organisationalUnitRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void shouldReturnAgencyTokenResponseDtoIfValid() throws CSRSApplicationException {
+        AgencyTokenResponseDto responseDto = AgencyTokenTestingUtils.getAgencyTokenResponseDto();
+        long orgId = 3l;
+        OrganisationalUnit orgUnit = new OrganisationalUnit();
+        AgencyToken agencyToken = AgencyTokenTestingUtils.getAgencyToken();
+        orgUnit.setAgencyToken(agencyToken);
+        Optional<OrganisationalUnit> optionalOrganisationalUnit = Optional.of(orgUnit);
+        when(organisationalUnitRepository.findById(eq(orgId))).thenReturn(optionalOrganisationalUnit);
+        when(agencyTokenService.getAgencyTokenResponseDto(eq(agencyToken))).thenReturn(responseDto);
+
+        AgencyTokenResponseDto actual = organisationalUnitService.getAgencyToken(orgId);
+
+        Assert.assertThat(actual.getToken(), equalTo((responseDto.getToken())));
+        Assert.assertThat(actual.getCapacity(), equalTo((responseDto.getCapacity())));
+        Assert.assertThat(actual.getCapacityUsed(), equalTo(responseDto.getCapacityUsed()));
+
+        Set<AgencyDomainDTO> actualAgencyDomains = actual.getAgencyDomains();
+        assertEquals(actualAgencyDomains.size(), 1);
+        AgencyDomainDTO[] actualAgencyDomainsAsAnArray = actualAgencyDomains.toArray(new AgencyDomainDTO[actualAgencyDomains.size()]);
+        assertEquals(actualAgencyDomainsAsAnArray[0].getDomain(), "aDomain");
+    }
+
+    @Test
+    public void shouldThrowTokenDoesNotExistIfOrganisationNotFound() throws CSRSApplicationException {
+        AgencyTokenResponseDto responseDto = AgencyTokenTestingUtils.getAgencyTokenResponseDto();
+        long orgId = 3l;
+        when(organisationalUnitRepository.findById(eq(orgId))).thenReturn(Optional.empty());
+
+        expectedException.expect(TokenDoesNotExistException.class);
+
+        AgencyTokenResponseDto actual = organisationalUnitService.getAgencyToken(orgId);
+
+        verifyZeroInteractions(agencyTokenService);
+    }
+
+    @Test
+    public void shouldThrowTokenDoesNotExistIfTokenNotFound() throws CSRSApplicationException {
+        AgencyTokenResponseDto responseDto = AgencyTokenTestingUtils.getAgencyTokenResponseDto();
+        long orgId = 3l;
+        OrganisationalUnit orgUnit = new OrganisationalUnit();
+        Optional<OrganisationalUnit> optionalOrganisationalUnit = Optional.of(orgUnit);
+        when(organisationalUnitRepository.findById(eq(orgId))).thenReturn(optionalOrganisationalUnit);
+
+        expectedException.expect(TokenDoesNotExistException.class);
+
+        AgencyTokenResponseDto actual = organisationalUnitService.getAgencyToken(orgId);
+    }
+
+    @Test
+    public void shouldThrowGeneralApplicationExceptionIfTechnicalError() throws CSRSApplicationException {
+        AgencyTokenResponseDto responseDto = AgencyTokenTestingUtils.getAgencyTokenResponseDto();
+        long orgId = 3l;
+        OrganisationalUnit orgUnit = new OrganisationalUnit();
+        AgencyToken agencyToken = AgencyTokenTestingUtils.getAgencyToken();
+        orgUnit.setAgencyToken(agencyToken);
+        Optional<OrganisationalUnit> optionalOrganisationalUnit = Optional.of(orgUnit);
+        when(organisationalUnitRepository.findById(eq(orgId))).thenReturn(optionalOrganisationalUnit);
+
+        RuntimeException runtimeException = new RuntimeException();
+        when(agencyTokenService.getAgencyTokenResponseDto(eq(agencyToken))).thenThrow(new CSRSApplicationException("something went wrong", runtimeException));
+        expectedException.expect(CSRSApplicationException.class);
+        expectedException.expectMessage("something went wrong");
+        expectedException.expectCause(is(runtimeException));
+
+        AgencyTokenResponseDto actual = organisationalUnitService.getAgencyToken(orgId);
+
+        verifyZeroInteractions(agencyTokenService);
     }
 
 }
