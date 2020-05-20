@@ -59,9 +59,7 @@ public class AgencyTokenTestingUtils {
     }
 
     public static String getExpectedFirstDomainNameFromSetOfAgencyDomains() {
-        Set<AgencyDomain> set = AgencyTokenTestingUtils.getAgencyToken().getAgencyDomains();
-        AgencyDomain[] agencyDomainsAsAnArray = set.toArray(new AgencyDomain[set.size()]);
-        return agencyDomainsAsAnArray[0].getDomain();
+        return "aDomain";
     }
 
     private static AgencyTokenResponseDto createAgencyTokenResponseDTO() {
