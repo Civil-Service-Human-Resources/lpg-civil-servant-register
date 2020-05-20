@@ -126,10 +126,6 @@ public class OrganisationalUnitControllerTest {
         RuntimeException expectedCause = new RuntimeException();
         when(organisationalUnitService.getAgencyToken(anyLong())).thenThrow(new CSRSApplicationException("something went wrong", expectedCause));
 
-     //   expectedException.expect(CSRSApplicationException.class);
-     //   expectedException.expectMessage("something went wrong");
-      //  expectedException.expectCause(is(expectedCause));
-
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/123/agencyToken")
                         .accept(APPLICATION_JSON))
