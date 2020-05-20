@@ -11,9 +11,11 @@ import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
 import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AgencyTokenResponseDtoFactoryTest {
@@ -34,8 +36,9 @@ public class AgencyTokenResponseDtoFactoryTest {
         assertEquals(actual.getToken(), agencyToken.getToken());
         Set<AgencyDomainDTO> actualAgencyDomains = actual.getAgencyDomains();
         assertEquals(actualAgencyDomains.size(), 1);
-        AgencyDomainDTO[] actualAgencyDomainsAsAnArray = actualAgencyDomains.toArray(new AgencyDomainDTO[actualAgencyDomains.size()]);
-        assertEquals(actualAgencyDomainsAsAnArray[0].getDomain(), AgencyTokenTestingUtils.getExpectedFirstDomainNameFromSetOfAgencyDomains());
+        Optional<AgencyDomainDTO> item = actualAgencyDomains.stream().findFirst();
+        assertNotNull(item.get());
+        assertEquals(item.get().getDomain(), AgencyTokenTestingUtils.getExpectedFirstDomainNameFromSetOfAgencyDomains());
     }
 
     @Test
