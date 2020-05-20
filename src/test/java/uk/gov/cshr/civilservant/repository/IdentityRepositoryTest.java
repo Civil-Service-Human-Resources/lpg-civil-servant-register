@@ -20,12 +20,13 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest
 @Transactional
 public class IdentityRepositoryTest {
+    private static final String UNKNOWN_UID = "??";
 
     @Autowired
     private IdentityRepository identityRepository;
 
     @Test
-    public void shouldFindIdentityByExistingUid() {
+    public void shouldGetIdentityByExistingUid() {
 
         final String uid = "uid";
 
@@ -38,8 +39,25 @@ public class IdentityRepositoryTest {
     }
 
     @Test
-    public void shouldNotFindIdentityByUnrecognisedUid() {
-        Optional<Identity> identity = identityRepository.findByUid("??");
+    public void shouldNotGetIdentityByUnrecognisedUid() {
+        Optional<Identity> identity = identityRepository.findByUid(UNKNOWN_UID);
         assertFalse(identity.isPresent());
+    }
+
+    @Test
+    public void shouldFindIdentityByExistingUid() {
+        final String uid = "uid";
+
+        identityRepository.save(new Identity(uid));
+
+        boolean isFound = identityRepository.existsByUid(uid);
+
+        assertTrue(isFound);
+    }
+
+    @Test
+    public void shouldNotFindIdentityByExistingUid() {
+        boolean isFound = identityRepository.existsByUid(UNKNOWN_UID);
+        assertFalse(isFound);
     }
 }

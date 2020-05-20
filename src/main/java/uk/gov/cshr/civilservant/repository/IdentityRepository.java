@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface IdentityRepository extends CrudRepository<Identity, Long> {
 
     Optional<Identity> findByUid(String uid);
+    boolean existsByUid(String uid);
 }
