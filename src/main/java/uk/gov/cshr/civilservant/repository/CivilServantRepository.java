@@ -39,7 +39,7 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
 
     @RestResource(exported = false)
     @Query("select new java.lang.Boolean(count(id) > 0) from CivilServant c where c.identity.uid = ?1")
-    boolean existsByIdentityUUID(@Param("uid") String uid);
+    boolean existsByIdentityUid(@Param("uid") String uid);
 
     List<CivilServant> findAllByOrganisationalUnit(OrganisationalUnit organisationalUnit);
 

@@ -140,7 +140,7 @@ public class CivilServantRepositoryTest {
         identityRepository.save(identity);
         civilServantRepository.save(civilServant);
 
-        boolean exists = civilServantRepository.existsByIdentityUUID(identity.getUid());
+        boolean exists = civilServantRepository.existsByIdentityUid(identity.getUid());
         assertTrue(exists);
     }
 
@@ -149,7 +149,7 @@ public class CivilServantRepositoryTest {
         final Identity identity = new Identity("1");
         identityRepository.save(identity);
 
-        boolean exists = civilServantRepository.existsByIdentityUUID(identity.getUid());
+        boolean exists = civilServantRepository.existsByIdentityUid(identity.getUid());
         assertFalse(exists);
     }
 }

@@ -17,8 +17,6 @@ import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.repository.IdentityRepository;
 
-import java.util.Optional;
-
 @Service
 public class IdentityTokenServices extends RemoteTokenServices {
 
@@ -60,7 +58,7 @@ public class IdentityTokenServices extends RemoteTokenServices {
             identity = identityRepository.findByUid(identityId).get();
         }
 
-        if (!civilServantRepository.existsByIdentityUUID(identityId)) {
+        if (!civilServantRepository.existsByIdentityUid(identityId)) {
             LOGGER.debug("No civil servant exists for identity {}, creating.", identity);
             CivilServant newCivilServant = new CivilServant(identity);
             civilServantRepository.save(newCivilServant);
