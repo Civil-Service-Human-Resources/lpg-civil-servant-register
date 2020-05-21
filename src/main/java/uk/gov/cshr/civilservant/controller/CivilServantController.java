@@ -248,4 +248,11 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         List<String> listUid = civilServantRepository.findCivilServantUID();
         return ResponseEntity.ok(listUid);
     }
+
+    @GetMapping("/civilservantreportingpermission/{uid}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity getCivilServantReportingPermission(@PathVariable String uid) {
+        List<String> listUid = civilServantRepository.findCivilServantReportingPermission(uid);
+        return ResponseEntity.ok(listUid);
+    }
 }

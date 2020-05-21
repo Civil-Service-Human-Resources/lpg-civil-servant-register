@@ -108,4 +108,11 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
             "join CivilServantOrganisationReportingPermission rp on rp.civilServantId = c.id " +
             "join Identity i on i.id = c.identity.id")
     List<String> findCivilServantUID();
+
+    @Query("select rp.organisationId " +
+            "from CivilServant c " +
+            "join Identity i on i.id = c.identity.id " +
+            "join CivilServantOrganisationReportingPermission rp on rp.civilServantId = c.id " +
+            "where i.uid = ?1")
+    List<String> findCivilServantReportingPermission(String uid);
 }

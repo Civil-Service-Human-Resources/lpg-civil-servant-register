@@ -32,6 +32,8 @@ import uk.gov.cshr.civilservant.service.identity.IdentityService;
 import uk.gov.cshr.civilservant.utils.JsonUtils;
 import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -362,6 +364,32 @@ public class CivilServantControllerTest {
 
         verify(civilServantRepository).findByPrincipal();
         verify(civilServantRepository).save(eq(civilServant));
+    }
+
+    @Test
+    public void getCivilServantUIDsWithReportingPermission() throws Exception {
+        List<String> listUid = Arrays.asList("1", "2", "3");
+        when(civilServantRepository.findCivilServantUID()).thenReturn(listUid);
+
+        mockMvc.perform(
+                get("/civilServants/civilservantwithreportingpermission")
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getCivilServantReportingPermission() throws Exception {
+        String uid = "12";
+        List<String> listUid = Arrays.asList("1", "2", "3");
+        when(civilServantRepository.findCivilServantReportingPermission(uid)).thenReturn(listUid);
+
+        mockMvc.perform(
+                get("/civilServants/civilservantwithreportingpermission")
+                        .param("uid", uid)
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 
     private CivilServant createCivilServant(String uid) {

@@ -46,4 +46,21 @@ public class OrganisationalReportingPermissionRepositoryTest {
         assertTrue(orgIds != null);
         assertTrue(orgIds.size() > 2);
     }
+
+    @Test
+    public void shouldDeleteReportingPermissionByIdCivilServantId() {
+
+        List<CivilServantReportDto> listCSDto = civilServantRepository.findAllNormalised();
+
+        Long civilServantId = Long.valueOf(listCSDto.get(0).getId());
+
+        CivilServantOrganisationReportingPermission entity1 = new CivilServantOrganisationReportingPermission(civilServantId, 1L);
+        CivilServantOrganisationReportingPermission entity2 = new CivilServantOrganisationReportingPermission(civilServantId, 2L);
+        List<CivilServantOrganisationReportingPermission> list = Arrays.asList(entity1, entity2);
+        repository.saveAll(list);
+
+        repository.deleteReportingPermissionById(civilServantId);
+        List<Long> listId = repository.findAllOrganisationIdByCivilServantId(civilServantId);
+        assertTrue(listId.isEmpty());
+    }
 }

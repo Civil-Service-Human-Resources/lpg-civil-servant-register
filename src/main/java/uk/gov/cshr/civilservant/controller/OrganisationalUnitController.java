@@ -125,12 +125,26 @@ public class OrganisationalUnitController {
     @PostMapping("/addOrganisationReportingPermission/{uid}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity addOrganisationReportingPermission(@PathVariable String uid, @Valid @RequestBody ArrayList<String> organisationIds) {
+        saveOrUpdate(uid, organisationIds, "add");
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @PutMapping("/updateOrganisationReportingPermission/{uid}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity updateOrganisationReportingPermission(@PathVariable String uid, @Valid @RequestBody ArrayList<String> organisationIds) {
+        saveOrUpdate(uid, organisationIds, "update");
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    private void saveOrUpdate(String uid, ArrayList<String> organisationIds, String addOrUpdate) {
         Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(uid);
         List<String> listOrganisationCodes = organisationalUnitService.getOrganisationalUnitCodesForIds(organisationIds);
         List<Long> organisationIdWithChildrenIds = organisationalUnitService.getOrganisationIdWithChildrenIds(listOrganisationCodes);
-
-        organisationalUnitService.addOrganisationReportingPermission(civilServant.get().getId(), organisationIdWithChildrenIds);
-        return ResponseEntity.ok(HttpStatus.OK);
+        if(addOrUpdate.equalsIgnoreCase("add")){
+            organisationalUnitService.addOrganisationReportingPermission(civilServant.get().getId(), organisationIdWithChildrenIds);
+        } else {
+            organisationalUnitService.updateOrganisationReportingPermission(civilServant.get().getId(), organisationIdWithChildrenIds);
+        }
     }
 
     @GetMapping("/{organisationalUnitId}/agencyToken")

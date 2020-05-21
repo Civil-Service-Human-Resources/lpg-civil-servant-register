@@ -7,13 +7,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.domain.Identity;
-import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
-import uk.gov.cshr.civilservant.domain.Profession;
+import uk.gov.cshr.civilservant.domain.*;
 import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +34,9 @@ public class CivilServantRepositoryTest {
 
     @Autowired
     private ProfessionRepository professionRepository;
+
+    @Autowired
+    private OrganisationalReportingPermissionRepository reportingPermissionRepository;
 
     @Test
     public void shouldFindCivilServantByIdentity() {
@@ -177,5 +178,22 @@ public class CivilServantRepositoryTest {
         List<CivilServantReportDto> result = civilServantRepository.findAllByReportingOrganisationId(listOrgIds);
 
         assertTrue(result.size() > 2);
+    }
+
+    @Test
+    @WithMockUser(authorities = {"INTERNAL", "PROFESSION_MANAGER"})
+    public void shouldFindCivilServantReportingPermission() {
+        List<CivilServantReportDto> listCSDto = civilServantRepository.findAllNormalised();
+
+        Long civilServantId = Long.valueOf(listCSDto.get(0).getId());
+
+        CivilServantOrganisationReportingPermission entity1 = new CivilServantOrganisationReportingPermission(civilServantId, 1L);
+        CivilServantOrganisationReportingPermission entity2 = new CivilServantOrganisationReportingPermission(civilServantId, 2L);
+        List<CivilServantOrganisationReportingPermission> list = Arrays.asList(entity1, entity2);
+        reportingPermissionRepository.saveAll(list);
+
+        List<String> result = civilServantRepository.findCivilServantReportingPermission(listCSDto.get(0).getUid());
+
+        assertTrue(result.size() >= 2);
     }
 }
