@@ -8,4 +8,8 @@ import lombok.NoArgsConstructor;
 public class AgencyDomainDTO {
 
     private String domain;
+
+    public AgencyDomainDTO(String domain) {
+        this.domain = domain;
+    }
 }

@@ -15,4 +15,11 @@ public class AgencyDomain implements RegistryEntity {
 
     @Column(nullable = false, length = 150)
     private String domain;
+
+    public AgencyDomain() {
+    }
+
+    public AgencyDomain(String domain) {
+        this.domain = domain;
+    }
 }
