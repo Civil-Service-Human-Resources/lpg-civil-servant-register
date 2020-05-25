@@ -114,6 +114,13 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/resource/{uid}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Resource<CivilServantResource>> getByUID(@PathVariable("uid") String uid) {
+        return civilServantRepository.findByIdentity(uid).map(
+                civilServant -> ResponseEntity.ok(civilServantResourceFactory.create(civilServant)))
+                .orElse(ResponseEntity.notFound().build());
+    }
 
     @Override
     public RepositoryLinksResource process(RepositoryLinksResource resource) {
