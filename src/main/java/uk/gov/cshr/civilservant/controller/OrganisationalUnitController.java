@@ -136,6 +136,14 @@ public class OrganisationalUnitController {
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
+    @DeleteMapping("/deleteOrganisationReportingPermission/{uid}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity deleteOrganisationReportingPermission(@PathVariable String uid) {
+        Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(uid);
+        organisationalUnitService.deleteOrganisationReportingPermission(civilServant.get().getId());
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
     private void saveOrUpdate(String uid, ArrayList<String> organisationIds, String addOrUpdate) {
         Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(uid);
         List<String> listOrganisationCodes = organisationalUnitService.getOrganisationalUnitCodesForIds(organisationIds);

@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
@@ -239,4 +240,20 @@ public class OrganisationalUnitControllerTest {
                 .updateOrganisationReportingPermission(civilServant.getId(), listOrgIdWithChildrenIds);
     }
 
+    @Test
+    public void shouldDeleteOrganisationReportingPermission() throws Exception {
+        String uid = "uid1";
+        CivilServant civilServant = new CivilServant();
+        civilServant.setId(1L);
+        Optional<CivilServant> civilServantOptional = Optional.of(civilServant);
+        when(civilServantRepository.findByIdentity(uid)).thenReturn(civilServantOptional);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/organisationalUnits/deleteOrganisationReportingPermission/uid1"))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        verify(organisationalUnitService, times(1))
+                .deleteOrganisationReportingPermission(civilServant.getId());
+    }
 }

@@ -44,7 +44,7 @@ public class OrganisationalReportingPermissionRepositoryTest {
 
         List<Long> orgIds = repository.findAllOrganisationIdByCivilServantId(civilServantId);
         assertTrue(orgIds != null);
-        assertTrue(orgIds.size() > 2);
+        assertTrue(orgIds.size() >= 2);
     }
 
     @Test

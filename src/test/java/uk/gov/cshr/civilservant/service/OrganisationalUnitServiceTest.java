@@ -176,6 +176,12 @@ public class OrganisationalUnitServiceTest {
     }
 
     @Test
+    public void shouldDeleteOrganisationReportingPermission() {
+        organisationalUnitService.deleteOrganisationReportingPermission(1L);
+        verify(organisationalReportingPermissionRepository).deleteReportingPermissionById(any());
+    }
+
+    @Test
     public void givenAnOrgWithThreeLevelsAndTopLevelIsRequested_whenGetOrganisationWithParents_thenShouldReturnParentOnlyOrgUnits() {
         // given
 

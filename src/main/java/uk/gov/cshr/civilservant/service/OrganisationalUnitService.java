@@ -212,4 +212,8 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         organisationIds.forEach(x -> list.add(new CivilServantOrganisationReportingPermission(id, x)));
         organisationalReportingPermissionRepository.saveAll (list);
     }
+
+    public void deleteOrganisationReportingPermission(Long uid) {
+        organisationalReportingPermissionRepository.deleteReportingPermissionById(uid);
+    }
 }
