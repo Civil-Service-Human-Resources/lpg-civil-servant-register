@@ -38,8 +38,6 @@ ADD CONSTRAINT `FK_organisational_unit_agency_token` FOREIGN KEY (`agency_token_
 
 SET FOREIGN_KEY_CHECKS=1;
 
-ALTER TABLE `civil_servant` ADD `force_org_reset` bit(1) DEFAULT FALSE;
-
 INSERT INTO agency_token VALUES (1, 'token123', 100, 10);
 INSERT INTO agency_token VALUES (2, 'token456', 200, 24);
 INSERT INTO agency_token VALUES (3, 'token4gla', 300, 24);

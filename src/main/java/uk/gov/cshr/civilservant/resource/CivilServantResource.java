@@ -18,5 +18,4 @@ public class CivilServantResource {
     private Set<Interest> interests;
     private String lineManagerName;
     private String lineManagerEmailAddress;
-    private Boolean forceOrgReset;
 }
