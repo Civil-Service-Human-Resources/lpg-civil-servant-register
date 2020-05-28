@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
@@ -30,6 +31,8 @@ public class IdentityService {
 
     private String identityAgencyTokenUrl;
 
+    private final UriComponentsBuilder agencyTokenUrlBuilder;
+
     @Autowired
     public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.identityAPIUrl}") String identityAPIUrl,
                            @Value("${identity.identityWhiteListUrl}") String identityWhiteListUrl,
@@ -38,6 +41,7 @@ public class IdentityService {
         this.identityAPIUrl = identityAPIUrl;
         this.identityWhiteListUrl = identityWhiteListUrl;
         this.identityAgencyTokenUrl = identityAgencyTokenUrl;
+        this.agencyTokenUrlBuilder = UriComponentsBuilder.fromHttpUrl(identityAgencyTokenUrl);
     }
 
     public IdentityFromService findByEmail(String email) {
@@ -119,10 +123,10 @@ public class IdentityService {
 
     public int getSpacesUsedForAgencyToken(String uid) throws CSRSApplicationException {
         log.debug("Getting the spaces used");
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAgencyTokenUrl).path("/" + uid);
+        UriComponents url = agencyTokenUrlBuilder.buildAndExpand(uid);
 
         try {
-            return restOperations.getForObject(builder.toUriString(), Integer.class);
+            return restOperations.getForObject(url.toUriString(), Integer.class);
         } catch (HttpClientErrorException clientError) {
             if(clientError.getStatusCode() == HttpStatus.NOT_FOUND) {
                 log.warn("Token for uid " + uid + " does not exist");
@@ -139,4 +143,18 @@ public class IdentityService {
 
     }
 
+    public void removeAgencyTokenFromUsers(String agencyTokenUid) throws CSRSApplicationException {
+        log.debug("Removing agency token");
+        UriComponents url = agencyTokenUrlBuilder.buildAndExpand(agencyTokenUid);
+
+        try {
+            restOperations.delete(url.toUriString());
+        } catch (HttpClientErrorException clientError) {
+            throw new CSRSApplicationException("Error calling identity service: delete agency token", clientError);
+        } catch (HttpServerErrorException serverError) {
+            throw new CSRSApplicationException("Server error calling identity service: delete agency token", serverError);
+        } catch (Exception e) {
+            throw new CSRSApplicationException("Unexpected error calling identity service: delete agency token", e);
+        }
+    }
 }

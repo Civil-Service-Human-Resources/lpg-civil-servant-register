@@ -2,10 +2,13 @@ package uk.gov.cshr.civilservant.service;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -17,6 +20,7 @@ import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.*;
@@ -24,13 +28,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 
+@RunWith(SpringRunner.class)
 public class IdentityServiceTest {
 
     private static final String FIND_BY_EMAIL_URL = "http://localhost/identity";
 
     private static final String IS_WHITELISTED_URL = "http://localhost:8080/domain/isWhitelisted";
 
-    private String GET_SPACES_USED_URL = "http://localhost:8080/agency/%s";
+    private String GET_SPACES_USED_URL = "http://localhost:8080/agency/{agencyTokenUid}";
 
     private IdentityService identityService;
 
@@ -131,19 +136,21 @@ public class IdentityServiceTest {
         assertThat(actualURI.toURL().toString(), equalTo(EXPECTED_IS_WHITELISTED_URL));
     }
 
+    @Test
     public void shouldReturnNumberOfSpacesIfValid() throws MalformedURLException, CSRSApplicationException {
         // given
-        ResponseEntity responseEntity = new ResponseEntity<Integer>(101, HttpStatus.OK);
-        when(restOperations.getForObject(any(String.class), any())).thenReturn(responseEntity);
+        Integer expectedSpaces = 101;
+        String agencyTokenUid = UUID.randomUUID().toString();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(GET_SPACES_USED_URL);
+
+        when(restOperations.getForObject(any(String.class), any())).thenReturn(expectedSpaces);
 
         // when
-        int actual = identityService.getSpacesUsedForAgencyToken("123");
+        int actual = identityService.getSpacesUsedForAgencyToken(agencyTokenUid);
 
         // then
-        assertThat(actual, equalTo(101));
-        verify(restOperations, times(1)).getForEntity(uriArgumentCaptor.capture(), ArgumentMatchers.any());
-        URI actualURI = uriArgumentCaptor.getValue();
-        assertThat(actualURI.toURL().toString(), equalTo(EXPECTED_GET_SPACES_USED_URL));
+        assertThat(actual, equalTo(expectedSpaces));
+        verify(restOperations, times(1)).getForObject(builder.buildAndExpand(agencyTokenUid).toUriString(), Integer.class);
     }
 
     @Test (expected = TokenDoesNotExistException.class)
@@ -176,6 +183,68 @@ public class IdentityServiceTest {
         verify(restOperations, times(1)).getForEntity(uriArgumentCaptor.capture(), ArgumentMatchers.any());
         URI actualURI = uriArgumentCaptor.getValue();
         assertThat(actualURI.toURL().toString(), equalTo(EXPECTED_GET_SPACES_USED_URL));
+    }
+
+    @Test
+    public void removeAgencyTokenFromUsers_ok() throws CSRSApplicationException {
+        String agencyTokenUid = UUID.randomUUID().toString();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(GET_SPACES_USED_URL);
+        identityService.removeAgencyTokenFromUsers(agencyTokenUid);
+        verify(restOperations, times(1)).delete(builder.buildAndExpand(agencyTokenUid).toUriString());
+    }
+
+    @Test(expected = CSRSApplicationException.class)
+    public void removeAgencyTokenFromUsers_clientError() throws CSRSApplicationException {
+        String agencyTokenUid = UUID.randomUUID().toString();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(GET_SPACES_USED_URL);
+        HttpClientErrorException causeException = new HttpClientErrorException(HttpStatus.BAD_REQUEST);
+
+        doThrow(causeException).when(restOperations).delete(builder.buildAndExpand(agencyTokenUid).toUriString());
+
+        try {
+            identityService.removeAgencyTokenFromUsers(agencyTokenUid);
+        } catch (Exception e) {
+            assertEquals("Error calling identity service: delete agency token", e.getMessage());
+            assertEquals(causeException, e.getCause());
+            verify(restOperations, times(1)).delete(builder.buildAndExpand(agencyTokenUid).toUriString());
+            throw e;
+        }
+    }
+
+    @Test(expected = CSRSApplicationException.class)
+    public void removeAgencyTokenFromUsers_serverError() throws CSRSApplicationException {
+        String agencyTokenUid = UUID.randomUUID().toString();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(GET_SPACES_USED_URL);
+        HttpServerErrorException causeException = new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+
+        doThrow(causeException).when(restOperations).delete(builder.buildAndExpand(agencyTokenUid).toUriString());
+
+        try {
+            identityService.removeAgencyTokenFromUsers(agencyTokenUid);
+        } catch (Exception e) {
+            assertEquals("Server error calling identity service: delete agency token", e.getMessage());
+            assertEquals(causeException, e.getCause());
+            verify(restOperations, times(1)).delete(builder.buildAndExpand(agencyTokenUid).toUriString());
+            throw e;
+        }
+    }
+
+    @Test(expected = CSRSApplicationException.class)
+    public void removeAgencyTokenFromUsers_unknownError() throws CSRSApplicationException {
+        String agencyTokenUid = UUID.randomUUID().toString();
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(GET_SPACES_USED_URL);
+        Exception causeException = new RuntimeException("Unknown error");
+
+        doThrow(causeException).when(restOperations).delete(builder.buildAndExpand(agencyTokenUid).toUriString());
+
+        try {
+            identityService.removeAgencyTokenFromUsers(agencyTokenUid);
+        } catch (Exception e) {
+            assertEquals("Unexpected error calling identity service: delete agency token", e.getMessage());
+            assertEquals(causeException, e.getCause());
+            verify(restOperations, times(1)).delete(builder.buildAndExpand(agencyTokenUid).toUriString());
+            throw e;
+        }
     }
 
 }

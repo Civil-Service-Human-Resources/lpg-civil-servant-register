@@ -5,6 +5,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -163,10 +165,19 @@ public class OrganisationalUnitController {
     @DeleteMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity deleteAgencyToken(@PathVariable Long organisationalUnitId) {
-        return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
-            organisationalUnitService.deleteAgencyToken(organisationalUnit);
-            return ResponseEntity.ok(organisationalUnit);
-        }).orElseGet(() -> new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        Optional<OrganisationalUnit> organisationalUnit = organisationalUnitService.getOrganisationalUnit(organisationalUnitId);
+
+        if (organisationalUnit.isPresent()) {
+           OrganisationalUnit updatedOrgUnit = organisationalUnitService.deleteAgencyToken(organisationalUnit.get());
+           if (updatedOrgUnit != null) {
+               return new ResponseEntity(HttpStatus.OK);
+           } else {
+               return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+           }
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)

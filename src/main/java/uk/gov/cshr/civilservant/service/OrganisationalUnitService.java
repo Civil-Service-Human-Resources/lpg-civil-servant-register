@@ -132,13 +132,22 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     }
 
     public OrganisationalUnit deleteAgencyToken(OrganisationalUnit organisationalUnit) {
+
         AgencyToken agencyToken = organisationalUnit.getAgencyToken();
 
+        try {
+            identityService.removeAgencyTokenFromUsers(agencyToken.getUid());
+        } catch (CSRSApplicationException e) {
+            log.error("Error removing users from agency token (%s) to be deleted, error is: %s", agencyToken.getUid(), e.getMessage());
+            return null;
+        }
+
         organisationalUnit.setAgencyToken(null);
+        OrganisationalUnit updateOrgUnit = repository.save(organisationalUnit);
 
         agencyTokenService.deleteAgencyToken(agencyToken);
 
-        return repository.save(organisationalUnit);
+        return updateOrgUnit;
     }
 
     public List<String> getOrganisationalUnitCodes() {

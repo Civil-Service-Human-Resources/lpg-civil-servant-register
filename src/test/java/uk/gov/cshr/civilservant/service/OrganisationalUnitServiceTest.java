@@ -29,6 +29,8 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
@@ -300,14 +302,54 @@ public class OrganisationalUnitServiceTest {
     }
 
     @Test
-    public void shouldDeleteAgencyToken() {
-        AgencyToken agencyToken = new AgencyToken();
-        OrganisationalUnit organisationalUnit = new OrganisationalUnit();
-        organisationalUnit.setAgencyToken(agencyToken);
+    public void deleteAgencyToken_ok() throws CSRSApplicationException {
 
-        doNothing().when(agencyTokenService).deleteAgencyToken(agencyToken);
+        String name = "name", code = "code", abbrv = "test", token = "token", agencyTokenCode = UUID.randomUUID().toString();
 
-        assertNull(organisationalUnitService.deleteAgencyToken(organisationalUnit));
+        AgencyToken agencyToken = new AgencyToken(1, token, 100, agencyTokenCode);
+        OrganisationalUnit originalOrganisationalUnit = new OrganisationalUnit(name, code, abbrv);
+        originalOrganisationalUnit.setId(500L);
+        originalOrganisationalUnit.setAgencyToken(agencyToken);
+
+        OrganisationalUnit clonedOrganisationalUnit = new OrganisationalUnit(originalOrganisationalUnit);
+
+        when(organisationalUnitRepository.save(clonedOrganisationalUnit)).thenReturn(clonedOrganisationalUnit);
+
+        organisationalUnitService.deleteAgencyToken(clonedOrganisationalUnit);
+
+        verify(identityService, times(1)).removeAgencyTokenFromUsers(agencyToken.getUid());
+        verify(organisationalUnitRepository, times(1)).save(clonedOrganisationalUnit);
+        verify(agencyTokenService, times(1)).deleteAgencyToken(agencyToken);
+
+        assertEquals(originalOrganisationalUnit.getName(), clonedOrganisationalUnit.getName());
+        assertEquals(originalOrganisationalUnit.getCode(), clonedOrganisationalUnit.getCode());
+        assertEquals(originalOrganisationalUnit.getAbbreviation(), clonedOrganisationalUnit.getAbbreviation());
+        assertNotEquals(originalOrganisationalUnit.getAgencyToken(), clonedOrganisationalUnit.getAgencyToken());
+        assertNull(clonedOrganisationalUnit.getAgencyToken());
+
+    }
+
+    @Test
+    public void deleteAgencyToken_removeAgencyTokenFromUsersException() throws CSRSApplicationException {
+
+        String name = "name", code = "code", abbrv = "test", token = "token", agencyTokenCode = UUID.randomUUID().toString();
+
+        AgencyToken agencyToken = new AgencyToken(1, token, 100, agencyTokenCode);
+        OrganisationalUnit originalOrganisationalUnit = new OrganisationalUnit(name, code, abbrv);
+        originalOrganisationalUnit.setId(500L);
+        originalOrganisationalUnit.setAgencyToken(agencyToken);
+
+        OrganisationalUnit clonedOrganisationalUnit = new OrganisationalUnit(originalOrganisationalUnit);
+
+        doThrow(new CSRSApplicationException("Bad error", new Exception("Root"))).when(identityService).removeAgencyTokenFromUsers(agencyToken.getUid());
+
+        OrganisationalUnit returnedOrganisationalUnit = organisationalUnitService.deleteAgencyToken(clonedOrganisationalUnit);
+
+        verify(identityService, times(1)).removeAgencyTokenFromUsers(agencyToken.getUid());
+        verify(organisationalUnitRepository, times(0)).save(clonedOrganisationalUnit);
+        verify(agencyTokenService, times(0)).deleteAgencyToken(agencyToken);
+
+        assertNull(returnedOrganisationalUnit);
     }
 
     @Test

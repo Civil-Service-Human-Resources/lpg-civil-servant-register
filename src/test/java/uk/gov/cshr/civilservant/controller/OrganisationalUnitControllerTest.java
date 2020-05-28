@@ -32,9 +32,7 @@ import java.util.*;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -271,6 +269,53 @@ public class OrganisationalUnitControllerTest {
 
         verify(organisationalUnitService, never()).getOrganisationalUnit(anyLong());
         verify(organisationalUnitService, never()).setAgencyToken(any(OrganisationalUnit.class), any(AgencyToken.class));
+    }
+
+    @Test
+    public void deleteAgencyToken_ok() throws Exception {
+        OrganisationalUnit organisationalUnit = new OrganisationalUnit();
+        organisationalUnit.setId(500L);
+
+        when(organisationalUnitService.getOrganisationalUnit(organisationalUnit.getId())).thenReturn(Optional.of(organisationalUnit));
+        when(organisationalUnitService.deleteAgencyToken(organisationalUnit)).thenReturn(organisationalUnit);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete(String.format("/organisationalUnits/%d/agencyToken", organisationalUnit.getId())))
+                .andExpect(status().isOk());
+
+        verify(organisationalUnitService, times(1)).getOrganisationalUnit(organisationalUnit.getId());
+        verify(organisationalUnitService, times(1)).deleteAgencyToken(organisationalUnit);
+    }
+
+    @Test
+    public void deleteAgencyToken_error() throws Exception {
+        OrganisationalUnit organisationalUnit = new OrganisationalUnit();
+        organisationalUnit.setId(500L);
+
+        when(organisationalUnitService.getOrganisationalUnit(organisationalUnit.getId())).thenReturn(Optional.of(organisationalUnit));
+        when(organisationalUnitService.deleteAgencyToken(organisationalUnit)).thenReturn(null);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete(String.format("/organisationalUnits/%d/agencyToken", organisationalUnit.getId())))
+                .andExpect(status().is5xxServerError());
+
+        verify(organisationalUnitService, times(1)).getOrganisationalUnit(organisationalUnit.getId());
+        verify(organisationalUnitService, times(1)).deleteAgencyToken(organisationalUnit);
+    }
+
+    @Test
+    public void deleteAgencyToken_notFound() throws Exception {
+        OrganisationalUnit organisationalUnit = new OrganisationalUnit();
+        organisationalUnit.setId(500L);
+
+        when(organisationalUnitService.getOrganisationalUnit(organisationalUnit.getId())).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete(String.format("/organisationalUnits/%d/agencyToken", organisationalUnit.getId())))
+                .andExpect(status().isNotFound());
+
+        verify(organisationalUnitService, times(1)).getOrganisationalUnit(organisationalUnit.getId());
+        verify(organisationalUnitService, times(0)).deleteAgencyToken(organisationalUnit);
     }
 
     @Test
