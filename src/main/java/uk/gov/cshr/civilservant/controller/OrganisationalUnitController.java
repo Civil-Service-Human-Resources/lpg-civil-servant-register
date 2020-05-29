@@ -22,7 +22,6 @@ import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.CivilServantService;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
@@ -72,7 +71,7 @@ public class OrganisationalUnitController {
 
     @GetMapping("/flat/{domain}/")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructureFilteredByDomain(@PathVariable String domain, HttpServletRequest request) {
+    public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructureFilteredByDomain(@PathVariable String domain) {
         log.info("Getting org flat, filtered by domain");
         String uid;
         try {
@@ -80,20 +79,19 @@ public class OrganisationalUnitController {
         } catch (CSRSApplicationException e) {
             return ResponseEntity.notFound().build();
         }
-        List<OrganisationalUnit> organisationalUnits;
 
         try {
-            organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain, uid);
+            List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain, uid);
+            List<OrganisationalUnitDto> dtos = organisationalUnits.stream()
+                    .map(ou -> organisationalUnitDtoFactory.create(ou))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(dtos);
         } catch(TokenDoesNotExistException | NoOrganisationsFoundException e) {
             return ResponseEntity.notFound().build();
         } catch(Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
-        List<OrganisationalUnitDto> dtos = organisationalUnits.stream()
-                .map(ou -> organisationalUnitDtoFactory.create(ou))
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/children/{code}")
