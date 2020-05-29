@@ -8,15 +8,11 @@ import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
-import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
-import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
-import uk.gov.cshr.civilservant.exception.TokenAlreadyExistsException;
-import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
+import uk.gov.cshr.civilservant.exception.*;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -48,24 +44,24 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         return organisationalUnitList;
     }
 
-    public List<OrganisationalUnit> getOrganisationsForDomain(String domain) {
-        boolean isWhitelistedUser = identityService.isDomainWhiteListed(domain);
+    public List<OrganisationalUnit> getOrganisationsForDomain(String domain, String uid) {
+        // if agency token person return filtered list
+        // else return all/everything
+        boolean isAgencyTokenDomain = agencyTokenService.isDomainInAgency(domain);
 
-        if(isWhitelistedUser) {
-            log.info("Getting all organisations");
+        if(isAgencyTokenDomain) {
+            log.debug("is an agency token domain, returning filtered organisation list");
+            AgencyToken agencyToken = agencyTokenService.getAgencyTokenByUid(uid)
+                    .orElseThrow(() -> new TokenDoesNotExistException());
+
+            OrganisationalUnit organisationalUnit = repository.findOrganisationByAgencyToken(agencyToken)
+                    .orElseThrow(() -> new NoOrganisationsFoundException((domain)));
+
+            return getOrganisationWithChildren(organisationalUnit.getCode());
+        } else {
+            log.debug("Getting all organisations");
             List<OrganisationalUnit> organisationalUnits = repository.findAll();
             return organisationalUnits;
-        }
-
-        Iterable<AgencyToken> agencyTokens = agencyTokenService.getAllAgencyTokensByDomain(domain);
-
-        if(agencyTokens.iterator().hasNext()) {
-            log.info("Getting only organisations for domain: " + domain);
-            Set<OrganisationalUnit> found = findOrganisationsForDomainForAgencyTokenUser(domain, agencyTokens);
-            return found.stream().collect(Collectors.toList());
-        } else {
-            log.warn("user is not a whitelisted user or an agency token user");
-            return Collections.emptyList();
         }
     }
 
@@ -73,7 +69,7 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         return repository.findAll();
     }
 
-    private Set<OrganisationalUnit> findOrganisationsForDomainForAgencyTokenUser(String domain, Iterable<AgencyToken> agencyTokens) {
+    /*private Set<OrganisationalUnit> findOrganisationsForDomainForAgencyTokenUser(String domain, Iterable<AgencyToken> agencyTokens) {
         // Each Organisational Unit has an AgencyToken.  1-to-1
         // Get all orgs
         // go through all and check if it contains the domain
@@ -100,11 +96,11 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         }
 
         return matchingOrganisationalUnitsAndChildrenToBeReturned;
-    }
+    }*/
 
-    private boolean containsDomain(String domain, OrganisationalUnit o) {
+  /*  private boolean containsDomain(String domain, OrganisationalUnit o) {
         return o.getAgencyToken().getAgencyDomains().stream().anyMatch(ad -> ad.getDomain().equals(domain));
-    }
+    }*/
 
     private List<OrganisationalUnit> getOrganisationalUnitAndChildren(String code, List<OrganisationalUnit> organisationalUnits) {
         repository.findByCode(code).ifPresent(organisationalUnit -> {

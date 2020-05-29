@@ -19,15 +19,17 @@ import uk.gov.cshr.civilservant.dto.AgencyTokenDto;
 import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
+import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
+import uk.gov.cshr.civilservant.service.CivilServantService;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
 import uk.gov.cshr.civilservant.utils.JsonUtils;
 import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
+import uk.gov.cshr.civilservant.utils.OrganisationalUnitTestUtils;
 
 import java.util.*;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,14 +38,17 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @RunWith(SpringRunner.class)
 @WithMockUser(username = "user")
 public class OrganisationalUnitControllerTest {
+
+    private static final String WL_DOMAIN = "mydomain.com";
+    private static final String NHS_GLASGOW_DOMAIN = "nhsglasgow.gov.uk";
+    private static final String UID = "myuid";
 
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -54,14 +59,32 @@ public class OrganisationalUnitControllerTest {
     @MockBean
     private OrganisationalUnitService organisationalUnitService;
 
+    @MockBean
+    private CivilServantService civilServantService;
+
     private String requestBodyAgencyTokenAsAString;
 
     private AgencyTokenDto dto;
 
+    private List<OrganisationalUnit> completeList;
+
+    private List<OrganisationalUnit> filteredList;
+
     @Before
-    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
+    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException, CSRSApplicationException {
         MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
         dto = AgencyTokenTestingUtils.createAgencyTokenDTO();
+        completeList = new ArrayList<>(10);
+        for(int i=0; i<10; i++) {
+            completeList.add(OrganisationalUnitTestUtils.buildOrgUnit("wl", i, "whitelisted-domain"));
+        }
+        filteredList = new ArrayList<>(3);
+        for(int i=0; i<3; i++) {
+            filteredList.add(OrganisationalUnitTestUtils.buildOrgUnit("f", i, "agency-domain"));
+        }
+        when(civilServantService.getCivilServantUid()).thenReturn(UID);
+        when(organisationalUnitService.getOrganisationsForDomain(eq(WL_DOMAIN), eq(UID))).thenReturn(completeList);
+        when(organisationalUnitService.getOrganisationsForDomain(eq(NHS_GLASGOW_DOMAIN), eq(UID))).thenReturn(filteredList);
     }
 
     @Test
@@ -88,6 +111,68 @@ public class OrganisationalUnitControllerTest {
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturnOkIfRequestingOrganisationalListFilteredByDomain_wlDomain() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/organisationalUnits/flat/" + WL_DOMAIN + "/")
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(completeList.size())))
+                .andExpect(jsonPath("$[0].code", equalTo(completeList.get(0).getCode())))
+                .andExpect(jsonPath("$[9].code", equalTo(completeList.get(9).getCode())));
+    }
+
+    @Test
+    public void shouldReturnOkIfRequestingOrganisationalListFilteredByDomain_agencyDomain() throws Exception {
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/organisationalUnits/flat/" + NHS_GLASGOW_DOMAIN + "/")
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(filteredList.size())))
+                .andExpect(jsonPath("$[0].code", equalTo(filteredList.get(0).getCode())))
+                .andExpect(jsonPath("$[2].code", equalTo(filteredList.get(2).getCode())));
+    }
+
+    @Test
+    public void shouldReturn404IfRequestingNonExistentCivilServant() throws Exception {
+        when(civilServantService.getCivilServantUid()).thenThrow(new CSRSApplicationException("not found", new Throwable()));
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/organisationalUnits/flat/" + WL_DOMAIN + "/")
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void shouldReturn404IfRequestingNonExistentAgencyToken() throws Exception {
+        when(organisationalUnitService.getOrganisationsForDomain(eq(WL_DOMAIN), eq(UID))).thenThrow(new TokenDoesNotExistException());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/organisationalUnits/flat/" + WL_DOMAIN + "/")
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void shouldReturn404IfRequestingNonExistentOrganisation() throws Exception {
+        when(organisationalUnitService.getOrganisationsForDomain(eq(WL_DOMAIN), eq(UID))).thenThrow(new NoOrganisationsFoundException(WL_DOMAIN));
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/organisationalUnits/flat/" + WL_DOMAIN + "/")
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void shouldReturn500IfTechnicalError() throws Exception {
+        when(organisationalUnitService.getOrganisationsForDomain(eq(WL_DOMAIN), eq(UID))).thenThrow(new RuntimeException());
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/organisationalUnits/flat/" + WL_DOMAIN + "/")
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test
@@ -220,4 +305,5 @@ public class OrganisationalUnitControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
     }
+
 }

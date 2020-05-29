@@ -17,9 +17,12 @@ import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.AgencyTokenFactory;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
 import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
+import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
+import uk.gov.cshr.civilservant.service.CivilServantService;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
@@ -37,10 +40,16 @@ public class OrganisationalUnitController {
 
     private AgencyTokenFactory agencyTokenFactory;
 
-    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService, OrganisationalUnitDtoFactory organisationalUnitDtoFactory, AgencyTokenFactory agencyTokenFactory) {
+    private CivilServantService civilServantService;
+
+    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService,
+                                        OrganisationalUnitDtoFactory organisationalUnitDtoFactory,
+                                        AgencyTokenFactory agencyTokenFactory,
+                                        CivilServantService civilServantService) {
         this.organisationalUnitService = organisationalUnitService;
         this.organisationalUnitDtoFactory = organisationalUnitDtoFactory;
         this.agencyTokenFactory = agencyTokenFactory;
+        this.civilServantService = civilServantService;
     }
 
     @GetMapping("/tree")
@@ -62,12 +71,23 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping("/flat/{domain}/")
-    public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructureFilteredByDomainAndCode(@PathVariable String domain) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructureFilteredByDomain(@PathVariable String domain, HttpServletRequest request) {
         log.info("Getting org flat, filtered by domain");
+        String uid;
+        try {
+            uid = civilServantService.getCivilServantUid();
+        } catch (CSRSApplicationException e) {
+            return ResponseEntity.notFound().build();
+        }
+        List<OrganisationalUnit> organisationalUnits;
 
-        List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain);
-        if(organisationalUnits.isEmpty()) {
-            return ResponseEntity.ok().build();
+        try {
+            organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain, uid);
+        } catch(TokenDoesNotExistException | NoOrganisationsFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
         List<OrganisationalUnitDto> dtos = organisationalUnits.stream()
