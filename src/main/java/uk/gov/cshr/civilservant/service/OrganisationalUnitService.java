@@ -69,39 +69,6 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         return repository.findAll();
     }
 
-    /*private Set<OrganisationalUnit> findOrganisationsForDomainForAgencyTokenUser(String domain, Iterable<AgencyToken> agencyTokens) {
-        // Each Organisational Unit has an AgencyToken.  1-to-1
-        // Get all orgs
-        // go through all and check if it contains the domain
-        // if so put this org into the set to return.
-        List<OrganisationalUnit> allOrgs = getAll();
-        Set<OrganisationalUnit> orgUnitsWithAnAgencyTokenForThisDomain = allOrgs.stream()
-                .filter(o -> o.getAgencyToken() != null)
-                .filter(o -> !o.getAgencyToken().getAgencyDomains().isEmpty())
-                .filter(o -> containsDomain(domain, o))
-                .collect(Collectors.toSet());
-
-        if(orgUnitsWithAnAgencyTokenForThisDomain.isEmpty()) {
-            throw new NoOrganisationsFoundException(domain);
-        }
-
-        log.info("Found " + orgUnitsWithAnAgencyTokenForThisDomain.size() + " org units with an agency token that has this agency domain.");
-
-        Set<OrganisationalUnit> matchingOrganisationalUnitsAndChildrenToBeReturned = new HashSet<>();
-        List<OrganisationalUnit> list = new ArrayList<>();
-
-        for (OrganisationalUnit ou : orgUnitsWithAnAgencyTokenForThisDomain) {
-            List<OrganisationalUnit> currentAndKids = getOrganisationalUnitAndChildren(ou.getCode(), list);
-            matchingOrganisationalUnitsAndChildrenToBeReturned.addAll(currentAndKids);
-        }
-
-        return matchingOrganisationalUnitsAndChildrenToBeReturned;
-    }*/
-
-  /*  private boolean containsDomain(String domain, OrganisationalUnit o) {
-        return o.getAgencyToken().getAgencyDomains().stream().anyMatch(ad -> ad.getDomain().equals(domain));
-    }*/
-
     private List<OrganisationalUnit> getOrganisationalUnitAndChildren(String code, List<OrganisationalUnit> organisationalUnits) {
         repository.findByCode(code).ifPresent(organisationalUnit -> {
             organisationalUnits.add(organisationalUnit);
