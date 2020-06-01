@@ -21,6 +21,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.when;
+import static uk.gov.cshr.civilservant.utils.ApplicationConstants.NO_CIVIL_SERVANT_FOUND_ERROR_MESSAGE;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CivilServantServiceTest {
@@ -53,7 +54,7 @@ public class CivilServantServiceTest {
         when(civilServantRepository.findByPrincipal()).thenReturn(optionalCivilServant);
 
         expectedException.expect(CSRSApplicationException.class);
-        expectedException.expectMessage("No Civil Servant found");
+        expectedException.expectMessage(NO_CIVIL_SERVANT_FOUND_ERROR_MESSAGE);
         expectedException.expectCause(is(instanceOf(CivilServantNotFoundException.class)));
 
         String actual = classUnderTest.getCivilServantUid();
@@ -66,7 +67,7 @@ public class CivilServantServiceTest {
         when(civilServantRepository.findByPrincipal()).thenReturn(Optional.empty());
 
         expectedException.expect(CSRSApplicationException.class);
-        expectedException.expectMessage("No Civil Servant found");
+        expectedException.expectMessage(NO_CIVIL_SERVANT_FOUND_ERROR_MESSAGE);
         expectedException.expectCause(is(instanceOf(CivilServantNotFoundException.class)));
 
         String actual = classUnderTest.getCivilServantUid();
@@ -80,7 +81,7 @@ public class CivilServantServiceTest {
         when(civilServantRepository.findByPrincipal()).thenThrow(runtimeException);
 
         expectedException.expect(CSRSApplicationException.class);
-        expectedException.expectMessage("No Civil Servant found");
+        expectedException.expectMessage(NO_CIVIL_SERVANT_FOUND_ERROR_MESSAGE);
         expectedException.expectCause(is(runtimeException));
 
         String actual = classUnderTest.getCivilServantUid();

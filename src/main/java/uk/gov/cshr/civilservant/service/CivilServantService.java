@@ -7,6 +7,8 @@ import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
 import uk.gov.cshr.civilservant.exception.CivilServantNotFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 
+import static uk.gov.cshr.civilservant.utils.ApplicationConstants.NO_CIVIL_SERVANT_FOUND_ERROR_MESSAGE;
+
 @Slf4j
 @Service
 public class CivilServantService {
@@ -27,7 +29,7 @@ public class CivilServantService {
                 throw new CivilServantNotFoundException();
             }
         } catch (Exception e) {
-            throw new CSRSApplicationException("No Civil Servant found", e);
+            throw new CSRSApplicationException(NO_CIVIL_SERVANT_FOUND_ERROR_MESSAGE, e);
         }
    }
 
