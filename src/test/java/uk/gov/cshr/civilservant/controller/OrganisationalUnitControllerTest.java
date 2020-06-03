@@ -19,6 +19,7 @@ import uk.gov.cshr.civilservant.dto.AgencyTokenDto;
 import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
+import uk.gov.cshr.civilservant.exception.CivilServantNotFoundException;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.CivilServantService;
@@ -69,7 +70,7 @@ public class OrganisationalUnitControllerTest {
     private List<OrganisationalUnit> filteredList;
 
     @Before
-    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException, CSRSApplicationException {
+    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
         MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
         dto = AgencyTokenTestingUtils.createAgencyTokenDTO();
         completeList = new ArrayList<>(10);
@@ -134,33 +135,33 @@ public class OrganisationalUnitControllerTest {
     }
 
     @Test
-    public void shouldReturn404IfRequestingNonExistentCivilServant() throws Exception {
-        when(civilServantService.getCivilServantUid()).thenThrow(new CSRSApplicationException("not found", new Throwable()));
+    public void shouldReturn200IfRequestingNonExistentCivilServant() throws Exception {
+        when(civilServantService.getCivilServantUid()).thenThrow(new CivilServantNotFoundException());
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat/" + WL_DOMAIN + "/")
                         .accept(APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 
     @Test
-    public void shouldReturn404IfRequestingNonExistentAgencyToken() throws Exception {
+    public void shouldReturn200IfRequestingNonExistentAgencyToken() throws Exception {
         when(organisationalUnitService.getOrganisationsForDomain(eq(WL_DOMAIN), eq(UID))).thenThrow(new TokenDoesNotExistException());
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat/" + WL_DOMAIN + "/")
                         .accept(APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 
     @Test
-    public void shouldReturn404IfRequestingNonExistentOrganisation() throws Exception {
+    public void shouldReturn200IfRequestingNonExistentOrganisation() throws Exception {
         when(organisationalUnitService.getOrganisationsForDomain(eq(WL_DOMAIN), eq(UID))).thenThrow(new NoOrganisationsFoundException(WL_DOMAIN));
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat/" + WL_DOMAIN + "/")
                         .accept(APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 
     @Test

@@ -18,6 +18,7 @@ import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.AgencyTokenFactory;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
 import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
+import uk.gov.cshr.civilservant.exception.CivilServantNotFoundException;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.CivilServantService;
@@ -75,22 +76,20 @@ public class OrganisationalUnitController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructureFilteredByDomain(@PathVariable String domain) {
         log.info("Getting org flat, filtered by domain");
-        String uid;
         try {
-            uid = civilServantService.getCivilServantUid();
-        } catch (CSRSApplicationException e) {
-            return ResponseEntity.notFound().build();
-        }
-
-        try {
+            String uid = civilServantService.getCivilServantUid();
             List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain, uid);
+            if(organisationalUnits.isEmpty()) {
+                throw new NoOrganisationsFoundException(domain);
+            }
             List<OrganisationalUnitDto> dtos = organisationalUnits.stream()
                     .map(ou -> organisationalUnitDtoFactory.create(ou))
                     .collect(Collectors.toList());
             return ResponseEntity.ok(dtos);
-        } catch(TokenDoesNotExistException | NoOrganisationsFoundException e) {
-            return ResponseEntity.notFound().build();
+        } catch(CivilServantNotFoundException | TokenDoesNotExistException | NoOrganisationsFoundException e) {
+            return ResponseEntity.ok().build();
         } catch(Exception e) {
+            log.error("Unexpected error occurred getting orgs filtered by domain", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
