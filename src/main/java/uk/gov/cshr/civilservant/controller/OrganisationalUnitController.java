@@ -5,7 +5,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.parameters.P;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +24,7 @@ import uk.gov.cshr.civilservant.service.CivilServantService;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -76,23 +72,27 @@ public class OrganisationalUnitController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructureFilteredByDomain(@PathVariable String domain) {
         log.info("Getting org flat, filtered by domain");
+        List<OrganisationalUnit> organisationalUnits;
         try {
             String uid = civilServantService.getCivilServantUid();
-            List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain, uid);
+            try {
+                organisationalUnits = organisationalUnitService.getOrganisationsForDomain(domain, uid);
+            } catch (NoOrganisationsFoundException e) {
+                return ResponseEntity.ok(Collections.EMPTY_LIST);
+            }
             if(organisationalUnits.isEmpty()) {
-                throw new NoOrganisationsFoundException(domain);
+                return ResponseEntity.ok(Collections.EMPTY_LIST);
             }
             List<OrganisationalUnitDto> dtos = organisationalUnits.stream()
                     .map(ou -> organisationalUnitDtoFactory.create(ou))
                     .collect(Collectors.toList());
             return ResponseEntity.ok(dtos);
-        } catch(CivilServantNotFoundException | TokenDoesNotExistException | NoOrganisationsFoundException e) {
-            return ResponseEntity.ok().build();
+        } catch(CivilServantNotFoundException | TokenDoesNotExistException e) {
+            return ResponseEntity.ok(Collections.EMPTY_LIST);
         } catch(Exception e) {
             log.error("Unexpected error occurred getting orgs filtered by domain", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
     }
 
     @GetMapping("/children/{code}")

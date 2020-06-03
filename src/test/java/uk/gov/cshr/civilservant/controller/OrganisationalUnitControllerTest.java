@@ -141,6 +141,7 @@ public class OrganisationalUnitControllerTest {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat/" + WL_DOMAIN + "/")
                         .accept(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)))
                 .andExpect(status().isOk());
     }
 
@@ -151,6 +152,7 @@ public class OrganisationalUnitControllerTest {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat/" + WL_DOMAIN + "/")
                         .accept(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)))
                 .andExpect(status().isOk());
     }
 
@@ -161,6 +163,7 @@ public class OrganisationalUnitControllerTest {
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat/" + WL_DOMAIN + "/")
                         .accept(APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(0)))
                 .andExpect(status().isOk());
     }
 
