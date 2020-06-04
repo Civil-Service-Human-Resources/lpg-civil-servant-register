@@ -12,6 +12,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.util.UriComponentsBuilder;
+import uk.gov.cshr.civilservant.dto.IdentityAgencyResponseDTO;
 import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
@@ -31,11 +32,15 @@ import static org.mockito.MockitoAnnotations.initMocks;
 @RunWith(SpringRunner.class)
 public class IdentityServiceTest {
 
+    private static final String USER_UID = "myuseruid";
+
     private static final String FIND_BY_EMAIL_URL = "http://localhost/identity";
 
     private static final String IS_WHITELISTED_URL = "http://localhost:8080/domain/isWhitelisted";
 
     private String GET_SPACES_USED_URL = "http://localhost:8080/agency/{agencyTokenUid}";
+
+    private String GET_AGENCY_TOKEN_UID_URL = "http://localhost:8080/identity/agency/{userUid}";
 
     private IdentityService identityService;
 
@@ -45,16 +50,21 @@ public class IdentityServiceTest {
 
     private String EXPECTED_GET_SPACES_USED_URL = "http://localhost:8080/agency/123";
 
+    private String EXPECTED_GET_AGENCY_TOKEN_UID_URL = "http://localhost:8080/identity/agency/" + USER_UID;
+
     @Mock
     private OAuth2RestOperations restOperations;
 
     @Captor
     private ArgumentCaptor<URI> uriArgumentCaptor;
 
+    @Captor
+    private ArgumentCaptor<String> urlArgumentCaptor;
+
     @Before
     public void setup() {
         initMocks(this);
-        identityService = new IdentityService(restOperations, FIND_BY_EMAIL_URL, IS_WHITELISTED_URL, GET_SPACES_USED_URL);
+        identityService = new IdentityService(restOperations, FIND_BY_EMAIL_URL, IS_WHITELISTED_URL, GET_SPACES_USED_URL, GET_AGENCY_TOKEN_UID_URL);
     }
 
     @Test
@@ -184,6 +194,23 @@ public class IdentityServiceTest {
         URI actualURI = uriArgumentCaptor.getValue();
         assertThat(actualURI.toURL().toString(), equalTo(EXPECTED_GET_SPACES_USED_URL));
     }
+
+    @Test
+    public void getAgencyTokenUid_ok() throws CSRSApplicationException {
+        IdentityAgencyResponseDTO response = new IdentityAgencyResponseDTO();
+        response.setAgencyTokenUid("100");
+        response.setUid(USER_UID);
+        when(restOperations.getForObject(anyString(), any())).thenReturn(response);
+
+        String actual = identityService.getAgencyTokenUid(USER_UID);
+
+        assertThat(actual, equalTo("100"));
+        verify(restOperations, times(1)).getForObject(urlArgumentCaptor.capture(), ArgumentMatchers.any());
+        String actualUrl = urlArgumentCaptor.getValue();
+        assertThat(actualUrl, equalTo(EXPECTED_GET_AGENCY_TOKEN_UID_URL));
+    }
+
+    // TODO - ERROR SCENARIOS
 
     @Test
     public void removeAgencyTokenFromUsers_ok() throws CSRSApplicationException {
