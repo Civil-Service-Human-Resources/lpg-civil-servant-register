@@ -19,6 +19,7 @@ import uk.gov.cshr.civilservant.service.exception.UserNotFoundException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -30,23 +31,23 @@ public class IdentityService {
 
     private String identityWhiteListUrl;
 
+    private String agencyTokenUrl;
+
     private String identityAgencyTokenUrl;
 
     private final UriComponentsBuilder agencyTokenUrlBuilder;
 
-    private final UriComponentsBuilder identityAgencyTokenUrlBuilder;
-
     @Autowired
     public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.identityAPIUrl}") String identityAPIUrl,
                            @Value("${identity.identityWhiteListUrl}") String identityWhiteListUrl,
-                           @Value("${identity.agencyTokenUrl}") String identityAgencyTokenUrl,
-                           @Value("${identity.identityAgencyTokenUrl}") String identityAgencyTokenUidUrl) {
+                           @Value("${identity.agencyTokenUrl}") String agencyTokenUrl,
+                           @Value("${identity.identityAgencyTokenUrl}") String identityAgencyTokenUrl) {
         this.restOperations = restOperations;
         this.identityAPIUrl = identityAPIUrl;
         this.identityWhiteListUrl = identityWhiteListUrl;
+        this.agencyTokenUrl = agencyTokenUrl;
         this.identityAgencyTokenUrl = identityAgencyTokenUrl;
-        this.agencyTokenUrlBuilder = UriComponentsBuilder.fromHttpUrl(identityAgencyTokenUrl);
-        this.identityAgencyTokenUrlBuilder = UriComponentsBuilder.fromHttpUrl(identityAgencyTokenUidUrl);
+        this.agencyTokenUrlBuilder = UriComponentsBuilder.fromHttpUrl(agencyTokenUrl);
     }
 
     public IdentityFromService findByEmail(String email) {
@@ -126,6 +127,36 @@ public class IdentityService {
 
     }
 
+    public Optional<String> getAgencyTokenUid(String userUid) throws CSRSApplicationException {
+        log.debug("Getting the agency token uid from identity service");
+        StringBuilder sb = new StringBuilder(identityAgencyTokenUrl);
+        sb.append(userUid);
+     /*   UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityAgencyTokenUrl).path(userUid);
+        //UriComponents url = identityAgencyTokenUrlBuilder.path(userUid).build();
+
+        URI uri;
+        try {
+            uri = new URI(builder.toUriString());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }*/
+
+        try {
+            ResponseEntity<IdentityAgencyResponseDTO> response = restOperations.getForEntity(sb.toString(), IdentityAgencyResponseDTO.class);
+
+            if(response.getStatusCode().is2xxSuccessful() && response.getBody() != null && response.getBody().getAgencyTokenUid() != null) {
+                return Optional.of(response.getBody().getAgencyTokenUid());
+            } else {
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            log.error("Unexpected error calling identity service: get agency token uid", e);
+            throw new CSRSApplicationException("Unexpected error calling identity service: get agency token uid", e);
+        }
+
+    }
+
     public int getSpacesUsedForAgencyToken(String uid) throws CSRSApplicationException {
         log.debug("Getting the spaces used");
         UriComponents url = agencyTokenUrlBuilder.buildAndExpand(uid);
@@ -147,22 +178,46 @@ public class IdentityService {
         }
 
     }
-
-    public String getAgencyTokenUid(String userUid) throws CSRSApplicationException {
+/*
+Caused by: org.springframework.web.client.RestClientException: Could not extract response:
+no suitable HttpMessageConverter found for response type [class uk.gov.cshr.civilservant.dto.IdentityAgencyResponseDTO] and content type [text/html;charset=UTF-8]
+ */
+    /*public Optional<String> getAgencyTokenUidWontWork(String userUid) throws CSRSApplicationException {
         log.debug("Getting the agency token uid from identity service");
         UriComponents url = identityAgencyTokenUrlBuilder.buildAndExpand(userUid);
 
         try {
-            IdentityAgencyResponseDTO responseDto = restOperations.getForObject(url.toUriString(), IdentityAgencyResponseDTO.class);
-            return responseDto.getAgencyTokenUid();
-        } catch (HttpClientErrorException clientError) {
+            //ResponseEntity<IdentityAgencyResponseDTO> responseEntity = restOperations.getForEntity(url.toUri(), IdentityAgencyResponseDTO.class);
+          //  Map<String, Object> request = new HashMap<String, Object>(2);
+           // request.put("name", name.getName());
+            Map<String, Object> request = new HashMap<String, Object>(1);
+            //request.put(HttpHeaders.CONTENT_TYPE, "text/html;charset=utf-8");
+            //"text/html;charset=utf-8";
+            request.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
+            ResponseEntity<IdentityAgencyResponseDTO> responseEntity = restOperations.getForEntity(url.toUriString(), IdentityAgencyResponseDTO.class, request);
+            //ResponseEntity<IdentityAgencyResponseDTO> responseEntity = restOperations.getForEntity(url.toUri(), IdentityAgencyResponseDTO.class, new HttpEntity<Map<String, Object>>(request));
+
+
+            if(responseEntity.getStatusCode() == HttpStatus.OK && responseEntity.getBody() != null && responseEntity.getBody().getAgencyTokenUid() != null) {
+                return Optional.of(responseEntity.getBody().getAgencyTokenUid());
+            } else {
+                return Optional.empty();
+            }
+        } catch(RestClientException clientError) {
+            log.error("Error calling identity service: get agency token uid", clientError);
+            throw new CSRSApplicationException("Error calling identity service: get agency token uid", clientError);
+            *//*catch (HttpClientErrorException clientError) {
+            log.error("Error calling identity service: get agency token uid", clientError);
             throw new CSRSApplicationException("Error calling identity service: get agency token uid", clientError);
         } catch (HttpServerErrorException serverError) {
+            log.error("Server error calling identity service: get agency token uid", serverError);
             throw new CSRSApplicationException("Server error calling identity service: get agency token uid", serverError);
+        } *//*
         } catch (Exception e) {
+            log.error("Unexpected error calling identity service: get agency token uid", e);
             throw new CSRSApplicationException("Unexpected error calling identity service: get agency token uid", e);
         }
-    }
+    }*/
 
     public void removeAgencyTokenFromUsers(String agencyTokenUid) throws CSRSApplicationException {
         log.debug("Removing agency token");
@@ -178,4 +233,5 @@ public class IdentityService {
             throw new CSRSApplicationException("Unexpected error calling identity service: delete agency token", e);
         }
     }
+
 }

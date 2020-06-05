@@ -21,6 +21,7 @@ import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -40,7 +41,7 @@ public class IdentityServiceTest {
 
     private String GET_SPACES_USED_URL = "http://localhost:8080/agency/{agencyTokenUid}";
 
-    private String GET_AGENCY_TOKEN_UID_URL = "http://localhost:8080/identity/agency/{userUid}";
+    private String GET_AGENCY_TOKEN_UID_URL = "http://localhost:8080/identity/agency/";
 
     private IdentityService identityService;
 
@@ -59,7 +60,7 @@ public class IdentityServiceTest {
     private ArgumentCaptor<URI> uriArgumentCaptor;
 
     @Captor
-    private ArgumentCaptor<String> urlArgumentCaptor;
+    private ArgumentCaptor<String> identityAgencyUrlArgumentCaptor;
 
     @Before
     public void setup() {
@@ -196,18 +197,19 @@ public class IdentityServiceTest {
     }
 
     @Test
-    public void getAgencyTokenUid_ok() throws CSRSApplicationException {
+    public void getAgencyTokenUid_ok() throws CSRSApplicationException, MalformedURLException {
         IdentityAgencyResponseDTO response = new IdentityAgencyResponseDTO();
         response.setAgencyTokenUid("100");
         response.setUid(USER_UID);
-        when(restOperations.getForObject(anyString(), any())).thenReturn(response);
+        ResponseEntity responseEntity = new ResponseEntity<IdentityAgencyResponseDTO>(response, HttpStatus.OK);
+        when(restOperations.getForEntity(any(String.class), any())).thenReturn(responseEntity);
 
-        String actual = identityService.getAgencyTokenUid(USER_UID);
+        Optional<String> actual = identityService.getAgencyTokenUid(USER_UID);
 
-        assertThat(actual, equalTo("100"));
-        verify(restOperations, times(1)).getForObject(urlArgumentCaptor.capture(), ArgumentMatchers.any());
-        String actualUrl = urlArgumentCaptor.getValue();
-        assertThat(actualUrl, equalTo(EXPECTED_GET_AGENCY_TOKEN_UID_URL));
+        assertThat(actual.get(), equalTo("100"));
+        verify(restOperations, times(1)).getForEntity(identityAgencyUrlArgumentCaptor.capture(), ArgumentMatchers.any());
+        String actualURL = identityAgencyUrlArgumentCaptor.getValue();
+        assertThat(actualURL, equalTo(EXPECTED_GET_AGENCY_TOKEN_UID_URL));
     }
 
     // TODO - ERROR SCENARIOS

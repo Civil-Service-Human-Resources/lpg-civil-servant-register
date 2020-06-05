@@ -371,7 +371,7 @@ public class OrganisationalUnitServiceTest {
     public void givenAgencyTokenDomain_whenGetOrganisationsForDomain_thenReturnMatchingOrganisationsForThatAgencyTokenIncludingTheirChildrenAndCascadeDownOnly() throws CSRSApplicationException {
         // given
         when(agencyTokenService.isDomainInAgency(eq(NHS_GLASGOW_DOMAIN))).thenReturn(true);
-        when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(AGENCY_TOKEN_UID);
+        when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(Optional.of(AGENCY_TOKEN_UID));
         Optional<AgencyToken> agencyTokenOptional = Optional.of(AgencyTokenTestingUtils.getAgencyToken());
         when(agencyTokenService.getAgencyTokenByUid(eq(AGENCY_TOKEN_UID))).thenReturn(agencyTokenOptional);
         Optional<OrganisationalUnit> nhsGlasgowWithChildren = buildNHSGlasgowWithChildren();
@@ -390,7 +390,7 @@ public class OrganisationalUnitServiceTest {
     public void givenAgencyTokenDomainAndNoAgencyTokenFound_whenGetOrganisationsForDomain_thenThrowTokenDoesNotExistException() throws CSRSApplicationException {
         // given
         when(agencyTokenService.isDomainInAgency(eq(NHS_GLASGOW_DOMAIN))).thenReturn(true);
-        when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(AGENCY_TOKEN_UID);
+        when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(Optional.of(AGENCY_TOKEN_UID));
         when(agencyTokenService.getAgencyTokenByUid(eq(AGENCY_TOKEN_UID))).thenReturn(Optional.empty());
         expectedException.expect(TokenDoesNotExistException.class);
 
@@ -405,7 +405,7 @@ public class OrganisationalUnitServiceTest {
     public void givenAgencyTokenDomainAndNoOrganisationFound_whenGetOrganisationsForDomain_thenThrowNoOrganisationsFoundException() throws CSRSApplicationException {
         // given
         when(agencyTokenService.isDomainInAgency(eq(NHS_GLASGOW_DOMAIN))).thenReturn(true);
-        when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(AGENCY_TOKEN_UID);
+        when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(Optional.of(AGENCY_TOKEN_UID));
         Optional<AgencyToken> agencyTokenOptional = Optional.of(AgencyTokenTestingUtils.getAgencyToken());
         when(agencyTokenService.getAgencyTokenByUid(eq(AGENCY_TOKEN_UID))).thenReturn(agencyTokenOptional);
         when(organisationalUnitRepository.findOrganisationByAgencyToken(eq(agencyTokenOptional.get()))).thenReturn(Optional.empty());

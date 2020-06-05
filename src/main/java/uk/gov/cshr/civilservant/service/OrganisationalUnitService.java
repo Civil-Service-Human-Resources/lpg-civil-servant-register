@@ -52,7 +52,8 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         if(isAgencyTokenDomain) {
             log.debug("is an agency token domain, returning filtered organisation list");
 
-            String agencyTokenUid = identityService.getAgencyTokenUid(userUid);
+            String agencyTokenUid = identityService.getAgencyTokenUid(userUid)
+                    .orElseThrow(() -> new TokenDoesNotExistException());
 
             AgencyToken agencyToken = agencyTokenService.getAgencyTokenByUid(agencyTokenUid)
                     .orElseThrow(() -> new TokenDoesNotExistException());
