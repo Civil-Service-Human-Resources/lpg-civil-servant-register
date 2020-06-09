@@ -1,10 +1,11 @@
 package uk.gov.cshr.civilservant.service;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.*;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
@@ -25,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -61,6 +63,9 @@ public class IdentityServiceTest {
 
     @Captor
     private ArgumentCaptor<String> identityAgencyUrlArgumentCaptor;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setup() {
@@ -197,7 +202,7 @@ public class IdentityServiceTest {
     }
 
     @Test
-    public void getAgencyTokenUid_ok() throws CSRSApplicationException, MalformedURLException {
+    public void getAgencyTokenUid_ok() throws CSRSApplicationException {
         IdentityAgencyResponseDTO response = new IdentityAgencyResponseDTO();
         response.setAgencyTokenUid("100");
         response.setUid(USER_UID);
@@ -212,7 +217,50 @@ public class IdentityServiceTest {
         assertThat(actualURL, equalTo(EXPECTED_GET_AGENCY_TOKEN_UID_URL));
     }
 
-    // TODO - ERROR SCENARIOS
+    @Test
+    public void getAgencyTokenUid_ok_whenNoAgencyTokenUid_shouldTreatAsOptionalEmpty() throws CSRSApplicationException {
+        IdentityAgencyResponseDTO response = new IdentityAgencyResponseDTO();
+        //response.setAgencyTokenUid("100");
+        response.setUid(USER_UID);
+        ResponseEntity responseEntity = new ResponseEntity<IdentityAgencyResponseDTO>(response, HttpStatus.OK);
+        when(restOperations.getForEntity(any(String.class), any())).thenReturn(responseEntity);
+
+        Optional<String> actual = identityService.getAgencyTokenUid(USER_UID);
+
+        assertTrue(!actual.isPresent());
+        verify(restOperations, times(1)).getForEntity(identityAgencyUrlArgumentCaptor.capture(), ArgumentMatchers.any());
+        String actualURL = identityAgencyUrlArgumentCaptor.getValue();
+        assertThat(actualURL, equalTo(EXPECTED_GET_AGENCY_TOKEN_UID_URL));
+    }
+
+    @Test
+    public void getAgencyTokenUid_notFound() throws CSRSApplicationException {
+        ResponseEntity responseEntity = new ResponseEntity<IdentityAgencyResponseDTO>(HttpStatus.NOT_FOUND);
+        when(restOperations.getForEntity(any(String.class), any())).thenReturn(responseEntity);
+
+        Optional<String> actual = identityService.getAgencyTokenUid(USER_UID);
+
+        assertTrue(!actual.isPresent());
+        verify(restOperations, times(1)).getForEntity(identityAgencyUrlArgumentCaptor.capture(), ArgumentMatchers.any());
+        String actualURL = identityAgencyUrlArgumentCaptor.getValue();
+        assertThat(actualURL, equalTo(EXPECTED_GET_AGENCY_TOKEN_UID_URL));
+    }
+
+    @Test
+    public void getAgencyTokenUid_technicalError() throws CSRSApplicationException {
+        RuntimeException runtimeException = new RuntimeException("broken");
+        when(restOperations.getForEntity(any(String.class), any())).thenThrow(runtimeException);
+        expectedException.expect(CSRSApplicationException.class);
+        expectedException.expectCause(is(RuntimeException.class));
+        expectedException.expectMessage("Unexpected error calling identity service: get agency token uid");
+
+        Optional<String> actual = identityService.getAgencyTokenUid(USER_UID);
+
+        assertTrue(!actual.isPresent());
+        verify(restOperations, times(1)).getForEntity(identityAgencyUrlArgumentCaptor.capture(), ArgumentMatchers.any());
+        String actualURL = identityAgencyUrlArgumentCaptor.getValue();
+        assertThat(actualURL, equalTo(EXPECTED_GET_AGENCY_TOKEN_UID_URL));
+    }
 
     @Test
     public void removeAgencyTokenFromUsers_ok() throws CSRSApplicationException {
