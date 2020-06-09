@@ -8,6 +8,7 @@ import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
 import uk.gov.cshr.civilservant.dto.factory.CivilServantDtoFactory;
 import uk.gov.cshr.civilservant.exception.UserNotFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
+import uk.gov.cshr.civilservant.repository.OrganisationalReportingPermissionRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,10 +20,13 @@ public class ReportService {
 
     private final CivilServantRepository civilServantRepository;
     private final CivilServantDtoFactory civilServantDtoFactory;
+    private final OrganisationalReportingPermissionRepository organisationalReportingPermissionRepository;
 
-    public ReportService(CivilServantRepository civilServantRepository, CivilServantDtoFactory civilServantDtoFactory) {
+    public ReportService(CivilServantRepository civilServantRepository, CivilServantDtoFactory civilServantDtoFactory,
+                         OrganisationalReportingPermissionRepository organisationalReportingPermissionRepository) {
         this.civilServantRepository = civilServantRepository;
         this.civilServantDtoFactory = civilServantDtoFactory;
+        this.organisationalReportingPermissionRepository = organisationalReportingPermissionRepository;
     }
 
     @Transactional(readOnly = true)
@@ -73,9 +77,14 @@ public class ReportService {
         CivilServant user = civilServantRepository.findByIdentity(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        if (user.getOrganisationalUnit().isPresent()) {
-            return civilServantRepository.findAllByOrganisationNormalised(user.getOrganisationalUnit().get()).stream()
-                    .collect(Collectors.toMap(CivilServantReportDto::getUid, civilServant -> civilServant));
+        List<Long> reportingOrganisationIdList = organisationalReportingPermissionRepository
+                .findAllOrganisationIdByCivilServantId(user.getId());
+        if(reportingOrganisationIdList != null && !reportingOrganisationIdList.isEmpty()) {
+            List<CivilServantReportDto> dtos = civilServantRepository
+                    .findAllByReportingOrganisationId(reportingOrganisationIdList);
+            return dtos.stream()
+                    .collect(Collectors
+                            .toMap(CivilServantReportDto::getUid, civilServant -> civilServant));
         }
         return Collections.emptyMap();
     }

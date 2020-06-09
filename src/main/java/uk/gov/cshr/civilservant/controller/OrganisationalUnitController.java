@@ -1,21 +1,24 @@
 package uk.gov.cshr.civilservant.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
+import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.validation.Valid;
+import java.util.*;
 import java.util.stream.Collectors;
+
 
 @RepositoryRestController
 @RequestMapping("/organisationalUnits")
@@ -24,8 +27,12 @@ public class OrganisationalUnitController {
 
     private OrganisationalUnitService organisationalUnitService;
 
-    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService) {
+    private CivilServantRepository civilServantRepository;
+
+    public OrganisationalUnitController(OrganisationalUnitService organisationalUnitService,
+                                        CivilServantRepository civilServantRepository) {
         this.organisationalUnitService = organisationalUnitService;
+        this.civilServantRepository = civilServantRepository;
     }
 
     @GetMapping("/tree")
@@ -71,6 +78,39 @@ public class OrganisationalUnitController {
         });
 
         return ResponseEntity.ok(codeParentCodesMap);
+    }
+
+    @PostMapping("/addOrganisationReportingPermission/{uid}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity addOrganisationReportingPermission(@PathVariable String uid, @Valid @RequestBody ArrayList<String> organisationIds) {
+        saveOrUpdate(uid, organisationIds, "add");
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @PutMapping("/updateOrganisationReportingPermission/{uid}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity updateOrganisationReportingPermission(@PathVariable String uid, @Valid @RequestBody ArrayList<String> organisationIds) {
+        saveOrUpdate(uid, organisationIds, "update");
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteOrganisationReportingPermission/{uid}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity deleteOrganisationReportingPermission(@PathVariable String uid) {
+        Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(uid);
+        organisationalUnitService.deleteOrganisationReportingPermission(civilServant.get().getId());
+        return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    private void saveOrUpdate(String uid, ArrayList<String> organisationIds, String addOrUpdate) {
+        Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(uid);
+        List<String> listOrganisationCodes = organisationalUnitService.getOrganisationalUnitCodesForIds(organisationIds);
+        List<Long> organisationIdWithChildrenIds = organisationalUnitService.getOrganisationIdWithChildrenIds(listOrganisationCodes);
+        if(addOrUpdate.equalsIgnoreCase("add")){
+            organisationalUnitService.addOrganisationReportingPermission(civilServant.get().getId(), organisationIdWithChildrenIds);
+        } else {
+            organisationalUnitService.updateOrganisationReportingPermission(civilServant.get().getId(), organisationIdWithChildrenIds);
+        }
     }
 }
 

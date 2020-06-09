@@ -24,12 +24,15 @@ import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -133,6 +136,32 @@ public class CivilServantControllerTest {
 
         verify(civilServantRepository).save(any());
         verify(lineManagerService).notifyLineManager(any(), any(), any());
+    }
+
+    @Test
+    public void getCivilServantUIDsWithReportingPermission() throws Exception {
+        List<String> listUid = Arrays.asList("1", "2", "3");
+        when(civilServantRepository.findCivilServantUID()).thenReturn(listUid);
+
+        mockMvc.perform(
+                get("/civilServants/civilservantwithreportingpermission")
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void getCivilServantReportingPermission() throws Exception {
+        String uid = "12";
+        List<String> listUid = Arrays.asList("1", "2", "3");
+        when(civilServantRepository.findCivilServantReportingPermission(uid)).thenReturn(listUid);
+
+        mockMvc.perform(
+                get("/civilServants/civilservantwithreportingpermission")
+                        .param("uid", uid)
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
     }
 
     private CivilServant createCivilServant(String uid) {

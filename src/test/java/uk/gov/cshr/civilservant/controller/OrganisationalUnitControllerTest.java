@@ -11,16 +11,20 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
+import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.service.OrganisationalUnitService;
 import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
+import uk.gov.cshr.civilservant.utils.JsonUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,6 +40,9 @@ public class OrganisationalUnitControllerTest {
 
     @MockBean
     private OrganisationalUnitService organisationalUnitService;
+
+    @MockBean
+    private CivilServantRepository civilServantRepository;
 
     @Before
     public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
@@ -99,5 +106,74 @@ public class OrganisationalUnitControllerTest {
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldAddOrganisationReportingPermission() throws Exception {
+        String uid = "uid1";
+        CivilServant civilServant = new CivilServant();
+        civilServant.setId(1L);
+        Optional<CivilServant> civilServantOptional = Optional.of(civilServant);
+        List<String> listOrgCode = Arrays.asList("orgCode1","orgCode2");
+        List<Long> listOrgIdWithChildrenIds = Arrays.asList(1L, 2L);
+        List<String> listOrgId = Arrays.asList("orgId1", "orgId2");
+        when(civilServantRepository.findByIdentity(uid)).thenReturn(civilServantOptional);
+        when(organisationalUnitService.getOrganisationalUnitCodesForIds(anyList())).thenReturn(listOrgCode);
+        when(organisationalUnitService.getOrganisationIdWithChildrenIds(anyList())).thenReturn(listOrgIdWithChildrenIds);
+
+        String requestBody = JsonUtils.asJsonString(listOrgId);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.post("/organisationalUnits/addOrganisationReportingPermission/uid1")
+                        .contentType(APPLICATION_JSON).accept(APPLICATION_JSON)
+                        .content(requestBody))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        verify(organisationalUnitService, times(1))
+                .addOrganisationReportingPermission(civilServant.getId(), listOrgIdWithChildrenIds);
+    }
+
+    @Test
+    public void shouldUpdateOrganisationReportingPermission() throws Exception {
+        String uid = "uid1";
+        CivilServant civilServant = new CivilServant();
+        civilServant.setId(1L);
+        Optional<CivilServant> civilServantOptional = Optional.of(civilServant);
+        List<String> listOrgCode = Arrays.asList("orgCode1","orgCode2");
+        List<Long> listOrgIdWithChildrenIds = Arrays.asList(1L, 2L);
+        List<String> listOrgId = Arrays.asList("orgId1", "orgId2");
+        when(civilServantRepository.findByIdentity(uid)).thenReturn(civilServantOptional);
+        when(organisationalUnitService.getOrganisationalUnitCodesForIds(anyList())).thenReturn(listOrgCode);
+        when(organisationalUnitService.getOrganisationIdWithChildrenIds(anyList())).thenReturn(listOrgIdWithChildrenIds);
+
+        String requestBody = JsonUtils.asJsonString(listOrgId);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.put("/organisationalUnits/updateOrganisationReportingPermission/uid1")
+                        .contentType(APPLICATION_JSON).accept(APPLICATION_JSON)
+                        .content(requestBody))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        verify(organisationalUnitService, times(1))
+                .updateOrganisationReportingPermission(civilServant.getId(), listOrgIdWithChildrenIds);
+    }
+
+    @Test
+    public void shouldDeleteOrganisationReportingPermission() throws Exception {
+        String uid = "uid1";
+        CivilServant civilServant = new CivilServant();
+        civilServant.setId(1L);
+        Optional<CivilServant> civilServantOptional = Optional.of(civilServant);
+        when(civilServantRepository.findByIdentity(uid)).thenReturn(civilServantOptional);
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.delete("/organisationalUnits/deleteOrganisationReportingPermission/uid1"))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        verify(organisationalUnitService, times(1))
+                .deleteOrganisationReportingPermission(civilServant.getId());
     }
 }
