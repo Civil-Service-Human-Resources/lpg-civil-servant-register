@@ -220,7 +220,6 @@ public class IdentityServiceTest {
     @Test
     public void getAgencyTokenUid_ok_whenNoAgencyTokenUid_shouldTreatAsOptionalEmpty() throws CSRSApplicationException {
         IdentityAgencyResponseDTO response = new IdentityAgencyResponseDTO();
-        //response.setAgencyTokenUid("100");
         response.setUid(USER_UID);
         ResponseEntity responseEntity = new ResponseEntity<IdentityAgencyResponseDTO>(response, HttpStatus.OK);
         when(restOperations.getForEntity(any(String.class), any())).thenReturn(responseEntity);
