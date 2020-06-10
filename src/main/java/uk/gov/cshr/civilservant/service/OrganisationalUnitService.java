@@ -44,14 +44,18 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         return organisationalUnitList;
     }
 
-    public List<OrganisationalUnit> getOrganisationsForDomain(String domain, String uid) {
+    public List<OrganisationalUnit> getOrganisationsForDomain(String domain, String userUid) throws CSRSApplicationException {
         // if agency token person return filtered list
         // else return all/everything
         boolean isAgencyTokenDomain = agencyTokenService.isDomainInAgency(domain);
 
         if(isAgencyTokenDomain) {
             log.debug("is an agency token domain, returning filtered organisation list");
-            AgencyToken agencyToken = agencyTokenService.getAgencyTokenByUid(uid)
+
+            String agencyTokenUid = identityService.getAgencyTokenUid(userUid)
+                    .orElseThrow(() -> new TokenDoesNotExistException());
+
+            AgencyToken agencyToken = agencyTokenService.getAgencyTokenByUid(agencyTokenUid)
                     .orElseThrow(() -> new TokenDoesNotExistException());
 
             OrganisationalUnit organisationalUnit = repository.findOrganisationByAgencyToken(agencyToken)

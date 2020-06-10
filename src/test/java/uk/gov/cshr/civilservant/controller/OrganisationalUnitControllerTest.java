@@ -70,7 +70,7 @@ public class OrganisationalUnitControllerTest {
     private List<OrganisationalUnit> filteredList;
 
     @Before
-    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
+    public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException, CSRSApplicationException {
         MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
         dto = AgencyTokenTestingUtils.createAgencyTokenDTO();
         completeList = new ArrayList<>(10);
@@ -165,6 +165,16 @@ public class OrganisationalUnitControllerTest {
                         .accept(APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(0)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void shouldReturn500IfGeneralApplicationError() throws Exception {
+        when(organisationalUnitService.getOrganisationsForDomain(eq(WL_DOMAIN), eq(UID))).thenThrow(new CSRSApplicationException("broken", new RuntimeException()));
+
+        mockMvc.perform(
+                MockMvcRequestBuilders.get("/organisationalUnits/flat/" + WL_DOMAIN + "/")
+                        .accept(APPLICATION_JSON))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test

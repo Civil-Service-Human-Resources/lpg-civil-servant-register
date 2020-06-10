@@ -11,6 +11,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.dto.IdentityAgencyResponseDTO;
 import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
@@ -18,6 +19,7 @@ import uk.gov.cshr.civilservant.service.exception.UserNotFoundException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -29,6 +31,8 @@ public class IdentityService {
 
     private String identityWhiteListUrl;
 
+    private String agencyTokenUrl;
+
     private String identityAgencyTokenUrl;
 
     private final UriComponentsBuilder agencyTokenUrlBuilder;
@@ -36,12 +40,14 @@ public class IdentityService {
     @Autowired
     public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.identityAPIUrl}") String identityAPIUrl,
                            @Value("${identity.identityWhiteListUrl}") String identityWhiteListUrl,
-                           @Value("${identity.agencyTokenUrl}") String identityAgencyTokenUrl) {
+                           @Value("${identity.agencyTokenUrl}") String agencyTokenUrl,
+                           @Value("${identity.identityAgencyTokenUrl}") String identityAgencyTokenUrl) {
         this.restOperations = restOperations;
         this.identityAPIUrl = identityAPIUrl;
         this.identityWhiteListUrl = identityWhiteListUrl;
+        this.agencyTokenUrl = agencyTokenUrl;
         this.identityAgencyTokenUrl = identityAgencyTokenUrl;
-        this.agencyTokenUrlBuilder = UriComponentsBuilder.fromHttpUrl(identityAgencyTokenUrl);
+        this.agencyTokenUrlBuilder = UriComponentsBuilder.fromHttpUrl(agencyTokenUrl);
     }
 
     public IdentityFromService findByEmail(String email) {
@@ -121,6 +127,26 @@ public class IdentityService {
 
     }
 
+    public Optional<String> getAgencyTokenUid(String userUid) throws CSRSApplicationException {
+        log.debug("Getting the agency token uid from identity service");
+        StringBuilder sb = new StringBuilder(identityAgencyTokenUrl);
+        sb.append(userUid);
+
+        try {
+            ResponseEntity<IdentityAgencyResponseDTO> response = restOperations.getForEntity(sb.toString(), IdentityAgencyResponseDTO.class);
+
+            if(response.getStatusCode().is2xxSuccessful() && response.getBody() != null && response.getBody().getAgencyTokenUid() != null) {
+                return Optional.of(response.getBody().getAgencyTokenUid());
+            } else {
+                return Optional.empty();
+            }
+        } catch (Exception e) {
+            log.error("Unexpected error calling identity service: get agency token uid", e);
+            throw new CSRSApplicationException("Unexpected error calling identity service: get agency token uid", e);
+        }
+
+    }
+
     public int getSpacesUsedForAgencyToken(String uid) throws CSRSApplicationException {
         log.debug("Getting the spaces used");
         UriComponents url = agencyTokenUrlBuilder.buildAndExpand(uid);
@@ -157,4 +183,5 @@ public class IdentityService {
             throw new CSRSApplicationException("Unexpected error calling identity service: delete agency token", e);
         }
     }
+
 }

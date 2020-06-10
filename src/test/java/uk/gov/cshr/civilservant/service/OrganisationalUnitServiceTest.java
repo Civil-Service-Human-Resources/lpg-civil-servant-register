@@ -42,7 +42,8 @@ public class OrganisationalUnitServiceTest {
 
     private static final String WL_DOMAIN = "mydomain.com";
     private static final String NHS_GLASGOW_DOMAIN = "nhsglasgow.gov.uk";
-    private static final String UID = "myuid";
+    private static final String USER_UID = "myuid";
+    private static final String AGENCY_TOKEN_UID = "myagencytokenuid";
 
     @Mock
     private OrganisationalUnitRepository organisationalUnitRepository;
@@ -353,13 +354,13 @@ public class OrganisationalUnitServiceTest {
     }
 
     @Test
-    public void givenAWhitelistedDomain_whenGetOrganisationsForDomain_thenReturnAllOrganisations() {
+    public void givenAWhitelistedDomain_whenGetOrganisationsForDomain_thenReturnAllOrganisations() throws CSRSApplicationException {
         // given
         when(agencyTokenService.isDomainInAgency(eq(WL_DOMAIN))).thenReturn(false);
         when(organisationalUnitRepository.findAll()).thenReturn(ALL_ORGS);
 
         // when
-        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain(WL_DOMAIN, UID);
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain(WL_DOMAIN, USER_UID);
 
         // then
         assertThat(actual).hasSize(ALL_ORGS.size());
@@ -367,16 +368,17 @@ public class OrganisationalUnitServiceTest {
     }
 
     @Test
-    public void givenAgencyTokenDomain_whenGetOrganisationsForDomain_thenReturnMatchingOrganisationsForThatAgencyTokenIncludingTheirChildrenAndCascadeDownOnly() {
+    public void givenAgencyTokenDomain_whenGetOrganisationsForDomain_thenReturnMatchingOrganisationsForThatAgencyTokenIncludingTheirChildrenAndCascadeDownOnly() throws CSRSApplicationException {
         // given
         when(agencyTokenService.isDomainInAgency(eq(NHS_GLASGOW_DOMAIN))).thenReturn(true);
+        when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(Optional.of(AGENCY_TOKEN_UID));
         Optional<AgencyToken> agencyTokenOptional = Optional.of(AgencyTokenTestingUtils.getAgencyToken());
-        when(agencyTokenService.getAgencyTokenByUid(eq(UID))).thenReturn(agencyTokenOptional);
+        when(agencyTokenService.getAgencyTokenByUid(eq(AGENCY_TOKEN_UID))).thenReturn(agencyTokenOptional);
         Optional<OrganisationalUnit> nhsGlasgowWithChildren = buildNHSGlasgowWithChildren();
         when(organisationalUnitRepository.findOrganisationByAgencyToken(eq(agencyTokenOptional.get()))).thenReturn(nhsGlasgowWithChildren);
 
         // when
-        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain(NHS_GLASGOW_DOMAIN, UID);
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain(NHS_GLASGOW_DOMAIN, USER_UID);
 
         // then
         // org for that at and all orgs children should be returned,
@@ -385,31 +387,33 @@ public class OrganisationalUnitServiceTest {
     }
 
     @Test
-    public void givenAgencyTokenDomainAndNoAgencyTokenFound_whenGetOrganisationsForDomain_thenThrowTokenDoesNotExistException() {
+    public void givenAgencyTokenDomainAndNoAgencyTokenFound_whenGetOrganisationsForDomain_thenThrowTokenDoesNotExistException() throws CSRSApplicationException {
         // given
         when(agencyTokenService.isDomainInAgency(eq(NHS_GLASGOW_DOMAIN))).thenReturn(true);
-        when(agencyTokenService.getAgencyTokenByUid(eq(UID))).thenReturn(Optional.empty());
+        when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(Optional.of(AGENCY_TOKEN_UID));
+        when(agencyTokenService.getAgencyTokenByUid(eq(AGENCY_TOKEN_UID))).thenReturn(Optional.empty());
         expectedException.expect(TokenDoesNotExistException.class);
 
         // when
-        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain(NHS_GLASGOW_DOMAIN, UID);
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain(NHS_GLASGOW_DOMAIN, USER_UID);
 
         // then
         verifyZeroInteractions(organisationalUnitRepository);
     }
 
     @Test
-    public void givenAgencyTokenDomainAndNoOrganisationFound_whenGetOrganisationsForDomain_thenThrowNoOrganisationsFoundException() {
+    public void givenAgencyTokenDomainAndNoOrganisationFound_whenGetOrganisationsForDomain_thenThrowNoOrganisationsFoundException() throws CSRSApplicationException {
         // given
         when(agencyTokenService.isDomainInAgency(eq(NHS_GLASGOW_DOMAIN))).thenReturn(true);
+        when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(Optional.of(AGENCY_TOKEN_UID));
         Optional<AgencyToken> agencyTokenOptional = Optional.of(AgencyTokenTestingUtils.getAgencyToken());
-        when(agencyTokenService.getAgencyTokenByUid(eq(UID))).thenReturn(agencyTokenOptional);
+        when(agencyTokenService.getAgencyTokenByUid(eq(AGENCY_TOKEN_UID))).thenReturn(agencyTokenOptional);
         when(organisationalUnitRepository.findOrganisationByAgencyToken(eq(agencyTokenOptional.get()))).thenReturn(Optional.empty());
         expectedException.expect(NoOrganisationsFoundException.class);
         expectedException.expectMessage("No organisations found for domain: " + NHS_GLASGOW_DOMAIN);
 
         // when
-        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain(NHS_GLASGOW_DOMAIN, UID);
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain(NHS_GLASGOW_DOMAIN, USER_UID);
 
         // then
         verifyZeroInteractions(organisationalUnitRepository);
