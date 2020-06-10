@@ -23,6 +23,8 @@ public class OAuthProperties implements Serializable {
 
     private int maxPerServiceUrl;
 
+    private String jwtKey;
+
     public String getServiceUrl() {
         return serviceUrl;
     }
@@ -77,5 +79,13 @@ public class OAuthProperties implements Serializable {
 
     public void setMaxPerServiceUrl(int maxPerServiceUrl) {
         this.maxPerServiceUrl = maxPerServiceUrl;
+    }
+
+    public String getJwtKey() {
+        return jwtKey;
+    }
+
+    public void setJwtKey(String jwtKey) {
+        this.jwtKey = jwtKey;
     }
 }
