@@ -35,6 +35,7 @@ import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -156,31 +157,29 @@ public class CivilServantControllerTest {
         OrgCodeDTO dto = new OrgCodeDTO();
         dto.setCode("co");
 
-        when(civilServantRepository.findByIdentity(eq("myuid"))).thenReturn(Optional.of(civilServant));
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
         when(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(civilServant)).thenReturn(Optional.of(dto));
 
         mockMvc.perform(
                 get("/civilServants/org")
-                        .param("uid", "myuid")
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("co"));
+                .andExpect(content().string(containsString("co")));
     }
 
     @Test
     public void givenCivilServantDoesNotExist_shouldReturnNotFound() throws Exception {
 
-        when(civilServantRepository.findByIdentity(eq("myuid"))).thenReturn(Optional.empty());
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.empty());
 
         mockMvc.perform(
                 get("/civilServants/org")
-                        .param("uid", "myuid")
                         .accept(APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound());
 
-        verify(civilServantRepository).findByIdentity(anyString());
+        verify(civilServantRepository).findByPrincipal();
         verify(civilServantResourceFactory, never()).getCivilServantOrganisationalUnitCode(any(CivilServant.class));
     }
 
@@ -189,16 +188,14 @@ public class CivilServantControllerTest {
 
         CivilServant civilServant = createCivilServant("myuid");
 
-        when(civilServantRepository.findByIdentity(eq("myuid"))).thenReturn(Optional.of(civilServant));
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
         when(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(any(CivilServant.class))).thenReturn(Optional.empty());
 
         mockMvc.perform(
                 get("/civilServants/org")
-                        .param("uid", "myuid")
                         .accept(APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().string("null"));
+                .andExpect(status().isNotFound());
     }
 
     @Test
