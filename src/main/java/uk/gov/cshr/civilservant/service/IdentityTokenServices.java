@@ -45,7 +45,7 @@ public class IdentityTokenServices extends RemoteTokenServices {
     }
 
     @Override
-    public OAuth2Authentication loadAuthentication(String accessToken) {
+    public OAuth2Authentication loadAuthentication(final String accessToken) {
         configureInternalUser();
 
         OAuth2Authentication authentication = super.loadAuthentication(accessToken);
@@ -60,13 +60,12 @@ public class IdentityTokenServices extends RemoteTokenServices {
             return identityRepository.save(newIdentity);
         });
 
-        Optional<CivilServant> civilServant = civilServantRepository.findByIdentity(storedIdentity);
-
-        civilServant.orElseGet(() -> {
+        boolean civilServantExists = civilServantRepository.existsByIdentity(storedIdentity);
+        if (!civilServantExists) {
             LOGGER.debug("No civil servant exists for identity {}, creating.", identity);
             CivilServant newCivilServant = new CivilServant(storedIdentity);
-            return civilServantRepository.save(newCivilServant);
-        });
+            civilServantRepository.save(newCivilServant);
+        }
 
         return authentication;
     }

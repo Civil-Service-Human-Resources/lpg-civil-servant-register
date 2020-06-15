@@ -38,10 +38,7 @@ public class CivilServantRepositoryTest {
     @Test
     public void shouldFindCivilServantByIdentity() {
         final Identity identity = new Identity("1");
-        final CivilServant civilServant = new CivilServant(identity);
-
-        identityRepository.save(identity);
-        civilServantRepository.save(civilServant);
+        persistCivilServantOf(identity);
 
         Optional<CivilServant> civilServantOptional = civilServantRepository.findByIdentity(identity);
         assertTrue(civilServantOptional.isPresent());
@@ -58,6 +55,24 @@ public class CivilServantRepositoryTest {
         assertFalse(civilServant.isPresent());
     }
 
+    @Test
+    public void shouldReturnTrueCivilServantFoundByIdentity() {
+        final Identity identity = new Identity("3");
+        persistCivilServantOf(identity);
+        Boolean exists = civilServantRepository.existsByIdentity(identity);
+        assertTrue("Civil servant with ID 3 should exist", exists );
+    }
+
+    @Test
+    public void shouldReturnFalseCivilServantNotFoundByIdentity() {
+        final Identity existingIdentity = new Identity("3");
+        persistCivilServantOf(existingIdentity);
+
+        final Identity notExistIdentity = new Identity("999");
+        identityRepository.save(notExistIdentity);
+        Boolean exists = civilServantRepository.existsByIdentity(notExistIdentity);
+        assertFalse("Civil servant with ID 999 should not exist", exists );
+    }
 
     @Test
     public void shouldReturnCivilServantsByOrganisationalUnit() {
@@ -74,22 +89,16 @@ public class CivilServantRepositoryTest {
         organisationalUnitRepository.save(organisationalUnit2);
 
         Identity identity1 = new Identity("1");
-        CivilServant civilServant1 = new CivilServant(identity1);
+        CivilServant civilServant1 = persistCivilServantOf(identity1);
         civilServant1.setOrganisationalUnit(organisationalUnit1);
-        identityRepository.save(identity1);
-        civilServantRepository.save(civilServant1);
 
         Identity identity2 = new Identity("2");
-        CivilServant civilServant2 = new CivilServant(identity2);
+        CivilServant civilServant2 = persistCivilServantOf(identity2);
         civilServant2.setOrganisationalUnit(organisationalUnit2);
-        identityRepository.save(identity2);
-        civilServantRepository.save(civilServant2);
 
         Identity identity3 = new Identity("3");
-        CivilServant civilServant3 = new CivilServant(identity3);
+        CivilServant civilServant3 = persistCivilServantOf(identity3);
         civilServant3.setOrganisationalUnit(organisationalUnit1);
-        identityRepository.save(identity3);
-        civilServantRepository.save(civilServant3);
 
         List<CivilServant> result = civilServantRepository.findAllByOrganisationalUnit(organisationalUnit1);
 
@@ -130,5 +139,12 @@ public class CivilServantRepositoryTest {
         assertEquals(2, result.size());
         assertEquals(civilServant1, result.get(0));
         assertEquals(civilServant3, result.get(1));
+    }
+
+    private CivilServant persistCivilServantOf(final Identity identity) {
+        final CivilServant civilServant = new  CivilServant(identity);
+        identityRepository.save(identity);
+        civilServantRepository.save(civilServant);
+        return civilServant;
     }
 }

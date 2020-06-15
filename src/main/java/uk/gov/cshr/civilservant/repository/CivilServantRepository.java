@@ -52,6 +52,9 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
     @RestResource(exported = false)
     Optional<CivilServant> findByIdentity(Identity identity);
 
+    @RestResource(exported = false)
+    Boolean existsByIdentity(Identity identity);
+
     List<CivilServant> findAllByOrganisationalUnit(OrganisationalUnit organisationalUnit);
 
     List<CivilServant> findAllByProfession(Profession profession);
