@@ -1,7 +1,5 @@
 package uk.gov.cshr.civilservant.domain;
 
-import lombok.ToString;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;

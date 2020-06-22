@@ -44,6 +44,13 @@ public class CivilServantResourceFactory {
             civilServantResource.setLineManagerEmailAddress(identityService.getEmailAddress(lineManager));
         }
 
+        civilServantResource.setUserId(civilServant.getId());
+        if(civilServant.getForceOrgReset() == null) {
+            civilServantResource.setForceOrgReset(false);
+        } else {
+            civilServantResource.setForceOrgReset(civilServant.getForceOrgReset());
+        }
+
         civilServantResource.setInterests(civilServant.getInterests());
         civilServantResource.setOtherAreasOfWork(civilServant.getOtherAreasOfWork());
 

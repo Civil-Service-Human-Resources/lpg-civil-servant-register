@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/organisationalUnits")
 public class OrganisationalUnitController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationalUnitController.class);
 
     private OrganisationalUnitService organisationalUnitService;
 

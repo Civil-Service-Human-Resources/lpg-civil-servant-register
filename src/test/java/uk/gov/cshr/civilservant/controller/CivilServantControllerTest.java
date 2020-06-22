@@ -117,11 +117,11 @@ public class CivilServantControllerTest {
 
     @Test
     public void shouldReturnOkAndUpdateCivilServant() throws Exception {
-
         String lineManagerEmail = "manager@domain.com";
 
         IdentityFromService lineManagerIdentity = new IdentityFromService();
         lineManagerIdentity.setUid("mid");
+
         lineManagerIdentity.setUsername(lineManagerEmail);
 
         when(lineManagerService.checkLineManager("learner@domain.com")).thenReturn(lineManagerIdentity);

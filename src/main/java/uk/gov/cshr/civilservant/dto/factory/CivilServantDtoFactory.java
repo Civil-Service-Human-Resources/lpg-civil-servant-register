@@ -2,8 +2,10 @@ package uk.gov.cshr.civilservant.dto.factory;
 
 import org.springframework.stereotype.Component;
 import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.domain.Profession;
 import uk.gov.cshr.civilservant.dto.CivilServantDto;
+import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 
 import java.util.stream.Collectors;
 
@@ -33,6 +35,12 @@ public class CivilServantDtoFactory extends DtoFactory<CivilServantDto, CivilSer
 
         if (civilServant.getGrade().isPresent()) {
             civilServantDto.setGrade(civilServant.getGrade().get().getName());
+        }
+
+        if(civilServant.getForceOrgReset() == null) {
+            civilServantDto.setForceOrgFlag(false);
+        } else {
+            civilServantDto.setForceOrgFlag(civilServant.getForceOrgReset());
         }
 
         return civilServantDto;
