@@ -41,7 +41,6 @@ public class CivilServantDtoFactoryTest {
         civilServant.setFullName(userName);
         civilServant.setOtherAreasOfWork(new HashSet<>(Arrays.asList(
                 new Profession(otherAreaOfWork1), new Profession(otherAreaOfWork2))));
-        civilServant.setForceOrgReset(forceOrgFlag);
 
         CivilServantDto dto = dtoFactory.create(civilServant);
 
@@ -52,7 +51,6 @@ public class CivilServantDtoFactoryTest {
         assertEquals(userName, dto.getName());
         assertEquals(Arrays.asList(otherAreaOfWork1, otherAreaOfWork2), dto.getOtherAreasOfWork().stream()
                 .sorted().collect(Collectors.toList()));
-        assertTrue(dto.isForceOrgFlag());
     }
 
     @Test
@@ -86,7 +84,5 @@ public class CivilServantDtoFactoryTest {
         assertEquals(userName, dto.getName());
         assertEquals(Arrays.asList(otherAreaOfWork1, otherAreaOfWork2), dto.getOtherAreasOfWork().stream()
                 .sorted().collect(Collectors.toList()));
-        assertFalse(dto.isForceOrgFlag());
     }
-
 }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
-import uk.gov.cshr.civilservant.dto.AgencyTokenDto;
+import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.AgencyTokenFactory;
@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/organisationalUnits")
 public class OrganisationalUnitController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(OrganisationalUnitController.class);
 
     private OrganisationalUnitService organisationalUnitService;
 
@@ -131,7 +130,7 @@ public class OrganisationalUnitController {
 
     @PostMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyTokenDto agencyTokenDto, UriComponentsBuilder builder) {
+    public ResponseEntity saveAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyTokenDTO agencyTokenDto, UriComponentsBuilder builder) {
         AgencyToken agencyToken = agencyTokenFactory.buildAgencyTokenFromAgencyTokenDto(agencyTokenDto);
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.setAgencyToken(organisationalUnit, agencyToken);
@@ -154,7 +153,7 @@ public class OrganisationalUnitController {
 
     @PatchMapping("/{organisationalUnitId}/agencyToken")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyTokenDto agencyTokenDto) {
+    public ResponseEntity updateAgencyToken(@PathVariable Long organisationalUnitId, @Valid @RequestBody AgencyTokenDTO agencyTokenDto) {
         AgencyToken agencyToken = agencyTokenFactory.buildAgencyTokenFromAgencyTokenDto(agencyTokenDto);
         return organisationalUnitService.getOrganisationalUnit(organisationalUnitId).map(organisationalUnit -> {
             organisationalUnitService.updateAgencyToken(organisationalUnit, agencyToken);

@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
-import uk.gov.cshr.civilservant.dto.AgencyTokenDto;
+import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
@@ -37,7 +37,8 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -63,7 +64,7 @@ public class OrganisationalUnitControllerTest {
 
     private String requestBodyAgencyTokenAsAString;
 
-    private AgencyTokenDto dto;
+    private AgencyTokenDTO dto;
 
     private List<OrganisationalUnit> completeList;
 

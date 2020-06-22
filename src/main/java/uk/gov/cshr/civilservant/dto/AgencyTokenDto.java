@@ -22,8 +22,7 @@ public class AgencyTokenDTO {
     @ValidCapacity
     private int capacity;
 
-    @PositiveOrZero
-    private int capacityUsed;
+    private String uid;
 
     @NotEmpty
     private Set<AgencyDomainDTO> agencyDomains;

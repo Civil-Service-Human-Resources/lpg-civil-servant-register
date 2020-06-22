@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.dto.AgencyDomainDTO;
-import uk.gov.cshr.civilservant.dto.AgencyTokenDto;
+import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -27,7 +27,7 @@ public class AgencyTokenFactoryTest {
 
     @Test
     public void buildAgencyTokenShouldBuildAndSetNewUid() {
-        AgencyTokenDto AgencyTokenDto = new AgencyTokenDto();
+        AgencyTokenDTO AgencyTokenDto = new AgencyTokenDTO();
         AgencyTokenDto.setCapacity(CAPACITY);
         AgencyTokenDto.setToken(TOKEN);
 
@@ -46,7 +46,7 @@ public class AgencyTokenFactoryTest {
 
     @Test
     public void buildAgencyTokenShouldBuildAndUseExistingUid() {
-        AgencyTokenDto AgencyTokenDto = new AgencyTokenDto();
+        AgencyTokenDTO AgencyTokenDto = new AgencyTokenDTO();
         AgencyTokenDto.setCapacity(CAPACITY);
         AgencyTokenDto.setToken(TOKEN);
         AgencyTokenDto.setUid(UID);

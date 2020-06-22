@@ -3,7 +3,7 @@ package uk.gov.cshr.civilservant.utils;
 import uk.gov.cshr.civilservant.domain.AgencyDomain;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.dto.AgencyDomainDTO;
-import uk.gov.cshr.civilservant.dto.AgencyTokenDto;
+import uk.gov.cshr.civilservant.dto.AgencyTokenDTO;
 import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
 
 import java.util.HashSet;
@@ -43,8 +43,8 @@ public class AgencyTokenTestingUtils {
         return at;
     }
 
-    public static AgencyTokenDto createAgencyTokenDTO() {
-        AgencyTokenDto dto = new AgencyTokenDto();
+    public static AgencyTokenDTO createAgencyTokenDTO() {
+        AgencyTokenDTO dto = new AgencyTokenDTO();
         dto.setToken("thisisatoken");
         dto.setCapacity(100);
         dto.setUid(UID);
