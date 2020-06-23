@@ -16,10 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -104,7 +101,7 @@ public class OrganisationalUnitRepositoryTest {
     public void findOrganisationByAgencyToken_whenTokenAndOrgExistAndLinked() {
 
         // Create data
-        AgencyToken savedToken = agencyTokenRepository.save(new AgencyToken(-1, "test-token", 1, 0));
+        AgencyToken savedToken = agencyTokenRepository.save(new AgencyToken(-1, "test-token", 1, "uid"));
         OrganisationalUnit savedOrg = repository.save(new OrganisationalUnit("org-name", "org-code", "org-abbrv"));
 
         // Link
@@ -118,7 +115,7 @@ public class OrganisationalUnitRepositoryTest {
     public void findOrganisationByAgencyToken_whenTokenAndOrgExistButNotLinked() {
 
         // Create data
-        AgencyToken savedToken = agencyTokenRepository.save(new AgencyToken(-1, "test-token", 1, 0));
+        AgencyToken savedToken = agencyTokenRepository.save(new AgencyToken(-1, "test-token", 1, "uid"));
         OrganisationalUnit savedOrg = repository.save(new OrganisationalUnit("org-name", "org-code", "org-abbrv"));
 
         assertFalse(repository.findOrganisationByAgencyToken(savedToken).isPresent());

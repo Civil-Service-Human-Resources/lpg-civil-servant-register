@@ -40,8 +40,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -150,42 +148,6 @@ public class CivilServantControllerTest {
 
         verify(civilServantRepository).save(any());
         verify(lineManagerService).notifyLineManager(any(), any(), any());
-    }
-
-    public void shouldReturnOkWhenRequestCivilServantByUid() throws Exception {
-        String uid = "uid";
-        String lineManagerEmail = "manager@domain.com";
-
-        CivilServant civilServant = createCivilServant(uid);
-
-        CivilServantResource civilServantResource = new CivilServantResource();
-        civilServantResource.setLineManagerEmailAddress(lineManagerEmail);
-
-        civilServant.setId(1L);
-
-        when(civilServantRepository.findByIdentity(uid)).thenReturn(Optional.of(civilServant));
-        when(civilServantResourceFactory.create(civilServant)).thenReturn(new Resource<>(civilServantResource));
-
-
-        mockMvc.perform(
-                get("/civilServants/" + uid).with(csrf())
-                        .accept(APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.lineManagerEmailAddress").value("manager@domain.com"));
-    }
-
-    @Test
-    public void shouldReturnNotFoundWhenRequestCivilServantByUidDoesntExist() throws Exception {
-        String uid = "uid";
-
-        when(civilServantRepository.findByIdentity(uid)).thenReturn(Optional.empty());
-
-        mockMvc.perform(
-                get("/civilServants/" + uid).with(csrf())
-                        .accept(APPLICATION_JSON))
-                .andDo(print())
-                .andExpect(status().isNotFound());
     }
 
     @Test

@@ -25,6 +25,7 @@ import static org.junit.Assert.assertTrue;
 @DataJpaTest
 public class AgencyTokenRepositoryTest {
 
+    private static final String UID = "uid";
     @Autowired
     private TestEntityManager entityManager;
 
@@ -38,7 +39,7 @@ public class AgencyTokenRepositoryTest {
         agencyToken = new AgencyToken();
         agencyToken.setToken("token4Test");
         agencyToken.setCapacity(100);
-        agencyToken.setCapacityUsed(91);
+        agencyToken.setUid(UID);
 
         AgencyDomain domainNHSDigital = new AgencyDomain();
         domainNHSDigital.setDomain("nhs.digital");
@@ -76,7 +77,6 @@ public class AgencyTokenRepositoryTest {
         assertTrue(actual.isPresent());
         assertThat(actual.get().getToken(), equalTo("token4Test"));
         assertThat(actual.get().getCapacity(), equalTo(100));
-        assertThat(actual.get().getCapacityUsed(), equalTo(91));
         assertThat(actual.get().getId(), is(notNullValue()));
         assertThat(actual.get().getAgencyDomains(), is(nullValue()));
     }
@@ -89,10 +89,8 @@ public class AgencyTokenRepositoryTest {
         assertTrue(actual.isPresent());
         assertThat(actual.get().getToken(), equalTo("token4Test"));
         assertThat(actual.get().getCapacity(), equalTo(100));
-        assertThat(actual.get().getCapacityUsed(), equalTo(91));
+        assertThat(actual.get().getUid(), equalTo(UID));
         assertThat(actual.get().getId(), is(notNullValue()));
         assertThat(actual.get().getAgencyDomains(), hasSize(3));
     }
-
-
 }

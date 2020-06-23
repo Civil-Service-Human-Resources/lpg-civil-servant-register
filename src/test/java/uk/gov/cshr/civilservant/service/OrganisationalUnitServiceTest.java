@@ -1,9 +1,7 @@
 package uk.gov.cshr.civilservant.service;
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -11,21 +9,27 @@ import org.mockito.junit.MockitoJUnitRunner;
 import uk.gov.cshr.civilservant.domain.AgencyDomain;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.dto.AgencyDomainDTO;
+import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
+import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
 import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
+import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 import uk.gov.cshr.civilservant.utils.AgencyTokenTestingUtils;
 import uk.gov.cshr.civilservant.utils.FamilyOrganisationUnits;
 import uk.gov.cshr.civilservant.utils.OrganisationalUnitTestUtils;
-import uk.gov.cshr.civilservant.utils.TypeList;
 
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -35,6 +39,12 @@ public class OrganisationalUnitServiceTest {
 
     private static String GODFATHERS_CODE;
     private static List<OrganisationalUnit> ALL_ORGS;
+
+    private static final String WL_DOMAIN = "mydomain.com";
+    private static final String NHS_GLASGOW_DOMAIN = "nhsglasgow.gov.uk";
+    private static final String USER_UID = "myuid";
+    private static final String AGENCY_TOKEN_UID = "myagencytokenuid";
+
     @Mock
     private OrganisationalUnitRepository organisationalUnitRepository;
     @Mock
@@ -47,6 +57,9 @@ public class OrganisationalUnitServiceTest {
     private OrganisationalUnitService organisationalUnitService;
     private FamilyOrganisationUnits family;
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @BeforeClass
     public static void staticSetUp(){
         ALL_ORGS = new ArrayList<>(10);
@@ -54,7 +67,6 @@ public class OrganisationalUnitServiceTest {
             ALL_ORGS.add(OrganisationalUnitTestUtils.buildOrgUnit("wl", i, "whitelisted-domain"));
         }
     }
-
 
     @Before
     public void setUp() {
@@ -291,40 +303,194 @@ public class OrganisationalUnitServiceTest {
     }
 
     @Test
-    public void shouldDeleteAgencyToken() {
-        AgencyToken agencyToken = new AgencyToken();
-        OrganisationalUnit organisationalUnit = new OrganisationalUnit();
-        organisationalUnit.setAgencyToken(agencyToken);
+    public void deleteAgencyToken_ok() throws CSRSApplicationException {
 
-        doNothing().when(agencyTokenService).deleteAgencyToken(agencyToken);
+        String name = "name", code = "code", abbrv = "test", token = "token", agencyTokenCode = UUID.randomUUID().toString();
 
-        assertNull(organisationalUnitService.deleteAgencyToken(organisationalUnit));
+        AgencyToken agencyToken = new AgencyToken(1, token, 100, agencyTokenCode);
+        OrganisationalUnit originalOrganisationalUnit = new OrganisationalUnit(name, code, abbrv);
+        originalOrganisationalUnit.setId(500L);
+        originalOrganisationalUnit.setAgencyToken(agencyToken);
+
+        OrganisationalUnit clonedOrganisationalUnit = new OrganisationalUnit(originalOrganisationalUnit);
+
+        when(organisationalUnitRepository.save(clonedOrganisationalUnit)).thenReturn(clonedOrganisationalUnit);
+
+        organisationalUnitService.deleteAgencyToken(clonedOrganisationalUnit);
+
+        verify(identityService, times(1)).removeAgencyTokenFromUsers(agencyToken.getUid());
+        verify(organisationalUnitRepository, times(1)).save(clonedOrganisationalUnit);
+        verify(agencyTokenService, times(1)).deleteAgencyToken(agencyToken);
+
+        assertEquals(originalOrganisationalUnit.getName(), clonedOrganisationalUnit.getName());
+        assertEquals(originalOrganisationalUnit.getCode(), clonedOrganisationalUnit.getCode());
+        assertEquals(originalOrganisationalUnit.getAbbreviation(), clonedOrganisationalUnit.getAbbreviation());
+        assertNotEquals(originalOrganisationalUnit.getAgencyToken(), clonedOrganisationalUnit.getAgencyToken());
+        assertNull(clonedOrganisationalUnit.getAgencyToken());
+
     }
 
-    @Test // BH CHECKED
-    public void givenAWhitelistedDomain_whenGetOrganisationsForDomain_thenReturnAllOrganisations() {
+    @Test
+    public void deleteAgencyToken_removeAgencyTokenFromUsersException() throws CSRSApplicationException {
+
+        String name = "name", code = "code", abbrv = "test", token = "token", agencyTokenCode = UUID.randomUUID().toString();
+
+        AgencyToken agencyToken = new AgencyToken(1, token, 100, agencyTokenCode);
+        OrganisationalUnit originalOrganisationalUnit = new OrganisationalUnit(name, code, abbrv);
+        originalOrganisationalUnit.setId(500L);
+        originalOrganisationalUnit.setAgencyToken(agencyToken);
+
+        OrganisationalUnit clonedOrganisationalUnit = new OrganisationalUnit(originalOrganisationalUnit);
+
+        doThrow(new CSRSApplicationException("Bad error", new Exception("Root"))).when(identityService).removeAgencyTokenFromUsers(agencyToken.getUid());
+
+        OrganisationalUnit returnedOrganisationalUnit = organisationalUnitService.deleteAgencyToken(clonedOrganisationalUnit);
+
+        verify(identityService, times(1)).removeAgencyTokenFromUsers(agencyToken.getUid());
+        verify(organisationalUnitRepository, times(0)).save(clonedOrganisationalUnit);
+        verify(agencyTokenService, times(0)).deleteAgencyToken(agencyToken);
+
+        assertNull(returnedOrganisationalUnit);
+    }
+
+    @Test
+    public void givenAWhitelistedDomain_whenGetOrganisationsForDomain_thenReturnAllOrganisations() throws CSRSApplicationException {
         // given
-        when(identityService.isDomainWhiteListed(anyString())).thenReturn(true);
+        when(agencyTokenService.isDomainInAgency(eq(WL_DOMAIN))).thenReturn(false);
         when(organisationalUnitRepository.findAll()).thenReturn(ALL_ORGS);
 
         // when
-        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("mydomain");
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain(WL_DOMAIN, USER_UID);
 
         // then
         assertThat(actual).hasSize(ALL_ORGS.size());
         verify(organisationalUnitRepository, times(1)).findAll();
+    }
+
+    @Test
+    public void givenAgencyTokenDomain_whenGetOrganisationsForDomain_thenReturnMatchingOrganisationsForThatAgencyTokenIncludingTheirChildrenAndCascadeDownOnly() throws CSRSApplicationException {
+        // given
+        when(agencyTokenService.isDomainInAgency(eq(NHS_GLASGOW_DOMAIN))).thenReturn(true);
+        when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(Optional.of(AGENCY_TOKEN_UID));
+        Optional<AgencyToken> agencyTokenOptional = Optional.of(AgencyTokenTestingUtils.getAgencyToken());
+        when(agencyTokenService.getAgencyTokenByUid(eq(AGENCY_TOKEN_UID))).thenReturn(agencyTokenOptional);
+        Optional<OrganisationalUnit> nhsGlasgowWithChildren = buildNHSGlasgowWithChildren();
+        when(organisationalUnitRepository.findOrganisationByAgencyToken(eq(agencyTokenOptional.get()))).thenReturn(nhsGlasgowWithChildren);
+
+        // when
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain(NHS_GLASGOW_DOMAIN, USER_UID);
+
+        // then
+        // org for that at and all orgs children should be returned,
+        // i.e. Glasgow and its children maryhill and govan ONLY
+        assertThat(actual).extracting("code").containsExactlyInAnyOrder("NHSGLASGOW", "NHSMARYHILL", "NHSGOVAN");
+    }
+
+    @Test
+    public void givenAgencyTokenDomainAndNoAgencyTokenFound_whenGetOrganisationsForDomain_thenThrowTokenDoesNotExistException() throws CSRSApplicationException {
+        // given
+        when(agencyTokenService.isDomainInAgency(eq(NHS_GLASGOW_DOMAIN))).thenReturn(true);
+        when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(Optional.of(AGENCY_TOKEN_UID));
+        when(agencyTokenService.getAgencyTokenByUid(eq(AGENCY_TOKEN_UID))).thenReturn(Optional.empty());
+        expectedException.expect(TokenDoesNotExistException.class);
+
+        // when
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain(NHS_GLASGOW_DOMAIN, USER_UID);
+
+        // then
+        verifyZeroInteractions(organisationalUnitRepository);
+    }
+
+    @Test
+    public void givenAgencyTokenDomainAndNoOrganisationFound_whenGetOrganisationsForDomain_thenThrowNoOrganisationsFoundException() throws CSRSApplicationException {
+        // given
+        when(agencyTokenService.isDomainInAgency(eq(NHS_GLASGOW_DOMAIN))).thenReturn(true);
+        when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(Optional.of(AGENCY_TOKEN_UID));
+        Optional<AgencyToken> agencyTokenOptional = Optional.of(AgencyTokenTestingUtils.getAgencyToken());
+        when(agencyTokenService.getAgencyTokenByUid(eq(AGENCY_TOKEN_UID))).thenReturn(agencyTokenOptional);
+        when(organisationalUnitRepository.findOrganisationByAgencyToken(eq(agencyTokenOptional.get()))).thenReturn(Optional.empty());
+        expectedException.expect(NoOrganisationsFoundException.class);
+        expectedException.expectMessage("No organisations found for domain: " + NHS_GLASGOW_DOMAIN);
+
+        // when
+        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain(NHS_GLASGOW_DOMAIN, USER_UID);
+
+        // then
+        verifyZeroInteractions(organisationalUnitRepository);
+    }
+
+    @Test
+    public void shouldReturnAgencyTokenResponseDtoIfValid() throws CSRSApplicationException {
+        AgencyTokenResponseDto responseDto = AgencyTokenTestingUtils.getAgencyTokenResponseDto();
+        long orgId = 3l;
+        OrganisationalUnit orgUnit = new OrganisationalUnit();
+        AgencyToken agencyToken = AgencyTokenTestingUtils.getAgencyToken();
+        orgUnit.setAgencyToken(agencyToken);
+        Optional<OrganisationalUnit> optionalOrganisationalUnit = Optional.of(orgUnit);
+        when(organisationalUnitRepository.findById(eq(orgId))).thenReturn(optionalOrganisationalUnit);
+        when(agencyTokenService.getAgencyTokenResponseDto(eq(agencyToken))).thenReturn(responseDto);
+
+        AgencyTokenResponseDto actual = organisationalUnitService.getAgencyToken(orgId);
+
+        Assert.assertThat(actual.getToken(), equalTo((responseDto.getToken())));
+        Assert.assertThat(actual.getCapacity(), equalTo((responseDto.getCapacity())));
+        Assert.assertThat(actual.getCapacityUsed(), equalTo(responseDto.getCapacityUsed()));
+
+        Set<AgencyDomainDTO> actualAgencyDomains = actual.getAgencyDomains();
+        assertEquals(actualAgencyDomains.size(), 1);
+        AgencyDomainDTO[] actualAgencyDomainsAsAnArray = actualAgencyDomains.toArray(new AgencyDomainDTO[actualAgencyDomains.size()]);
+        assertEquals(actualAgencyDomainsAsAnArray[0].getDomain(), "aDomain");
+    }
+
+    @Test
+    public void shouldThrowTokenDoesNotExistIfOrganisationNotFound() throws CSRSApplicationException {
+        AgencyTokenResponseDto responseDto = AgencyTokenTestingUtils.getAgencyTokenResponseDto();
+        long orgId = 3l;
+        when(organisationalUnitRepository.findById(eq(orgId))).thenReturn(Optional.empty());
+
+        expectedException.expect(TokenDoesNotExistException.class);
+
+        AgencyTokenResponseDto actual = organisationalUnitService.getAgencyToken(orgId);
+
         verifyZeroInteractions(agencyTokenService);
     }
 
     @Test
-    public void givenDomainWithOneMatchingAgencyTokens_whenGetOrganisationsForDomain_thenReturnMatchingOrganisationsForThatAgencyTokenIncludingTheirChildrenAndCascadeDownOnly() {
-        // given
-        when(identityService.isDomainWhiteListed(anyString())).thenReturn(false);
-        when(organisationalUnitRepository.findAll()).thenReturn(ALL_ORGS);
+    public void shouldThrowTokenDoesNotExistIfTokenNotFound() throws CSRSApplicationException {
+        AgencyTokenResponseDto responseDto = AgencyTokenTestingUtils.getAgencyTokenResponseDto();
+        long orgId = 3l;
+        OrganisationalUnit orgUnit = new OrganisationalUnit();
+        Optional<OrganisationalUnit> optionalOrganisationalUnit = Optional.of(orgUnit);
+        when(organisationalUnitRepository.findById(eq(orgId))).thenReturn(optionalOrganisationalUnit);
 
+        expectedException.expect(TokenDoesNotExistException.class);
+
+        AgencyTokenResponseDto actual = organisationalUnitService.getAgencyToken(orgId);
+    }
+
+    @Test
+    public void shouldThrowGeneralApplicationExceptionIfTechnicalError() throws CSRSApplicationException {
+        AgencyTokenResponseDto responseDto = AgencyTokenTestingUtils.getAgencyTokenResponseDto();
+        long orgId = 3l;
+        OrganisationalUnit orgUnit = new OrganisationalUnit();
+        AgencyToken agencyToken = AgencyTokenTestingUtils.getAgencyToken();
+        orgUnit.setAgencyToken(agencyToken);
+        Optional<OrganisationalUnit> optionalOrganisationalUnit = Optional.of(orgUnit);
+        when(organisationalUnitRepository.findById(eq(orgId))).thenReturn(optionalOrganisationalUnit);
+
+        RuntimeException runtimeException = new RuntimeException();
+        when(agencyTokenService.getAgencyTokenResponseDto(eq(agencyToken))).thenThrow(new CSRSApplicationException("something went wrong", runtimeException));
+        expectedException.expect(CSRSApplicationException.class);
+        expectedException.expectMessage("something went wrong");
+        expectedException.expectCause(is(runtimeException));
+
+        AgencyTokenResponseDto actual = organisationalUnitService.getAgencyToken(orgId);
+
+        verifyZeroInteractions(agencyTokenService);
+    }
+
+    private Optional<OrganisationalUnit> buildNHSGlasgowWithChildren() {
         // set up at for nhs glasgow
-        AgencyToken[] atArray = new AgencyToken[1];
-
         // AT 1
         AgencyToken at = new AgencyToken();
         at.setId(new Long(100));
@@ -341,10 +507,6 @@ public class OrganisationalUnitServiceTest {
         nhsEdinburgh.setDomain("nhsedinburgh.gov.uk");
         at.getAgencyDomains().add(nhsEdinburgh);
 
-        atArray[0] = at;
-        Iterable<AgencyToken> it = new TypeList<>(atArray);
-        when(agencyTokenService.getAllAgencyTokensByDomain(anyString())).thenReturn(it);
-
         // glasgows children x 2
         OrganisationalUnit maryhillNHS = new OrganisationalUnit();
         maryhillNHS.setCode("NHSMARYHILL");
@@ -368,8 +530,6 @@ public class OrganisationalUnitServiceTest {
 
         greaterGlasgowNHS.setParent(ALL_ORGS.get(0));
 
-        ALL_ORGS.add(greaterGlasgowNHS);
-
         Optional<OrganisationalUnit> optNhsGlasgow = Optional.of(greaterGlasgowNHS);
         when(organisationalUnitRepository.findByCode(eq("NHSGLASGOW"))).thenReturn(optNhsGlasgow);
 
@@ -379,210 +539,7 @@ public class OrganisationalUnitServiceTest {
         Optional<OrganisationalUnit> optNhsGovan = Optional.of(govanNHS);
         when(organisationalUnitRepository.findByCode(eq("NHSGOVAN"))).thenReturn(optNhsGovan);
 
-        // when
-        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("nhsglasgow.gov.uk");
-
-        // then
-        // domain was only added to one agency token, see static set up method
-        // org for that at and all orgs children should be returned, i.e. Glasgow and its children maryhill and govan
-        assertThat(actual).extracting("code").containsExactlyInAnyOrder("NHSGLASGOW", "NHSMARYHILL", "NHSGOVAN");
-        verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("nhsglasgow.gov.uk");
-        verify(organisationalUnitRepository, times(1)).findAll();
-    }
-
-    @Test
-    public void givenDomainWithMultipleAgencyTokens_whenGetOrganisationsForDomain_thenReturnMatchingOrganisationsForThatAgencyTokenIncludingTheirChildrenAndCascadeDownOnly() {
-        // given
-        when(identityService.isDomainWhiteListed(anyString())).thenReturn(false);
-        when(organisationalUnitRepository.findAll()).thenReturn(ALL_ORGS);
-
-        // set up at for nhs glasgow
-        AgencyToken[] atArray = new AgencyToken[2];
-
-        // AT number 1
-        AgencyToken at = new AgencyToken();
-        at.setId(new Long(100));
-        at.setToken("token123");
-        at.setAgencyDomains(new HashSet<>());
-
-        AgencyDomain nhsGlasgow = new AgencyDomain();
-        nhsGlasgow.setId(new Long(3000));
-        nhsGlasgow.setDomain("nhsglasgow.gov.uk");
-        at.getAgencyDomains().add(nhsGlasgow);
-
-        AgencyDomain nhsEdinburgh = new AgencyDomain();
-        nhsEdinburgh.setId(new Long(3001));
-        nhsEdinburgh.setDomain("nhsedinburgh.gov.uk");
-        at.getAgencyDomains().add(nhsEdinburgh);
-
-        atArray[0] = at;
-
-        // AT number 2
-        AgencyToken at2 = new AgencyToken();
-        at2.setId(new Long(100));
-        at2.setToken("token456");
-        at2.setAgencyDomains(new HashSet<>());
-
-        AgencyDomain nhsAyrshire = new AgencyDomain();
-        nhsAyrshire.setId(new Long(3002));
-        nhsAyrshire.setDomain("nhsayrshire.gov.uk");
-        // required to test when there are +1 ATs.
-        nhsAyrshire.setDomain("nhsglasgow.gov.uk");
-        at2.getAgencyDomains().add(nhsAyrshire);
-
-        AgencyDomain nhsArran = new AgencyDomain();
-        nhsArran.setId(new Long(3003));
-        nhsArran.setDomain("nhsarran.gov.uk");
-        at2.getAgencyDomains().add(nhsArran);
-
-        atArray[1] = at2;
-        Iterable<AgencyToken> it = new TypeList<>(atArray);
-        when(agencyTokenService.getAllAgencyTokensByDomain(anyString())).thenReturn(it);
-
-        // glasgows children x 2
-        OrganisationalUnit maryhillNHS = new OrganisationalUnit();
-        maryhillNHS.setCode("NHSMARYHILL");
-
-        OrganisationalUnit govanNHS = new OrganisationalUnit();
-        govanNHS.setCode("NHSGOVAN");
-
-        // set up org for nhs glasgow
-        OrganisationalUnit greaterGlasgowNHS = new OrganisationalUnit();
-        greaterGlasgowNHS.setCode("NHSGLASGOW");
-        greaterGlasgowNHS.setAgencyToken(at);
-
-        List<OrganisationalUnit> children = new ArrayList<>();
-        children.add(maryhillNHS);
-        children.add(govanNHS);
-        greaterGlasgowNHS.setChildren(children);
-
-        // set the kids parent to be glasgow
-        maryhillNHS.setParent(greaterGlasgowNHS);
-        govanNHS.setParent(greaterGlasgowNHS);
-
-        greaterGlasgowNHS.setParent(ALL_ORGS.get(0));
-
-        ALL_ORGS.add(greaterGlasgowNHS);
-
-        // ayrshireandarrans children x 2
-        OrganisationalUnit ayrshireNHS = new OrganisationalUnit();
-        ayrshireNHS.setCode("NHSAYRSHIRE");
-
-        OrganisationalUnit arranNHS = new OrganisationalUnit();
-        arranNHS.setCode("NHSARRAN");
-
-        // set up org for nhs AYRSHIreandArran
-        OrganisationalUnit ayrshireAndArranNHS = new OrganisationalUnit();
-        ayrshireAndArranNHS.setCode("NHSAYRSHIREANDARRAN");
-        ayrshireAndArranNHS.setAgencyToken(at2);
-
-        List<OrganisationalUnit> children2 = new ArrayList<>();
-        children2.add(ayrshireNHS);
-        children2.add(arranNHS);
-        ayrshireAndArranNHS.setChildren(children2);
-
-        // set the kids parent to be glasgow
-        ayrshireNHS.setParent(ayrshireAndArranNHS);
-        arranNHS.setParent(ayrshireAndArranNHS);
-
-        // children of children
-        OrganisationalUnit largsNHS = new OrganisationalUnit();
-        largsNHS.setCode("NHSLARGS");
-        largsNHS.setParent(ayrshireNHS);
-
-        List<OrganisationalUnit> childrenOfAyrshire = new ArrayList<>();
-        childrenOfAyrshire.add(largsNHS);
-        ayrshireNHS.setChildren(childrenOfAyrshire);
-
-        ALL_ORGS.add(ayrshireAndArranNHS);
-
-        Optional<OrganisationalUnit> optNhsGlasgow = Optional.of(greaterGlasgowNHS);
-        when(organisationalUnitRepository.findByCode(eq("NHSGLASGOW"))).thenReturn(optNhsGlasgow);
-
-        Optional<OrganisationalUnit> optNhsMaryhill = Optional.of(maryhillNHS);
-        when(organisationalUnitRepository.findByCode(eq("NHSMARYHILL"))).thenReturn(optNhsMaryhill);
-
-        Optional<OrganisationalUnit> optNhsGovan = Optional.of(govanNHS);
-        when(organisationalUnitRepository.findByCode(eq("NHSGOVAN"))).thenReturn(optNhsGovan);
-
-        Optional<OrganisationalUnit> optNhsArran = Optional.of(arranNHS);
-        when(organisationalUnitRepository.findByCode(eq("NHSARRAN"))).thenReturn(optNhsArran);
-
-        Optional<OrganisationalUnit> optNhsAyrshire = Optional.of(ayrshireNHS);
-        when(organisationalUnitRepository.findByCode(eq("NHSAYRSHIRE"))).thenReturn(optNhsAyrshire);
-
-        Optional<OrganisationalUnit> optNhsAyrshireAndArran = Optional.of(ayrshireAndArranNHS);
-        when(organisationalUnitRepository.findByCode(eq("NHSAYRSHIREANDARRAN"))).thenReturn(optNhsAyrshireAndArran);
-
-        Optional<OrganisationalUnit> optNhsLargs = Optional.of(largsNHS);
-        when(organisationalUnitRepository.findByCode(eq("NHSLARGS"))).thenReturn(optNhsLargs);
-
-        // when
-        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("nhsglasgow.gov.uk");
-
-        // then
-        // domain was only added to one agency token, see static set up method
-        // org for that at and all orgs children should be returned, i.e. Glasgow and its children maryhill and govan
-        // and AYRSHIRE AND ARRAN, AYRSHIRE, ARRan and largs
-        assertThat(actual).extracting("code").containsExactlyInAnyOrder("NHSGLASGOW", "NHSMARYHILL", "NHSGOVAN", "NHSARRAN", "NHSAYRSHIRE", "NHSAYRSHIREANDARRAN", "NHSLARGS");
-        verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("nhsglasgow.gov.uk");
-        verify(organisationalUnitRepository, times(1)).findAll();
-    }
-
-    @Ignore
-    public void givenDomainWithNonWhiteListedDomainAndNoAgencyTokens_whenGetOrganisationsForDomain_thenThrowNoOrganisationsFoundException() {
-
-        /*
-        Note: At time of writing, this is a valid scenario.
-        as the SOR for agency token is csrs and the SOR for whitelisted domains is identity service
-        Therefore there is nothing to stop an admin person adding agency tokens to an whitelisted domain.
-         */
-        // given
-        when(identityService.isDomainWhiteListed(anyString())).thenReturn(false);
-        AgencyToken[] atArray = new AgencyToken[0];
-        Iterable<AgencyToken> it = new TypeList<>(atArray);
-        when(agencyTokenService.getAllAgencyTokensByDomain(anyString())).thenReturn(it);
-
-        // when
-        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("mydomain");
-
-        // then
-        assertThat(actual).hasSize(ALL_ORGS.size());
-        verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("mydomain");
-        verify(organisationalUnitRepository, times(1)).findAll();
-    }
-
-    @Test (expected = NoOrganisationsFoundException.class)
-    public void givenDomainWithNonWhiteListedDomainAndNoOrganisations_whenGetOrganisationsForDomain_thenThrowNoOrganisationsFoundException() {
-
-        /*
-        Note: At time of writing, this is a valid scenario.
-        as the SOR for agency token is csrs and the SOR for whitelisted domains is identity service
-        Therefore there is nothing to stop an admin person adding agency tokens to an whitelisted domain.
-         */
-        // given
-        when(identityService.isDomainWhiteListed(anyString())).thenReturn(false);
-        AgencyToken[] atArray = new AgencyToken[4];
-        for(int i=0; i<atArray.length; i++) {
-            atArray[i] = AgencyTokenTestingUtils.createAgencyToken(i);
-        }
-        Iterable<AgencyToken> it = new TypeList<>(atArray);
-        when(agencyTokenService.getAllAgencyTokensByDomain(anyString())).thenReturn(it);
-
-        // override static set up method
-        List<OrganisationalUnit> orgs = new ArrayList<>(10);
-        for(int i=0; i<10; i++) {
-            orgs.add(OrganisationalUnitTestUtils.buildOrgUnit("wl", i, "whitelisted-domain"));
-        }
-        when(organisationalUnitRepository.findAll()).thenReturn(orgs);
-
-        // when
-        List<OrganisationalUnit> actual = organisationalUnitService.getOrganisationsForDomain("mydomain");
-
-        // then
-        assertThat(actual).hasSize(1); // domain was only added to one agency token, see static set up method
-        verify(agencyTokenService, times(1)).getAllAgencyTokensByDomain("mydomain");
-        verify(organisationalUnitRepository, times(1)).findAll();
+        return Optional.of(greaterGlasgowNHS);
     }
 
 }

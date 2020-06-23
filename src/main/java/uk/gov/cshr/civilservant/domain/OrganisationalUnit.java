@@ -30,6 +30,7 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
         this.children = organisationalUnit.getChildren();
         this.abbreviation = organisationalUnit.getAbbreviation();
         this.setPaymentMethods(organisationalUnit.getPaymentMethods());
+        this.agencyToken = organisationalUnit.agencyToken;
     }
 
     public OrganisationalUnit() {
