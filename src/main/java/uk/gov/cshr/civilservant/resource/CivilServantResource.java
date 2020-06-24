@@ -19,5 +19,4 @@ public class CivilServantResource {
     private String lineManagerName;
     private String lineManagerEmailAddress;
     private Long userId;
-    private Boolean forceOrgReset;
 }
