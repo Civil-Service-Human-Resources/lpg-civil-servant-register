@@ -29,7 +29,6 @@ public class CivilServantDtoFactoryTest {
         String email = "test@example.com";
         String otherAreaOfWork1 = "other-profession-1";
         String otherAreaOfWork2 = "other-profession-2";
-        boolean forceOrgFlag = true;
 
         OrganisationalUnit organisation = new OrganisationalUnit();
         organisation.setName(organisationName);
