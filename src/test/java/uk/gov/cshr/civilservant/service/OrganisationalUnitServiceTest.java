@@ -27,24 +27,21 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class OrganisationalUnitServiceTest {
 
-    private static String GODFATHERS_CODE;
-    private static List<OrganisationalUnit> ALL_ORGS;
-
     private static final String WL_DOMAIN = "mydomain.com";
     private static final String NHS_GLASGOW_DOMAIN = "nhsglasgow.gov.uk";
     private static final String USER_UID = "myuid";
     private static final String AGENCY_TOKEN_UID = "myagencytokenuid";
-
+    private static String GODFATHERS_CODE;
+    private static List<OrganisationalUnit> ALL_ORGS;
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
     @Mock
     private OrganisationalUnitRepository organisationalUnitRepository;
     @Mock
@@ -56,9 +53,6 @@ public class OrganisationalUnitServiceTest {
     @InjectMocks
     private OrganisationalUnitService organisationalUnitService;
     private FamilyOrganisationUnits family;
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @BeforeClass
     public static void staticSetUp(){
@@ -356,7 +350,6 @@ public class OrganisationalUnitServiceTest {
     @Test
     public void givenAWhitelistedDomain_whenGetOrganisationsForDomain_thenReturnAllOrganisations() throws CSRSApplicationException {
         // given
-        when(agencyTokenService.isDomainInAgency(eq(WL_DOMAIN))).thenReturn(false);
         when(organisationalUnitRepository.findAll()).thenReturn(ALL_ORGS);
 
         // when
@@ -370,7 +363,6 @@ public class OrganisationalUnitServiceTest {
     @Test
     public void givenAgencyTokenDomain_whenGetOrganisationsForDomain_thenReturnMatchingOrganisationsForThatAgencyTokenIncludingTheirChildrenAndCascadeDownOnly() throws CSRSApplicationException {
         // given
-        when(agencyTokenService.isDomainInAgency(eq(NHS_GLASGOW_DOMAIN))).thenReturn(true);
         when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(Optional.of(AGENCY_TOKEN_UID));
         Optional<AgencyToken> agencyTokenOptional = Optional.of(AgencyTokenTestingUtils.getAgencyToken());
         when(agencyTokenService.getAgencyTokenByUid(eq(AGENCY_TOKEN_UID))).thenReturn(agencyTokenOptional);
@@ -389,7 +381,6 @@ public class OrganisationalUnitServiceTest {
     @Test
     public void givenAgencyTokenDomainAndNoAgencyTokenFound_whenGetOrganisationsForDomain_thenThrowTokenDoesNotExistException() throws CSRSApplicationException {
         // given
-        when(agencyTokenService.isDomainInAgency(eq(NHS_GLASGOW_DOMAIN))).thenReturn(true);
         when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(Optional.of(AGENCY_TOKEN_UID));
         when(agencyTokenService.getAgencyTokenByUid(eq(AGENCY_TOKEN_UID))).thenReturn(Optional.empty());
         expectedException.expect(TokenDoesNotExistException.class);
@@ -404,7 +395,6 @@ public class OrganisationalUnitServiceTest {
     @Test
     public void givenAgencyTokenDomainAndNoOrganisationFound_whenGetOrganisationsForDomain_thenThrowNoOrganisationsFoundException() throws CSRSApplicationException {
         // given
-        when(agencyTokenService.isDomainInAgency(eq(NHS_GLASGOW_DOMAIN))).thenReturn(true);
         when(identityService.getAgencyTokenUid(eq(USER_UID))).thenReturn(Optional.of(AGENCY_TOKEN_UID));
         Optional<AgencyToken> agencyTokenOptional = Optional.of(AgencyTokenTestingUtils.getAgencyToken());
         when(agencyTokenService.getAgencyTokenByUid(eq(AGENCY_TOKEN_UID))).thenReturn(agencyTokenOptional);

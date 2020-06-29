@@ -8,11 +8,16 @@ import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
-import uk.gov.cshr.civilservant.exception.*;
+import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
+import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
+import uk.gov.cshr.civilservant.exception.TokenAlreadyExistsException;
+import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -45,32 +50,17 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     }
 
     public List<OrganisationalUnit> getOrganisationsForDomain(String domain, String userUid) throws CSRSApplicationException {
-        // if agency token person return filtered list
-        // else return all/everything
-        boolean isAgencyTokenDomain = agencyTokenService.isDomainInAgency(domain);
+        return identityService.getAgencyTokenUid(userUid)
+                .map(s -> {
+                    AgencyToken agencyToken = agencyTokenService.getAgencyTokenByUid(s)
+                            .orElseThrow(TokenDoesNotExistException::new);
 
-        if(isAgencyTokenDomain) {
-            log.debug("is an agency token domain, returning filtered organisation list");
+                    OrganisationalUnit organisationalUnit = repository.findOrganisationByAgencyToken(agencyToken)
+                            .orElseThrow(() -> new NoOrganisationsFoundException((domain)));
 
-            String agencyTokenUid = identityService.getAgencyTokenUid(userUid)
-                    .orElseThrow(() -> new TokenDoesNotExistException());
-
-            AgencyToken agencyToken = agencyTokenService.getAgencyTokenByUid(agencyTokenUid)
-                    .orElseThrow(() -> new TokenDoesNotExistException());
-
-            OrganisationalUnit organisationalUnit = repository.findOrganisationByAgencyToken(agencyToken)
-                    .orElseThrow(() -> new NoOrganisationsFoundException((domain)));
-
-            return getOrganisationWithChildren(organisationalUnit.getCode());
-        } else {
-            log.debug("Getting all organisations");
-            List<OrganisationalUnit> organisationalUnits = repository.findAll();
-            return organisationalUnits;
-        }
-    }
-
-    public List<OrganisationalUnit> getAll() {
-        return repository.findAll();
+                    return getOrganisationWithChildren(organisationalUnit.getCode());
+                })
+                .orElseGet(() -> repository.findAll());
     }
 
     private List<OrganisationalUnit> getOrganisationalUnitAndChildren(String code, List<OrganisationalUnit> organisationalUnits) {
