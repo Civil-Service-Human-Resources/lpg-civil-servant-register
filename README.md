@@ -39,7 +39,7 @@ For a complete list of test dependencies check the `build.gradle` file. The main
 
 #### Other LPG Services
 
-- `identity-service` for OAuth token validation on all requests
+- `identity-service` for getting user identity details and creating service tokens to make inter-component requests
 
 #### External integrations
 
@@ -52,6 +52,10 @@ For a complete list of test dependencies check the `build.gradle` file. The main
 #### Data migrations
 
 The CSRS application uses Flyway to manage the DB migrations inside its own schema. See the `src/main/resources/db/migration` folder. Note: in-memory H2 DB has a separate migration folder than the deployed target MySQL DB - changes must be made to both in order to run successfully when deployed to the real environments.
+
+#### Caching
+
+The CSRS application is one of few application components in LPG that has explicit caching. The caching implemented is using the `@Cacheable` annotation in the `OrganisationalUnitController` and caches both the endpoint results for the Tree and Flat versions of the organisations hierarchy. The cache is evicted on calls to save and delete in the `OrganisationalUnitRepository`. 
 
 
 ## Build, run, test, deploy
@@ -75,7 +79,7 @@ Deployment is controlled via the Terraform scripts in the main PaaS repository, 
 
 Significant configuration properties are highlighted here. For the full configuration file see `src/main/resources/application.yml`
 
-- `oauth` connection settings for the identity-service used to validate bearer tokens
+- `oauth` connection settings for the identity-service used to create auth tokens
 - `spring.datasource` connection settings for MySQL database
 - `govNotify` credentials and template reference for the GOV.UK client library
 
