@@ -29,23 +29,16 @@ public class IdentityService {
 
     private String identityAPIUrl;
 
-    private String identityWhiteListUrl;
-
-    private String agencyTokenUrl;
-
     private String identityAgencyTokenUrl;
 
     private final UriComponentsBuilder agencyTokenUrlBuilder;
 
     @Autowired
     public IdentityService(OAuth2RestOperations restOperations, @Value("${identity.identityAPIUrl}") String identityAPIUrl,
-                           @Value("${identity.identityWhiteListUrl}") String identityWhiteListUrl,
                            @Value("${identity.agencyTokenUrl}") String agencyTokenUrl,
                            @Value("${identity.identityAgencyTokenUrl}") String identityAgencyTokenUrl) {
         this.restOperations = restOperations;
         this.identityAPIUrl = identityAPIUrl;
-        this.identityWhiteListUrl = identityWhiteListUrl;
-        this.agencyTokenUrl = agencyTokenUrl;
         this.identityAgencyTokenUrl = identityAgencyTokenUrl;
         this.agencyTokenUrlBuilder = UriComponentsBuilder.fromHttpUrl(agencyTokenUrl);
     }
@@ -93,38 +86,6 @@ public class IdentityService {
             return identity.getUsername();
         }
         return null;
-    }
-
-    public boolean isDomainWhiteListed(String domain){
-        log.debug("finding if domain:" + domain + " is whitelisted from identity service");
-
-        String domainWithSlashAtStartAndEnd = "/" +  domain + "/";
-
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(identityWhiteListUrl).path(domainWithSlashAtStartAndEnd);
-
-        URI uri = null;
-        try {
-            uri = new URI(builder.toUriString());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        try {
-            ResponseEntity<String> response = restOperations.getForEntity(uri, String.class);
-
-            if(response.getStatusCode().is2xxSuccessful() && response.getBody().equals("true")) {
-                return true;
-            } else if(response.getStatusCode().is2xxSuccessful() && response.getBody().equals("false")) {
-                return false;
-            } else {
-                throw new NoOrganisationsFoundException(domain);
-            }
-        } catch (Exception e) {
-            log.warn("Error calling identity service", e);
-            throw new NoOrganisationsFoundException(domain);
-        }
-
     }
 
     public Optional<String> getAgencyTokenUid(String userUid) throws CSRSApplicationException {
