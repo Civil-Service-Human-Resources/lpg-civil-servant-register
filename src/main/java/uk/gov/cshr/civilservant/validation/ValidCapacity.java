@@ -10,7 +10,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidCapacity {
 
-    String message() default "Invalid capacity";
+    String message() default "{agency.spaces.invalid}";
 
     Class<?>[] groups() default {};
 

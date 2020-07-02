@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.validation;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -17,11 +18,14 @@ public class ValidAgencyTokenCapacityValidator implements ConstraintValidator<Va
 
     @Override
     public void initialize(ValidCapacity constraintAnnotation) {
+
     }
 
     @Override
     public boolean isValid(Integer value, ConstraintValidatorContext context) {
+        ((ConstraintValidatorContextImpl) context).addMessageParameter("minValue", minValue);
+        ((ConstraintValidatorContextImpl) context).addMessageParameter("maxValue", maxValue);
+
         return value != null && value >= minValue && value <= maxValue;
     }
-
 }
