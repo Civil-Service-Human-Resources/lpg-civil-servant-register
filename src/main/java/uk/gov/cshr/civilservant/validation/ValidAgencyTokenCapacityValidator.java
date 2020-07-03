@@ -24,10 +24,10 @@ public class ValidAgencyTokenCapacityValidator implements ConstraintValidator<Va
     @Override
     public boolean isValid(Integer value, ConstraintValidatorContext context) {
         if (value != null && value >= minValue && value <= maxValue) {
-            ((ConstraintValidatorContextImpl) context).addMessageParameter("minValue", minValue);
-            ((ConstraintValidatorContextImpl) context).addMessageParameter("maxValue", maxValue);
             return true;
         } else {
+            ((ConstraintValidatorContextImpl) context).addMessageParameter("minValue", minValue);
+            ((ConstraintValidatorContextImpl) context).addMessageParameter("maxValue", maxValue);
             return false;
         }
     }
