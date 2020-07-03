@@ -24,8 +24,10 @@ import java.util.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AgencyTokenServiceTest {
@@ -123,6 +125,35 @@ public class AgencyTokenServiceTest {
 
         assertTrue(returnedToken.isPresent());
         assertEquals(agencyToken, returnedToken.get());
+    }
+
+    @Test
+    public void givenCodeHasSiblingGrandchildOwnerOfTokenAndDomain_getAgencyTokenByDomainTokenAndOrganisation_returnAgencyToken() {
+        String domain = "test.domain";
+        AgencyToken agencyToken = new AgencyToken(1, "test-token", 1, "uid");
+        OrganisationalUnit parentOrganisationalUnit = new OrganisationalUnit("parent-name", "parent-code", "parent-abbrv");
+        OrganisationalUnit childOrganisationalUnit = new OrganisationalUnit("child-name", "child-code", "child-abbrv");
+        OrganisationalUnit grandchildOneOrganisationalUnit = new OrganisationalUnit("grandchild-one-name", "grandchild-one-code", "grandchild-1-abbrv");
+        OrganisationalUnit grandchildTwoOrganisationalUnit = new OrganisationalUnit("grandchild-two-name", "grandchild-two-code", "grandchild-2-abbrv");
+
+        List<OrganisationalUnit> grandchildList = new ArrayList<>();
+        grandchildList.add(grandchildOneOrganisationalUnit);
+        grandchildList.add(grandchildTwoOrganisationalUnit);
+
+        parentOrganisationalUnit.setChildren(Collections.singletonList(childOrganisationalUnit));
+        childOrganisationalUnit.setChildren(grandchildList);
+
+        when(agencyTokenRepository.findByDomainAndToken(domain, agencyToken.getToken())).thenReturn(Optional.of(agencyToken));
+        when(organisationalUnitRepository.findOrganisationByAgencyToken(agencyToken)).thenReturn(Optional.of(parentOrganisationalUnit));
+
+        Optional<AgencyToken> returnedTokenOne = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), grandchildOneOrganisationalUnit.getCode());
+        Optional<AgencyToken> returnedTokenTwo = agencyTokenService.getAgencyTokenByDomainTokenCodeAndOrg(domain, agencyToken.getToken(), grandchildTwoOrganisationalUnit.getCode());
+
+        assertTrue(returnedTokenOne.isPresent());
+        assertEquals(agencyToken, returnedTokenOne.get());
+
+        assertTrue(returnedTokenTwo.isPresent());
+        assertEquals(agencyToken, returnedTokenTwo.get());
     }
 
     @Test
