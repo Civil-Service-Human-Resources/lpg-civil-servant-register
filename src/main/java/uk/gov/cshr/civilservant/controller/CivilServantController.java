@@ -4,28 +4,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.rest.webmvc.support.RepositoryEntityLinks;
 import org.springframework.hateoas.Resource;
 import org.springframework.hateoas.ResourceProcessor;
 import org.springframework.hateoas.Resources;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
-import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
-import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -43,17 +37,13 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     private final CivilServantResourceFactory civilServantResourceFactory;
 
-    private final OrganisationalUnitRepository organisationalUnitRepository;
-
     public CivilServantController(LineManagerService lineManagerService, CivilServantRepository civilServantRepository,
                                   RepositoryEntityLinks repositoryEntityLinks,
-                                  CivilServantResourceFactory civilServantResourceFactory,
-                                  OrganisationalUnitRepository organisationalUnitRepository) {
+                                  CivilServantResourceFactory civilServantResourceFactory) {
         this.lineManagerService = lineManagerService;
         this.civilServantRepository = civilServantRepository;
         this.repositoryEntityLinks = repositoryEntityLinks;
         this.civilServantResourceFactory = civilServantResourceFactory;
-        this.organisationalUnitRepository = organisationalUnitRepository;
     }
 
     @GetMapping
@@ -111,75 +101,6 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
             return ResponseEntity.ok(civilServantResourceFactory.create(civilServant));
         }
         return ResponseEntity.unprocessableEntity().build();
-    }
-
-    @GetMapping("/org")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> getOrgCodeForCivilServant() {
-        log.debug("Getting civil servant org details");
-
-        return civilServantRepository.findByPrincipal()
-                .map(this::getOrgCode)
-                .orElseThrow(() -> new ResourceNotFoundException());
-    }
-
-    @PatchMapping("/org")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity updateOrganisation(@Valid @RequestBody UpdateOrganisationDTO updateOrganisationDTO) {
-
-        log.info("updating civil servants organisation for organisation=" + updateOrganisationDTO.getOrganisation());
-
-        return civilServantRepository.findByPrincipal()
-                .map(cs -> findOrgUnitAndSave(cs, updateOrganisationDTO.getOrganisation()))
-                .orElseThrow(() -> new ResourceNotFoundException());
-    }
-
-    private ResponseEntity findOrgUnitAndSave(CivilServant cs, String organisationCode) {
-        return organisationalUnitRepository.findByCode(organisationCode)
-                .map(orgCode -> {
-                    cs.setOrganisationalUnit(orgCode);
-
-                    try {
-                        civilServantRepository.save(cs);
-                    } catch (Exception e) {
-                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-                    }
-                    return ResponseEntity.noContent().build();
-                })
-                .orElseThrow(() -> new NoOrganisationsFoundException(organisationCode));
-    }
-
-    private ResponseEntity<String> getOrgCode(CivilServant cs) {
-        return civilServantResourceFactory.getCivilServantOrganisationalUnitCode(cs)
-                .map(organisationalUnitCode -> organisationalUnitCode.getCode())
-                .map(code -> ResponseEntity.ok(code))
-                .orElseThrow(() -> new ResourceNotFoundException());
-    }
-
-    @DeleteMapping("/org")
-    public ResponseEntity removeOrganisation() {
-        /*
-         * separate end point to make the civil servants organisation null.
-         * This is so we don't allow a non-existent org in the update scenario.
-         */
-        log.info("deleting civil servants organisation for organisation");
-
-        try {
-            Optional<CivilServant> optionalCivilServant = civilServantRepository.findByPrincipal();
-            if (optionalCivilServant.isPresent()) {
-                CivilServant civilServant = optionalCivilServant.get();
-                civilServant.setOrganisationalUnit(null);
-                civilServantRepository.save(civilServant);
-                log.info("civil servants organisation has successfully been removed");
-                return ResponseEntity.noContent().build();
-            } else {
-                log.warn("civil servant to update has not been found");
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            log.error("An error occurred deleting Civil Servants organisation", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
     }
 
     @DeleteMapping("/{uid}/delete")
