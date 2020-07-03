@@ -1,7 +1,9 @@
 package uk.gov.cshr.civilservant.validation;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,6 +23,9 @@ public class ValidAgencyTokenCapacityValidatorTest {
     @Autowired
     private ValidAgencyTokenCapacityValidator classUnderTest;
 
+    @Mock
+    private ConstraintValidatorContextImpl constraintValidatorContext;
+
     @Value("${agencyToken.capacity.min}")
     private int minValueFromConfig;
 
@@ -33,7 +38,7 @@ public class ValidAgencyTokenCapacityValidatorTest {
         Integer capacity = minValueFromConfig + 1;
 
         // when
-        boolean actual = classUnderTest.isValid(capacity, null);
+        boolean actual = classUnderTest.isValid(capacity, constraintValidatorContext);
 
         // then
         assertTrue(actual);
@@ -45,7 +50,7 @@ public class ValidAgencyTokenCapacityValidatorTest {
         Integer capacity = maxValueFromConfig + 1;
 
         // when
-        boolean actual = classUnderTest.isValid(capacity, null);
+        boolean actual = classUnderTest.isValid(capacity, constraintValidatorContext);
 
         // then
         assertFalse(actual);
@@ -57,7 +62,7 @@ public class ValidAgencyTokenCapacityValidatorTest {
         Integer capacity = minValueFromConfig - 1;
 
         // when
-        boolean actual = classUnderTest.isValid(capacity, null);
+        boolean actual = classUnderTest.isValid(capacity, constraintValidatorContext);
 
         // then
         assertFalse(actual);
