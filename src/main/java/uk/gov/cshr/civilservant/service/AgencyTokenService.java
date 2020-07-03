@@ -56,7 +56,9 @@ public class AgencyTokenService {
             return true;
         } else if (organisationalUnit.hasChildren()) {
             for (OrganisationalUnit childUnit : organisationalUnit.getChildren()) {
-                return organisationContainsCode(childUnit, code);
+                if  (organisationContainsCode(childUnit, code)) {
+                    return true;
+                }
             }
         } else {
             return false;
