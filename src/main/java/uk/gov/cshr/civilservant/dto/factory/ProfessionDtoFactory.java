@@ -20,6 +20,7 @@ public class ProfessionDtoFactory extends DtoFactory<ProfessionDto, Profession> 
         professionDto.setName(profession.getName());
         professionDto.setFormattedName(formatName(profession));
         professionDto.setHref(repositoryEntityService.getUri(profession));
+        professionDto.setId(profession.getId());
 
         return professionDto;
     }

@@ -5,10 +5,13 @@ import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.dto.CivilServantDto;
 import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
+import uk.gov.cshr.civilservant.dto.SkillsReportsDto;
 import uk.gov.cshr.civilservant.dto.factory.CivilServantDtoFactory;
 import uk.gov.cshr.civilservant.exception.UserNotFoundException;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -19,10 +22,12 @@ public class ReportService {
 
     private final CivilServantRepository civilServantRepository;
     private final CivilServantDtoFactory civilServantDtoFactory;
+    private final QuizService quizService;
 
-    public ReportService(CivilServantRepository civilServantRepository, CivilServantDtoFactory civilServantDtoFactory) {
+    public ReportService(CivilServantRepository civilServantRepository, CivilServantDtoFactory civilServantDtoFactory, QuizService quizService) {
         this.civilServantRepository = civilServantRepository;
         this.civilServantDtoFactory = civilServantDtoFactory;
+        this.quizService = quizService;
     }
 
     @Transactional(readOnly = true)
@@ -98,5 +103,25 @@ public class ReportService {
         List<CivilServantReportDto> allByOrganisationCodeNormalised = civilServantRepository.findAllByOrganisationCodeNormalised(organisationCode);
         return allByOrganisationCodeNormalised.stream()
                 .collect(Collectors.toMap(CivilServantReportDto::getUid, civilServant -> civilServant));
+    }
+
+    @Transactional(readOnly = true)
+    public List<SkillsReportsDto> getReportForSuperAdmin(LocalDateTime from, LocalDateTime to) {
+        return quizService.getReportForSuperAdmin(from, to);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SkillsReportsDto> getReportForOrganisationAdmin(long organisationId, LocalDateTime from, LocalDateTime to) {
+        return quizService.getReportForOrganisationAdmin(organisationId, from, to);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SkillsReportsDto> getReportForProfessionAdmin(long professionId, LocalDateTime from, LocalDateTime to) {
+        return quizService.getReportForProfessionAdmin(professionId, from, to);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SkillsReportsDto> getReportForProfessionReporter(long organisationId, long professionId, LocalDateTime from, LocalDateTime to) {
+        return quizService.getReportForProfessionReporter(organisationId, professionId, from, to);
     }
 }

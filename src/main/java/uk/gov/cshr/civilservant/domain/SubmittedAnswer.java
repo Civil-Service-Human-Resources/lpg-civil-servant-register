@@ -22,8 +22,9 @@ public class SubmittedAnswer {
     @Column
     private String[] submittedAnswers;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "question_id")
+    @JsonBackReference
     private Question question;
 
     @ManyToOne
@@ -33,6 +34,9 @@ public class SubmittedAnswer {
 
     @Column
     private boolean skipped;
+
+    @Column
+    private boolean correct;
 
     public void setQuizResult(QuizResult quizResult) {
         if (quizResult != null) {
