@@ -1,11 +1,13 @@
 package uk.gov.cshr.civilservant.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 
 @Getter
@@ -39,19 +41,24 @@ public class Question {
     @Column(length = 500)
     private String learningReference;
 
-    @ManyToOne
+    @ManyToOne (fetch = FetchType.EAGER)
     @JsonBackReference
     @JoinColumn(name = "quiz_id")
     private Quiz quiz;
 
-    @OneToOne (mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne (
+            mappedBy = "question",
+            cascade = CascadeType.ALL
+    )
     private Answer answer;
 
     @OneToMany (mappedBy = "question", fetch = FetchType.LAZY,
             cascade = {CascadeType.REFRESH,CascadeType.DETACH,
                     CascadeType.MERGE, CascadeType.PERSIST})
     @JsonIgnore
-    private List<SubmittedAnswer> submittedAnswers;
+    @JsonManagedReference
+    @Builder.Default
+    private List<SubmittedAnswer> submittedAnswers = new ArrayList<>();
 
     @Column
     private String imgUrl;
@@ -60,10 +67,27 @@ public class Question {
     private String suggestions;
 
     @Column
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @Column
     private String alternativeText;
+
+    /**
+     * Below fields are used in reporting.
+     **/
+
+    @Column
+    private long timesAttempted;
+
+    @Column
+    private long correctCount;
+
+    @Column
+    private long incorrectCount;
+
+    @Column
+    private long skippedCount;
 
     public void setQuiz(Quiz quiz) {
         if (quiz != null) {
@@ -74,7 +98,7 @@ public class Question {
         this.quiz = quiz;
     }
 
-    public void addQuestion(Answer answer) {
-        answer.setQuestion(this);
+    public void addSubmittedAnswer(SubmittedAnswer submittedAnswer) {
+        this.getSubmittedAnswers().add(submittedAnswer);
     }
 }

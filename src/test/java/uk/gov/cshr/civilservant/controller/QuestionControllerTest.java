@@ -69,9 +69,11 @@ public class QuestionControllerTest {
         //Given
 
         Integer professionId = 12312312;
+        Integer organisationId = 12312312;
         QuestionDto questionDto = QuizBuilder.buildAQuestion(1L);
         String questionsJson = objectMapper.writeValueAsString(AddQuestionDto.builder()
                 .question(questionDto)
+                .organisationId(organisationId)
                 .professionId(professionId)
                 .build());
         //then
@@ -141,15 +143,20 @@ public class QuestionControllerTest {
     }
 
     @Test
-    public void shouldServerErrorWhenAddingANewQuestionToQuiz() throws Exception {
+    public void shouldThrow400WhenAddingANewQuestionToQuiz() throws Exception {
         //Given
-        Long quizId = 12312312L;
-        QuestionDto questionDto = QuizBuilder.buildAQuestion(quizId);
-        String questionsJson = objectMapper.writeValueAsString(questionDto);
-
+        Integer professionId = 12312312;
+        Integer organisationId = 12312312;
+        QuestionDto questionDto = QuizBuilder.buildAQuestion(1L);
+        String questionsJson = objectMapper.writeValueAsString(AddQuestionDto.builder()
+                .question(questionDto)
+                .organisationId(organisationId)
+                .professionId(professionId)
+                .build());
         //when
 
-        doThrow(QuizServiceException.class).when(questionService).addQuizQuestion(anyLong(), any());
+        doThrow(QuizServiceException.class).when(questionService)
+                .addQuizQuestion(anyLong(), anyLong(), any());
 
         //then
 
@@ -158,7 +165,7 @@ public class QuestionControllerTest {
                         .content(questionsJson)
                         .contentType(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -167,7 +174,8 @@ public class QuestionControllerTest {
 
         //when
 
-        doThrow(QuizServiceException.class).when(questionService).addQuizQuestion(anyLong(), any());
+        doThrow(QuizServiceException.class).when(questionService)
+                .addQuizQuestion(anyLong(), anyLong(), any());
 
         //then
 

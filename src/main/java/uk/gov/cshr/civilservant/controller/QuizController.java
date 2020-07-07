@@ -51,11 +51,14 @@ public class QuizController {
             Roles.ORGANISATION_REPORTER,
             Roles.PROFESSION_REPORTER
     })
-    public ResponseEntity<List<QuestionDto>> listQuestionsByProfession(@RequestParam Long professionId, @RequestParam(defaultValue = "10") Integer limit) {
+    public ResponseEntity<List<QuestionDto>> listQuestionsByProfession(
+            @RequestParam Long professionId,
+            @RequestParam Long organisationId,
+            @RequestParam(defaultValue = "18") Integer limit) {
         if (limit < 1 ) {
             return ResponseEntity.badRequest().build();
         }
-        return quizService.getQuizByProfessionId(professionId)
+        return quizService.getQuizByProfessionIdAndOrganisationId(professionId, organisationId)
                 .map(quiz -> {
                     List<QuestionDto> questions = quiz.getQuestions()
                             .stream()
@@ -116,12 +119,12 @@ public class QuizController {
             Roles.ORGANISATION_REPORTER,
             Roles.PROFESSION_REPORTER
     })
-    public ResponseEntity deleteQuiz(@RequestParam Long professionId) {
+    public ResponseEntity deleteQuiz(@RequestParam Long professionId, @RequestParam Long organisationId) {
         try {
-            log.info("Deleting Quiz with identifier {}",professionId);
-            quizService.delete(professionId);
+            log.info("Deleting Quiz for profession {} and organisation {}",professionId, organisationId);
+            quizService.delete(professionId, organisationId);
         } catch (EntityNotFoundException e) {
-            log.error("Error in deleting Quiz with identifier {}",professionId);
+            log.error("Error in deleting Quiz");
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body("There was a problem deleting the quiz :" + e.getMessage());
@@ -139,7 +142,12 @@ public class QuizController {
     public ResponseEntity update(@Valid @RequestBody QuizDto quiz) {
         try {
             Quiz quizRecord = quizDTOFactory.mapDtoToModel(quiz);
-            return ok(quizService.update(quizRecord, quizRecord.getProfession().getId()));
+            return ok(
+                    quizService.update(
+                        quizRecord,
+                        quizRecord.getProfession().getId(),
+                        quizRecord.getOrganisationId())
+            );
         } catch (Exception ex) {
             log.error(String.format("Error while updating the quiz %s",ex.getMessage()));
             return ResponseEntity
@@ -172,9 +180,15 @@ public class QuizController {
     @PostMapping("/submit-answers")
     @RoleMapping(Roles.LEARNER)
     public ResponseEntity submitQuiz(@Valid @RequestBody QuizSubmissionDto quizSubmissionDto) {
-        return quizService.submitAnswers(quizSubmissionDto)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+        try {
+            return quizService.submitAnswers(quizSubmissionDto)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.badRequest().build());
+        } catch (QuizServiceException e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getLocalizedMessage());
+        }
     }
 
     @GetMapping("/quiz-summary")
@@ -206,9 +220,9 @@ public class QuizController {
             Roles.ORGANISATION_REPORTER,
             Roles.PROFESSION_REPORTER
     })
-    public ResponseEntity getQuizResultsForProfession(@RequestParam int professionId) {
+    public ResponseEntity getQuizResultsForProfession(@RequestParam int professionId, @RequestParam int organisationId) {
 
-        return quizService.getAllResultsForProfession(professionId)
+        return quizService.getAllResultsForProfessionInOrganisation(professionId, organisationId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
@@ -227,25 +241,25 @@ public class QuizController {
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
-    @GetMapping("/{professionId}")
+    @GetMapping("{organisationId}/{professionId}")
     @RoleMapping({
             Roles.LEARNING_MANAGER,
             Roles.CSHR_REPORTER,
             Roles.ORGANISATION_REPORTER,
             Roles.PROFESSION_REPORTER
     })
-    public ResponseEntity getQuizForProfession(@PathVariable int professionId) {
+    public ResponseEntity getQuizForProfession(@PathVariable Long organisationId, @PathVariable int professionId) {
 
-        return quizService.getQuiz(professionId)
+        return quizService.getQuiz(professionId, organisationId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
-    @GetMapping("/{professionId}/info")
+    @GetMapping("{organisationId}/{professionId}/info")
     @RoleMapping(Roles.LEARNER)
-    public ResponseEntity getQuizMetaData(@PathVariable Long professionId) {
+    public ResponseEntity getQuizMetaData(@PathVariable Long organisationId, @PathVariable Long professionId) {
 
-        return quizService.getQuizInfo(professionId)
+        return quizService.getQuizInfo(professionId, organisationId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }

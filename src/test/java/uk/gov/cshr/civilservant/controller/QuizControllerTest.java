@@ -64,14 +64,19 @@ public class QuizControllerTest {
         //Given
         Optional<QuizDto> quiz = QuizBuilder.buildQuizDTO();
         long professionId = 1L;
+        long organisationId = 1L;
 
         //when
-        when(quizService.getQuizByProfessionId(professionId)).thenReturn(quiz);
+        when(quizService.getQuizByProfessionIdAndOrganisationId(professionId, organisationId)).thenReturn(quiz);
 
         //then
 
         mockMvc.perform(
-                get("/api/quiz?professionId=1&limit=3").with(csrf())
+                get("/api/quiz")
+                        .param("professionId", "1")
+                        .param("organisationId", "1")
+                        .param("limit", "3")
+                        .with(csrf())
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -108,15 +113,17 @@ public class QuizControllerTest {
     @WithMockUser(username = "user", authorities = {"LEARNING_MANAGER","CSHR_REPORTER", "ORGANISATION_REPORTER", "PROFESSION_REPORTER"})
     public void shouldReturnNothingIfNoQuizFoundForProfession() throws Exception {
         //Given a profession id
-        Long id = 1L;
+        Long professionId = 1L;
+        Long organisationId = 1L;
 
         //when
-        when(quizService.getQuizByProfessionId(id)).thenReturn(Optional.empty());
+        when(quizService.getQuizByProfessionIdAndOrganisationId(professionId, organisationId))
+                .thenReturn(Optional.empty());
 
         //then
 
         mockMvc.perform(
-                get("/api/quiz/1").with(csrf())
+                get("/api/quiz/1/1").with(csrf())
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNoContent());
@@ -137,7 +144,7 @@ public class QuizControllerTest {
         //when
         when(quizDTOFactory.mapDtoToModel(any())).thenReturn(quizFromDto);
         when(quizRepository.findById(quizFromDto.getId())).thenReturn(Optional.of(quizRecordToBeUpdated));
-        when(quizService.update(any(),anyLong())).thenReturn(quiz);
+        when(quizService.update(any(),anyLong(), anyLong())).thenReturn(quiz);
 
         //then
 
@@ -167,7 +174,9 @@ public class QuizControllerTest {
         //then
 
         mockMvc.perform(
-                delete("/api/quiz/delete").param("professionId", "1")
+                delete("/api/quiz/delete")
+                        .param("professionId", "1")
+                        .param("organisationId", "1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
@@ -176,17 +185,23 @@ public class QuizControllerTest {
     @WithMockUser(username = "user", authorities = {"LEARNING_MANAGER","CSHR_REPORTER"})
     public void shouldGetAllQuizResultsForProfession() throws Exception {
         //Given a profession id
-        Long id = 1L;
+        Long professionId = 1L;
+        Long organisationId = 1L;
         File file = new File("src/test/resources/test_data/results_by_profession.json");
         QuizDataTableDto quizResult = objectMapper.readValue(file, QuizDataTableDto.class);
 
         //when
-        when(quizService.getAllResultsForProfession(id)).thenReturn(Optional.of(quizResult));
+        when(quizService
+                .getAllResultsForProfessionInOrganisation(professionId, organisationId))
+                .thenReturn(Optional.of(quizResult));
 
         //then
 
         mockMvc.perform(
-                get("/api/quiz/results-by-profession?professionId=1").with(csrf())
+                get("/api/quiz/results-by-profession")
+                        .param("professionId","1")
+                        .param("organisationId", "1")
+                        .with(csrf())
                         .accept(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk())

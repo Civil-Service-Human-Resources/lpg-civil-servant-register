@@ -44,29 +44,29 @@ public class QuestionServiceTest {
   @InjectMocks QuestionService questionService;
 
   @Test
-  public void shouldAddANewQuestionToQuiz() {
+  public void shouldAddANewQuestionToQuiz() throws QuizServiceException, QuizNotFoundException {
     // Given
     Long professionId = 1L;
+    Long organisationId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(1L);
     Quiz quiz = QuizBuilder.buildEntity();
     Question entity = QuizBuilder.buildAQuestionEntity();
     Answer answer = QuizBuilder.buildAnAnswer();
 
     // when
-    when(quizRepository
-            .findFirstByProfessionIdAndStatusIsNot(professionId, Status.INACTIVE))
-            .thenReturn(Optional.of(quiz));
-    when(questionDtoFactory.createEntity(questionDto)).thenReturn(entity);
+    doReturn(Optional.of(quiz)).when(quizRepository)
+            .findFirstByProfessionIdAndOrganisationIdAndStatusIsNot(anyLong(), anyLong(), any());
+    when(questionDtoFactory.createEntity(any())).thenReturn(entity);
     when(answerDtoFactory.createEntity(any())).thenReturn(answer);
-    when(quizRepository.save(any())).thenReturn(quiz);
+    when(questionRepository.save(any())).thenReturn(entity);
 
     // then
-    Long expectedId = questionService.addQuizQuestion(professionId, questionDto);
+    Long expectedId = questionService.addQuizQuestion(professionId, organisationId, questionDto);
     assertTrue(expectedId.equals(1L));
   }
 
   @Test
-  public void shouldUpdateAQuestionInTheQuiz() {
+  public void shouldUpdateAQuestionInTheQuiz() throws QuizServiceException, QuizNotFoundException {
     // Given
     Long professionId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(professionId);
@@ -110,7 +110,7 @@ public class QuestionServiceTest {
   }
 
   @Test(expected = QuizNotFoundException.class)
-  public void shouldThrowQuizNotFoundExceptionWhenUpdatingAQuestionInAnInactiveQuiz() {
+  public void shouldThrowQuizNotFoundExceptionWhenUpdatingAQuestionInAnInactiveQuiz() throws QuizServiceException, QuizNotFoundException {
     // Given
     Long professionId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(professionId);
@@ -129,7 +129,7 @@ public class QuestionServiceTest {
   }
 
   @Test(expected = QuizServiceException.class)
-  public void shouldThrowQuizNotFoundExceptionWhenUpdatingAnInactiveQuestionInQuiz() {
+  public void shouldThrowQuizNotFoundExceptionWhenUpdatingAnInactiveQuestionInQuiz() throws QuizServiceException, QuizNotFoundException {
     // Given
     Long professionId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(professionId);
@@ -148,22 +148,23 @@ public class QuestionServiceTest {
   }
 
   @Test(expected = QuizNotFoundException.class)
-  public void shouldNotAddANewQuestionToAnInactiveQuiz() {
+  public void shouldNotAddANewQuestionToAnInactiveQuiz() throws QuizServiceException, QuizNotFoundException {
     // Given
     long professionId = 1L;
+    long organisationId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(1L);
 
     // when
     when(quizRepository
-            .findFirstByProfessionIdAndStatusIsNot(professionId, Status.INACTIVE))
+            .findFirstByProfessionIdAndOrganisationIdAndStatusIsNot(professionId, organisationId, Status.INACTIVE))
             .thenReturn(Optional.empty());
 
     // then
-    questionService.addQuizQuestion(professionId, questionDto);
+    questionService.addQuizQuestion(professionId, organisationId, questionDto);
   }
 
   @Test(expected = QuizServiceException.class)
-  public void shouldThrowExceptionOnUpdateIfQuestionNotFound() {
+  public void shouldThrowExceptionOnUpdateIfQuestionNotFound() throws QuizServiceException, QuizNotFoundException {
     // Given
     QuestionDto questionDto = QuizBuilder.buildAQuestion(1L);
 
@@ -176,20 +177,21 @@ public class QuestionServiceTest {
   }
 
   @Test(expected = QuizServiceException.class)
-  public void shouldNotAddANewQuestionIfAltTextNotFoundForQuestionWithImageUrl() {
+  public void shouldNotAddANewQuestionIfAltTextNotFoundForQuestionWithImageUrl() throws QuizServiceException, QuizNotFoundException {
     // Given
     long professionId = 1L;
+    long organisationId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(1L);
 
     // when
     questionDto.setImgUrl("www.gov.uk");
 
     // then
-    questionService.addQuizQuestion(professionId, questionDto);
+    questionService.addQuizQuestion(professionId, organisationId, questionDto);
   }
 
   @Test
-  public void shouldUpdateAQuestionWithMultipleAnswersInTheQuiz() {
+  public void shouldUpdateAQuestionWithMultipleAnswersInTheQuiz() throws QuizServiceException, QuizNotFoundException {
     // Given
     Long professionId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(professionId);
