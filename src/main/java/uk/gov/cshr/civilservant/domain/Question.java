@@ -1,19 +1,24 @@
 package uk.gov.cshr.civilservant.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-
+import java.util.List;
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
 
-@Data
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
+
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Question {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -23,20 +28,53 @@ public class Question {
     private String theme;
 
     @Column(length = 500)
-    private String learningName;
-
-    @Column(length = 500)
-    private String learningReference;
-
-    @Column(length = 500)
     private String value;
 
     @Column(length = 500)
     private String why;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private Set<Choice> choices = new HashSet<>();
+    @Column(length = 500)
+    private String learningName;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    private Set<Choice> answers = new HashSet<>();
+    @Column(length = 500)
+    private String learningReference;
+
+    @ManyToOne
+    @JsonBackReference
+    @JoinColumn(name = "quiz_id")
+    private Quiz quiz;
+
+    @OneToOne (mappedBy = "question", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Answer answer;
+
+    @OneToMany (mappedBy = "question", fetch = FetchType.LAZY,
+            cascade = {CascadeType.REFRESH,CascadeType.DETACH,
+                    CascadeType.MERGE, CascadeType.PERSIST})
+    @JsonIgnore
+    private List<SubmittedAnswer> submittedAnswers;
+
+    @Column
+    private String imgUrl;
+
+    @Column(length = 500)
+    private String suggestions;
+
+    @Column
+    private Status status;
+
+    @Column
+    private String alternativeText;
+
+    public void setQuiz(Quiz quiz) {
+        if (quiz != null) {
+            quiz.getQuestions().add(this);
+        } else if (this.quiz != null) {
+            this.quiz.getQuestions().remove(this);
+        }
+        this.quiz = quiz;
+    }
+
+    public void addQuestion(Answer answer) {
+        answer.setQuestion(this);
+    }
 }

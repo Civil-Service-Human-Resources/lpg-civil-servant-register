@@ -1,0 +1,19 @@
+{
+  "professionId" : 1,
+  "question":{
+    "value": "Why did the chicken cross the road?",
+    "why": null,
+    "answer":
+    {
+      "correctAnswers": ["A","B"],
+      "answers": {
+        "A": "For money",
+        "B": "For fame",
+        "C": "Just another Beatles-wannabe-group-of-chicken",
+        "D": "None of these"
+      }
+    },
+    "imgUrl": "https://www.gov.uk/assets/frontend/homepage/budget-2020--480w-bfea319fdfbc0acf87ebe3b14499f0ad1268c9c10ae1f7ab7fc82832d6c5c708.jpg",
+    "suggestions": null
+  }
+}
