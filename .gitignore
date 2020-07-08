@@ -1,6 +1,11 @@
+*.ipr
+*.iws
 .idea
 *.iml
 .gradle
 gradle/tools
 build
 out
+.project
+.settings/*
+.vscode/*
