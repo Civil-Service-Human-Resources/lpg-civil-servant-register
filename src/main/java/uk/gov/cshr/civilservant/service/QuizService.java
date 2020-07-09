@@ -7,6 +7,7 @@ import javax.persistence.EntityNotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.*;
 import uk.gov.cshr.civilservant.dto.*;
@@ -14,6 +15,7 @@ import uk.gov.cshr.civilservant.dto.factory.QuestionDtoFactory;
 import uk.gov.cshr.civilservant.dto.factory.QuizDtoFactory;
 import uk.gov.cshr.civilservant.dto.factory.QuizResultDtoFactory;
 import uk.gov.cshr.civilservant.exception.ProfessionNotFoundException;
+import uk.gov.cshr.civilservant.exception.QuizNotFoundException;
 import uk.gov.cshr.civilservant.exception.QuizServiceException;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.repository.ProfessionRepository;
@@ -21,7 +23,7 @@ import uk.gov.cshr.civilservant.repository.QuizRepository;
 import uk.gov.cshr.civilservant.repository.QuizResultRepository;
 
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = {QuizServiceException.class, QuizNotFoundException.class})
 public class QuizService {
 
 
@@ -64,10 +66,6 @@ public class QuizService {
     return Optional.empty();
   }
 
-  public List<QuizDto> getAll() {
-    return null;
-  }
-
   @Transactional
   public void delete(Long professionId) {
     Optional<Quiz> optionalEntry = quizRepository.findFirstByProfessionIdAndStatusIsNot(professionId, Status.INACTIVE);
@@ -101,7 +99,7 @@ public class QuizService {
     return null;
   }
 
-  public QuizDto create(Long professionId, Long organisationId) {
+  public QuizDto create(Long professionId, Long organisationId) throws QuizServiceException, ProfessionNotFoundException {
     if (!organisationalUnitRepository.findById(organisationId).isPresent()) {
       throw new QuizServiceException("Invalid organisation supplied");
     }
@@ -139,7 +137,7 @@ public class QuizService {
     return Optional.empty();
   }
 
-  public long publish(Quiz quiz) {
+  public long publish(Quiz quiz) throws QuizServiceException {
     Optional<Quiz> quizToBePublished =
             quizRepository.findFirstByProfessionIdAndStatusIsNot(quiz.getProfession().getId(), Status.INACTIVE);
     if (quizToBePublished.isPresent()) {
@@ -163,7 +161,7 @@ public class QuizService {
     }
   }
 
-  public Optional<Long> submitAnswers(QuizSubmissionDto quizSubmissionDto) {
+  public Optional<Long> submitAnswers(QuizSubmissionDto quizSubmissionDto) throws QuizServiceException {
     try {
       QuizResult result = QuizResult.builder()
               .quizId(quizSubmissionDto.getQuizId())
@@ -217,7 +215,7 @@ public class QuizService {
     return correctCount;
   }
 
-  public QuizResultDto getQuizResult(Long quizResultId, String staffId) {
+  public QuizResultDto getQuizResult(Long quizResultId, String staffId) throws QuizServiceException {
     Optional<QuizResult> quizResultOptional = quizResultRepository.findQuizResultByIdAndStaffId(quizResultId, staffId);
 
     return quizResultOptional

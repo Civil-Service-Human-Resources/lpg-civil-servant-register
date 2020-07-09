@@ -28,7 +28,7 @@ public class Quiz {
     @Column
     private String name;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     private Profession profession;
 
     @Column(name = "organisation_id")

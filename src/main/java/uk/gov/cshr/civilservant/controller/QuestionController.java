@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.gov.cshr.civilservant.dto.AddQuestionDto;
 import uk.gov.cshr.civilservant.dto.QuestionDto;
+import uk.gov.cshr.civilservant.exception.QuizNotFoundException;
+import uk.gov.cshr.civilservant.exception.QuizServiceException;
 import uk.gov.cshr.civilservant.mapping.RoleMapping;
 import uk.gov.cshr.civilservant.service.QuestionService;
 
@@ -36,11 +38,15 @@ public class QuestionController {
             QuestionDto questionDto = addQuestionDto.getQuestion();
 
             return ResponseEntity.ok(questionService.addQuizQuestion(professionId, questionDto));
-        } catch (Exception ex) {
+        } catch (QuizServiceException ex) {
             log.error("Error while adding question to Quiz {}", ex);
             return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("There was a problem adding the question");
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("There was a problem adding the question. Error: " + ex.getLocalizedMessage());
+        }catch (QuizNotFoundException ex) {
+            log.error("Error while adding question to Quiz {}", ex);
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+          .body("There was a problem adding the question. Error: "+ ex.getLocalizedMessage());
         }
     }
 

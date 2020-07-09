@@ -172,9 +172,15 @@ public class QuizController {
     @PostMapping("/submit-answers")
     @RoleMapping(Roles.LEARNER)
     public ResponseEntity submitQuiz(@Valid @RequestBody QuizSubmissionDto quizSubmissionDto) {
-        return quizService.submitAnswers(quizSubmissionDto)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.badRequest().build());
+        try {
+            return quizService.submitAnswers(quizSubmissionDto)
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.badRequest().build());
+        } catch (QuizServiceException e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(e.getLocalizedMessage());
+        }
     }
 
     @GetMapping("/quiz-summary")

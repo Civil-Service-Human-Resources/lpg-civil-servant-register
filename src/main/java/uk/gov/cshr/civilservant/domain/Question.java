@@ -60,6 +60,7 @@ public class Question {
     private String suggestions;
 
     @Column
+    @Enumerated(EnumType.STRING)
     private Status status;
 
     @Column

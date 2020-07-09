@@ -53,12 +53,10 @@ public class QuestionServiceTest {
     Answer answer = QuizBuilder.buildAnAnswer();
 
     // when
-    when(quizRepository
-            .findFirstByProfessionIdAndStatusIsNot(professionId, Status.INACTIVE))
-            .thenReturn(Optional.of(quiz));
-    when(questionDtoFactory.createEntity(questionDto)).thenReturn(entity);
+    doReturn(Optional.of(quiz)).when(quizRepository).findFirstByProfessionIdAndStatusIsNot(anyLong(), any());
+    when(questionDtoFactory.createEntity(any())).thenReturn(entity);
     when(answerDtoFactory.createEntity(any())).thenReturn(answer);
-    when(quizRepository.save(any())).thenReturn(quiz);
+    when(questionRepository.save(any())).thenReturn(entity);
 
     // then
     Long expectedId = questionService.addQuizQuestion(professionId, questionDto);

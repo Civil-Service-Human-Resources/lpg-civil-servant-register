@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.*;
 import uk.gov.cshr.civilservant.dto.AnswerDto;
@@ -21,7 +22,7 @@ import uk.gov.cshr.civilservant.repository.QuizRepository;
 
 @Slf4j
 @Service
-@Transactional
+@Transactional(propagation = Propagation.REQUIRES_NEW, rollbackFor = {QuizServiceException.class, QuizNotFoundException.class})
 public class QuestionService {
     private QuizRepository quizRepository;
     private QuestionRepository questionRepository;
@@ -47,7 +48,7 @@ public class QuestionService {
      * @param questionDTO
      * @return The updated quiz identifier.
      */
-    public Long updateQuizQuestion(QuestionDto questionDTO) {
+    public Long updateQuizQuestion(QuestionDto questionDTO) throws QuizNotFoundException, QuizServiceException {
         Optional<Question> questionToBeUpdated = questionRepository.findById(questionDTO.getId());
         if (questionToBeUpdated.isPresent()) {
             Quiz quizRecord = questionToBeUpdated.get().getQuiz();
@@ -90,7 +91,7 @@ public class QuestionService {
         }
     }
 
-    public Long addQuizQuestion(long professionId, QuestionDto questionDTO) {
+    public Long addQuizQuestion(long professionId, QuestionDto questionDTO) throws QuizServiceException, QuizNotFoundException {
         if (!StringUtils.isEmpty(questionDTO.getImgUrl())
                 && StringUtils.isEmpty(questionDTO.getAlternativeText())) {
             throw new QuizServiceException("Alternative text value required for image added.");
@@ -100,11 +101,14 @@ public class QuestionService {
                 .findFirstByProfessionIdAndStatusIsNot(professionId, Status.INACTIVE);
         Quiz quizRecord;
         if (!quiz.isPresent()) {
+            log.info("Quiz Not found for profession : " + professionId);
             throw new QuizNotFoundException("No quiz found for profession");
         } else {
+            log.info("Quiz found");
             quizRecord = quiz.get();
         }
-
+        log.info("Quiz record found for profession id : " + professionId);
+        log.info("Quiz record id : " + quizRecord.getId());
         Question question = questionDTOFactory.createEntity(questionDTO);
         question.setQuiz(quizRecord);
         if (questionDTO.getAnswer().getCorrectAnswers().length > 1) {
@@ -118,7 +122,9 @@ public class QuestionService {
         question.setStatus(Status.ACTIVE);
         quizRecord.getQuestions().add(question);
         quizRecord.setNumberOfQuestions(quizRecord.getQuestions().size());
-        return quizRepository.save(quizRecord).getId();
+        long savedQuestionId = questionRepository.save(question).getId();
+        log.info("Saved question and the identifier is : " + savedQuestionId);
+        return savedQuestionId;
     }
 
     public void deleteQuestion(Long id) {
