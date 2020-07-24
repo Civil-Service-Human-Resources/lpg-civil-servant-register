@@ -1,6 +1,7 @@
 package uk.gov.cshr.civilservant.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.*;
 
@@ -55,6 +56,7 @@ public class QuizResult {
     float score;
 
     @OneToMany(mappedBy = "quizResult",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<SubmittedAnswer> answers;
+    @Builder.Default
+    private List<SubmittedAnswer> answers = new ArrayList<>();
 
 }

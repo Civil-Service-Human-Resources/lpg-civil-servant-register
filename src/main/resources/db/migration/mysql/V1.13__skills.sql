@@ -1,12 +1,12 @@
 SET FOREIGN_KEY_CHECKS = 0;
 
-DROP TABLE choice;
+DROP TABLE IF EXISTS choice;
 
-DROP TABLE question_answers;
+DROP TABLE IF EXISTS question_answers;
 
-DROP TABLE question_choices;
+DROP TABLE IF EXISTS question_choices;
 
-DROP TABLE quiz_questions;
+DROP TABLE IF EXISTS quiz_questions;
 
 
 CREATE TABLE IF NOT EXISTS `answer`
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS `answer`
     `question_id`    SMALLINT(5) UNSIGNED NOT NULL,
     `answers` VARCHAR(2500),
     `correct_answer` VARCHAR(500),
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS `submitted_answer`
     `question_id` SMALLINT(5) UNSIGNED NOT NULL,
     `submitted_answers` VARCHAR(20),
     `skipped` VARCHAR(10),
-    PRIMARY KEY (`id`),
+    `correct` VARCHAR(10),
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
@@ -45,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `quiz_result`
     `result`  VARCHAR(15),
     `type`  VARCHAR(10),
     `completed_on` TIMESTAMP NOT NULL,
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
@@ -53,12 +54,16 @@ ALTER TABLE
   `question`
 ADD
   (
-    `answer` SMALLINT(5),
+    `answer` SMALLINT(5) UNSIGNED,
     `img_url` VARCHAR(500),
     `alternative_text` VARCHAR(500),
     `suggestions` VARCHAR(500),
     `status`  VARCHAR(15),
-    `quiz_id` SMALLINT(5) UNSIGNED NOT NULL
+    `quiz_id` SMALLINT(5) UNSIGNED NOT NULL,
+    `times_attempted` INT(5)  UNSIGNED,
+    `correct_count` INT(5)  UNSIGNED,
+    `incorrect_count` INT(5)  UNSIGNED,
+    `skipped_count` INT(5)  UNSIGNED
   );
 
 ALTER TABLE
@@ -91,6 +96,5 @@ ADD
     CONSTRAINT `FK_question_answer` FOREIGN KEY (`answer`) REFERENCES `answer` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT `FK_quiz` FOREIGN KEY (`quiz_id`) REFERENCES `quiz` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
   );
-
 
 SET FOREIGN_KEY_CHECKS = 1;

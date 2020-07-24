@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,9 +40,10 @@ public interface QuizResultRepository extends JpaRepository<QuizResult, Long> {
             "INNER JOIN Quiz quiz " +
             "ON result.quizId = quiz.id " +
             "WHERE result.professionId = :professionId " +
+            "AND result.organisationId = :organisationId " +
             "AND quiz.status NOT LIKE 'INACTIVE' " +
             "GROUP BY result.professionId")
-    QuizResultSummaryDto findByProfessionId(long professionId);
+    QuizResultSummaryDto findByProfessionIdAndOrganisationId(long professionId, long organisationId);
 
     Optional<QuizResult> findQuizResultByIdAndStaffId(long id, String staffId);
 
@@ -67,4 +69,25 @@ public interface QuizResultRepository extends JpaRepository<QuizResult, Long> {
             "WHERE quiz.status NOT LIKE 'INACTIVE' " +
             "GROUP BY result.professionId")
     List<QuizResultSummaryDto> findAllResults();
+
+    List<QuizResult> findAllByCompletedOnBetween(LocalDateTime from, LocalDateTime to);
+
+    List<QuizResult> findAllByOrganisationIdAndCompletedOnBetween(
+            long organisationId,
+            LocalDateTime from,
+            LocalDateTime to
+    );
+
+    List<QuizResult> findAllByOrganisationIdAndProfessionIdAndCompletedOnBetween(
+            long organisationId,
+            long professionId,
+            LocalDateTime from,
+            LocalDateTime to
+    );
+
+    List<QuizResult> findAllByProfessionIdAndCompletedOnBetween(
+        long professionId,
+        LocalDateTime from,
+        LocalDateTime to
+    );
 }

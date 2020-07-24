@@ -1,6 +1,7 @@
 package uk.gov.cshr.civilservant.domain;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
 
@@ -14,7 +15,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Getter
 @Setter
-@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -28,7 +28,7 @@ public class Quiz {
     @Column
     private String name;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     private Profession profession;
 
     @Column(name = "organisation_id")
@@ -36,7 +36,8 @@ public class Quiz {
 
     @OneToMany(mappedBy = "quiz",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JsonManagedReference
-    private Set<Question> questions;
+    @Builder.Default
+    private Set<Question> questions = new HashSet<>();
 
     @CreationTimestamp
     private LocalDateTime createdOn;
@@ -56,9 +57,4 @@ public class Quiz {
 
     @Column
     String description;
-
-    public void addQuiz(Question question) {
-        question.setQuiz(this);
-    }
-
 }
