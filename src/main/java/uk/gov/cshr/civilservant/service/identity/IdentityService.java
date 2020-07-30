@@ -1,9 +1,12 @@
 package uk.gov.cshr.civilservant.service.identity;
 
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.OAuth2RestOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -13,13 +16,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.dto.IdentityAgencyResponseDTO;
 import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
-import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
 import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.service.exception.UserNotFoundException;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Optional;
 
 @Slf4j
 @Service

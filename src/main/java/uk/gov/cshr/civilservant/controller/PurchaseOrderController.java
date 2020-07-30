@@ -13,13 +13,13 @@ import uk.gov.cshr.civilservant.repository.PurchaseOrderRepository;
 @RequestMapping("/purchaseOrders")
 public class PurchaseOrderController {
 
-    @Autowired
-    private PurchaseOrderRepository purchaseOrderRepository;
+  @Autowired private PurchaseOrderRepository purchaseOrderRepository;
 
-    @GetMapping("/{code}")
-    public ResponseEntity<PurchaseOrder> get(@PathVariable String code) {
-        return purchaseOrderRepository.findFirstByCodeEquals(code)
-                .map(po -> ResponseEntity.ok(po))
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
+  @GetMapping("/{code}")
+  public ResponseEntity<PurchaseOrder> get(@PathVariable String code) {
+    return purchaseOrderRepository
+        .findFirstByCodeEquals(code)
+        .map(po -> ResponseEntity.ok(po))
+        .orElseGet(() -> ResponseEntity.notFound().build());
+  }
 }

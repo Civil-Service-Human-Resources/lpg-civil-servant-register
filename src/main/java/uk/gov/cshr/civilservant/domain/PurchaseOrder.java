@@ -1,19 +1,19 @@
 package uk.gov.cshr.civilservant.domain;
 
+import javax.persistence.*;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-
-import javax.persistence.*;
 
 @Data
 @Entity
 public class PurchaseOrder {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @JsonIgnore
+  private Long id;
 
-    @Column(nullable = false, length = 20, unique = true)
-    private String code;
+  @Column(nullable = false, length = 20, unique = true)
+  private String code;
 }

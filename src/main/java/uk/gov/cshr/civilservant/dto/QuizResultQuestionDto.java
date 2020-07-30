@@ -10,15 +10,15 @@ import uk.gov.cshr.civilservant.domain.Status;
 @Getter
 @Setter
 public class QuizResultQuestionDto {
-    private QuestionType type;
-    private String theme;
-    private String value;
-    private String why;
-    private AnswerDto answer;
-    private String imgUrl;
-    private String suggestions;
-    private Status status;
-    private String alternativeText;
-    private String learningName;
-    private String learningReference;
+  private QuestionType type;
+  private String theme;
+  private String value;
+  private String why;
+  private AnswerDto answer;
+  private String imgUrl;
+  private String suggestions;
+  private Status status;
+  private String alternativeText;
+  private String learningName;
+  private String learningReference;
 }

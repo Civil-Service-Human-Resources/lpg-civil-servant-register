@@ -6,6 +6,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 @Data
 public class OrganisationalUnitDto extends DtoEntity {
-    protected String formattedName;
-    private String code;
+  protected String formattedName;
+  private String code;
 }

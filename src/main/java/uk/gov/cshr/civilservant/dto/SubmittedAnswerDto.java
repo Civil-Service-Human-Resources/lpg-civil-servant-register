@@ -8,8 +8,8 @@ import lombok.*;
 @Getter
 @Setter
 public class SubmittedAnswerDto {
-    int questionId;
-    String[] submittedAnswers;
-    boolean skipped;
-    QuizResultQuestionDto question;
+  int questionId;
+  String[] submittedAnswers;
+  boolean skipped;
+  QuizResultQuestionDto question;
 }

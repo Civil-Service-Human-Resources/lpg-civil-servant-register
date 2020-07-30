@@ -6,8 +6,9 @@ import org.hibernate.type.StandardBasicTypes;
 
 public class CustomMySqlDialect extends MySQL5InnoDBDialect {
 
-    public CustomMySqlDialect() {
-        super();
-        this.registerFunction("group_concat", new SQLFunctionTemplate(StandardBasicTypes.STRING, "group_concat(?1)"));
-    }
+  public CustomMySqlDialect() {
+    super();
+    this.registerFunction(
+        "group_concat", new SQLFunctionTemplate(StandardBasicTypes.STRING, "group_concat(?1)"));
+  }
 }

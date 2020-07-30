@@ -1,13 +1,11 @@
 package uk.gov.cshr.civilservant.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
-
 import javax.persistence.EntityNotFoundException;
 
 import org.junit.Test;
@@ -34,8 +32,7 @@ public class QuestionServiceTest {
 
   @Mock AnswerDtoFactory answerDtoFactory;
 
-  @Mock
-  AnswerRepository answerRepository;
+  @Mock AnswerRepository answerRepository;
 
   @Mock QuestionRepository questionRepository;
 
@@ -47,21 +44,21 @@ public class QuestionServiceTest {
   public void shouldAddANewQuestionToQuiz() throws QuizServiceException, QuizNotFoundException {
     // Given
     Long professionId = 1L;
-    Long organisationId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(1L);
     Quiz quiz = QuizBuilder.buildEntity();
     Question entity = QuizBuilder.buildAQuestionEntity();
     Answer answer = QuizBuilder.buildAnAnswer();
 
     // when
-    doReturn(Optional.of(quiz)).when(quizRepository)
-            .findFirstByProfessionIdAndOrganisationIdAndStatusIsNot(anyLong(), anyLong(), any());
+    doReturn(Optional.of(quiz))
+        .when(quizRepository)
+        .findFirstByProfessionIdAndStatusIsNot(anyLong(), any());
     when(questionDtoFactory.createEntity(any())).thenReturn(entity);
     when(answerDtoFactory.createEntity(any())).thenReturn(answer);
     when(questionRepository.save(any())).thenReturn(entity);
 
     // then
-    Long expectedId = questionService.addQuizQuestion(professionId, organisationId, questionDto);
+    Long expectedId = questionService.addQuizQuestion(professionId, questionDto);
     assertTrue(expectedId.equals(1L));
   }
 
@@ -78,10 +75,10 @@ public class QuestionServiceTest {
     // when
     when(questionDtoFactory.createEntity(questionDto)).thenReturn(entity);
     when(answerDtoFactory.createEntity(any())).thenReturn(answer);
-    when(questionRepository.findById(
-            questionDto.getId())).thenReturn(Optional.of(entity));
+    when(questionRepository.findById(questionDto.getId())).thenReturn(Optional.of(entity));
     when(questionRepository.save(any())).thenReturn(entity);
-    when(answerRepository.findById(questionDto.getAnswer().getId())).thenReturn(Optional.of(answer));
+    when(answerRepository.findById(questionDto.getAnswer().getId()))
+        .thenReturn(Optional.of(answer));
 
     // then
     Long expectedId = questionService.updateQuizQuestion(questionDto);
@@ -90,19 +87,15 @@ public class QuestionServiceTest {
 
   @Test
   public void shouldDeleteQuestions() {
-    //Given
+    // Given
     Long questionId = 1L;
-    Question question = Question.builder()
-            .id(1L)
-            .quiz(Quiz.builder()
-                    .numberOfQuestions(4)
-                    .build())
-            .build();
+    Question question =
+        Question.builder().id(1L).quiz(Quiz.builder().numberOfQuestions(4).build()).build();
 
-    //when
+    // when
     when(questionRepository.findById(questionId)).thenReturn(Optional.of(question));
 
-    //then
+    // then
     questionService.deleteQuestion(questionId);
     assertEquals(question.getStatus(), Status.INACTIVE);
     assertEquals(3, (int) question.getQuiz().getNumberOfQuestions());
@@ -110,7 +103,8 @@ public class QuestionServiceTest {
   }
 
   @Test(expected = QuizNotFoundException.class)
-  public void shouldThrowQuizNotFoundExceptionWhenUpdatingAQuestionInAnInactiveQuiz() throws QuizServiceException, QuizNotFoundException {
+  public void shouldThrowQuizNotFoundExceptionWhenUpdatingAQuestionInAnInactiveQuiz()
+      throws QuizServiceException, QuizNotFoundException {
     // Given
     Long professionId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(professionId);
@@ -120,8 +114,7 @@ public class QuestionServiceTest {
     entity.getQuiz().setStatus(Status.INACTIVE);
 
     // when
-    when(questionRepository.findById(
-            questionDto.getId())).thenReturn(Optional.of(entity));
+    when(questionRepository.findById(questionDto.getId())).thenReturn(Optional.of(entity));
 
     // then
     questionService.updateQuizQuestion(questionDto);
@@ -129,7 +122,8 @@ public class QuestionServiceTest {
   }
 
   @Test(expected = QuizServiceException.class)
-  public void shouldThrowQuizNotFoundExceptionWhenUpdatingAnInactiveQuestionInQuiz() throws QuizServiceException, QuizNotFoundException {
+  public void shouldThrowQuizNotFoundExceptionWhenUpdatingAnInactiveQuestionInQuiz()
+      throws QuizServiceException, QuizNotFoundException {
     // Given
     Long professionId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(professionId);
@@ -139,8 +133,7 @@ public class QuestionServiceTest {
     entity.setStatus(Status.INACTIVE);
 
     // when
-    when(questionRepository.findById(
-            questionDto.getId())).thenReturn(Optional.of(entity));
+    when(questionRepository.findById(questionDto.getId())).thenReturn(Optional.of(entity));
 
     // then
     questionService.updateQuizQuestion(questionDto);
@@ -148,62 +141,61 @@ public class QuestionServiceTest {
   }
 
   @Test(expected = QuizNotFoundException.class)
-  public void shouldNotAddANewQuestionToAnInactiveQuiz() throws QuizServiceException, QuizNotFoundException {
+  public void shouldNotAddANewQuestionToAnInactiveQuiz()
+      throws QuizServiceException, QuizNotFoundException {
     // Given
     long professionId = 1L;
-    long organisationId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(1L);
 
     // when
-    when(quizRepository
-            .findFirstByProfessionIdAndOrganisationIdAndStatusIsNot(professionId, organisationId, Status.INACTIVE))
-            .thenReturn(Optional.empty());
+    when(quizRepository.findFirstByProfessionIdAndStatusIsNot(professionId, Status.INACTIVE))
+        .thenReturn(Optional.empty());
 
     // then
-    questionService.addQuizQuestion(professionId, organisationId, questionDto);
+    questionService.addQuizQuestion(professionId, questionDto);
   }
 
   @Test(expected = QuizServiceException.class)
-  public void shouldThrowExceptionOnUpdateIfQuestionNotFound() throws QuizServiceException, QuizNotFoundException {
+  public void shouldThrowExceptionOnUpdateIfQuestionNotFound()
+      throws QuizServiceException, QuizNotFoundException {
     // Given
     QuestionDto questionDto = QuizBuilder.buildAQuestion(1L);
 
     // when
-    when(questionRepository.findById(questionDto.getId()))
-            .thenReturn(Optional.empty());
+    when(questionRepository.findById(questionDto.getId())).thenReturn(Optional.empty());
 
     // then
     questionService.updateQuizQuestion(questionDto);
   }
 
   @Test(expected = QuizServiceException.class)
-  public void shouldNotAddANewQuestionIfAltTextNotFoundForQuestionWithImageUrl() throws QuizServiceException, QuizNotFoundException {
+  public void shouldNotAddANewQuestionIfAltTextNotFoundForQuestionWithImageUrl()
+      throws QuizServiceException, QuizNotFoundException {
     // Given
     long professionId = 1L;
-    long organisationId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(1L);
 
     // when
     questionDto.setImgUrl("www.gov.uk");
 
     // then
-    questionService.addQuizQuestion(professionId, organisationId, questionDto);
+    questionService.addQuizQuestion(professionId, questionDto);
   }
 
   @Test
-  public void shouldUpdateAQuestionWithMultipleAnswersInTheQuiz() throws QuizServiceException, QuizNotFoundException {
+  public void shouldUpdateAQuestionWithMultipleAnswersInTheQuiz()
+      throws QuizServiceException, QuizNotFoundException {
     // Given
     Long professionId = 1L;
     QuestionDto questionDto = QuizBuilder.buildAQuestion(professionId);
     questionDto.setType(QuestionType.SINGLE);
-    questionDto.getAnswer().setCorrectAnswers(new String[] {"A","B"});
+    questionDto.getAnswer().setCorrectAnswers(new String[] {"A", "B"});
 
     Question entity = QuizBuilder.buildAQuestionEntity();
 
     // when
     when(questionDtoFactory.createEntity(questionDto)).thenReturn(entity);
-    when(questionRepository.findById(
-            questionDto.getId())).thenReturn(Optional.of(entity));
+    when(questionRepository.findById(questionDto.getId())).thenReturn(Optional.of(entity));
     when(questionRepository.save(any())).thenReturn(entity);
 
     // then
@@ -217,8 +209,7 @@ public class QuestionServiceTest {
     QuestionDto questionDto = QuizBuilder.buildAQuestion(1L);
     Question entity = QuizBuilder.buildAQuestionEntity();
     // when
-    when(questionRepository.findById(questionDto.getId()))
-            .thenReturn(Optional.of(entity));
+    when(questionRepository.findById(questionDto.getId())).thenReturn(Optional.of(entity));
 
     when(questionDtoFactory.create(entity)).thenReturn(questionDto);
 
@@ -233,12 +224,10 @@ public class QuestionServiceTest {
     // Given
     long questionId = 1L;
     // when
-    when(questionRepository.findById(questionId))
-            .thenReturn(Optional.empty());
+    when(questionRepository.findById(questionId)).thenReturn(Optional.empty());
 
     // then
     questionService.deleteQuestion(questionId);
     verify(questionRepository, times(1)).findById(questionId);
   }
-
 }

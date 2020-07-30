@@ -5,5 +5,4 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class ProfessionDto extends DtoEntity {
-}
+public class ProfessionDto extends DtoEntity {}

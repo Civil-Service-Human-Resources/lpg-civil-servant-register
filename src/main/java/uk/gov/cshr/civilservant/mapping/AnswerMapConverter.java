@@ -1,21 +1,20 @@
 package uk.gov.cshr.civilservant.mapping;
 
+import java.io.IOException;
+import java.util.Map;
+import javax.persistence.AttributeConverter;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import java.io.IOException;
-import java.util.Map;
-import javax.persistence.AttributeConverter;
 
 public class AnswerMapConverter implements AttributeConverter<Map<String, Object>, String> {
 
-  private ObjectMapper objectMapper = new ObjectMapper();
-
   private static final Logger logger = LoggerFactory.getLogger(AnswerMapConverter.class);
+  private ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
   public String convertToDatabaseColumn(Map<String, Object> answers) {
@@ -42,5 +41,4 @@ public class AnswerMapConverter implements AttributeConverter<Map<String, Object
     }
     return answerSet;
   }
-
 }

@@ -10,9 +10,9 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QuizHistoryDto {
-    private List<QuizResultDto> quizResultDto;
+  private List<QuizResultDto> quizResultDto;
 
-    public void setQuizResultDto(List<QuizResultDto> quizResultDto) {
-        this.quizResultDto = quizResultDto;
-    }
+  public void setQuizResultDto(List<QuizResultDto> quizResultDto) {
+    this.quizResultDto = quizResultDto;
+  }
 }

@@ -1,57 +1,57 @@
 package uk.gov.cshr.civilservant.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @MappedSuperclass
 public abstract class SelfReferencingEntity<T> implements RegistryEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  Long id;
 
-    @Column(unique = true, nullable = false)
-    String name;
+  @Column(unique = true, nullable = false)
+  String name;
 
-    @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
-    @JsonBackReference
-    T parent;
+  @ManyToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+  @JsonBackReference
+  T parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
-    List<T> children = new ArrayList<>();
+  @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+  List<T> children = new ArrayList<>();
 
-    public abstract T getParent();
+  public abstract T getParent();
 
-    public abstract void setParent(T parent);
+  public abstract void setParent(T parent);
 
-    public abstract List<T> getChildren();
+  public abstract List<T> getChildren();
 
-    public abstract void setChildren(List<T> children);
+  public abstract void setChildren(List<T> children);
 
-    public boolean hasParent() {
-        return parent != null;
-    }
+  public boolean hasParent() {
+    return parent != null;
+  }
 
-    public boolean hasChildren() {
-        return !children.isEmpty();
-    }
+  public boolean hasChildren() {
+    return !children.isEmpty();
+  }
 
-    @Override
-    public Long getId() {
-        return id;
-    }
+  @Override
+  public Long getId() {
+    return id;
+  }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+  public void setId(Long id) {
+    this.id = id;
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getName() {
+    return name;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public void setName(String name) {
+    this.name = name;
+  }
 }

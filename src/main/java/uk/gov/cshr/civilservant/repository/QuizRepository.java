@@ -12,7 +12,7 @@ import uk.gov.cshr.civilservant.domain.Status;
 @PreAuthorize("isAuthenticated()")
 public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
-  Optional<Quiz> findFirstByProfessionIdAndOrganisationIdAndStatusIsNot(long professionId, long organisationId, Status status);
+  Optional<Quiz> findFirstByProfessionIdAndStatusIsNot(long professionId, Status status);
 
-  Optional<Quiz> findFirstByProfessionIdAndOrganisationIdAndStatusIs(long professionId, long organisationId, Status status);
+  Optional<Quiz> findFirstByProfessionIdAndStatusIs(long professionId, Status status);
 }
