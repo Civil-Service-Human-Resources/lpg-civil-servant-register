@@ -6,6 +6,7 @@
 gradle/tools
 build
 out
+.DS_Store
 .project
 .settings/*
 .vscode/*
