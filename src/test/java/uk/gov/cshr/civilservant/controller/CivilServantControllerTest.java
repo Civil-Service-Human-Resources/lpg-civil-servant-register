@@ -3,6 +3,8 @@ package uk.gov.cshr.civilservant.controller;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,30 +13,36 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.hateoas.Resource;
+import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.domain.Identity;
+import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
+import uk.gov.cshr.civilservant.dto.UpdateOrganisationDTO;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
+import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
+import uk.gov.cshr.civilservant.utils.JsonUtils;
 import uk.gov.cshr.civilservant.utils.MockMVCFilterOverrider;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -54,6 +62,12 @@ public class CivilServantControllerTest {
     @MockBean
     private CivilServantResourceFactory civilServantResourceFactory;
 
+    @MockBean
+    private OrganisationalUnitRepository organisationalUnitRepository;
+
+    @Captor
+    private ArgumentCaptor<CivilServant> civilServantOrgToBeDeletedCaptor;
+
     @Before
     public void overridePatternMappingFilterProxyFilter() throws IllegalAccessException {
         MockMVCFilterOverrider.overrideFilterOf(mockMvc, "PatternMappingFilterProxy" );
@@ -61,7 +75,7 @@ public class CivilServantControllerTest {
 
     @Test
     public void shouldReturnNotFoundIfNoLineManager() throws Exception {
-        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(createCivilServant("uid")));
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(createCivilServant("myuid")));
         mockMvc.perform(
                 patch("/civilServants/manager?email=bogus@domain.com").with(csrf())
                         .accept(APPLICATION_JSON))
@@ -85,13 +99,13 @@ public class CivilServantControllerTest {
     public void shouldReturnBadRequestIfSettingLineManagerToYourself() throws Exception {
 
         IdentityFromService lineManager = new IdentityFromService();
-        lineManager.setUid("uid");
+        lineManager.setUid("myuid");
 
         when(lineManagerService.checkLineManager("learner@domain.com")).thenReturn(lineManager);
 
-        CivilServant civilServant = createCivilServant("uid");
+        CivilServant civilServant = createCivilServant("myuid");
 
-        when(civilServantRepository.findByIdentity("uid")).thenReturn(Optional.of(civilServant));
+        when(civilServantRepository.findByIdentity("myuid")).thenReturn(Optional.of(civilServant));
         when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
 
         mockMvc.perform(
@@ -113,7 +127,7 @@ public class CivilServantControllerTest {
         when(lineManagerService.checkLineManager("learner@domain.com")).thenReturn(lineManagerIdentity);
 
         CivilServant lineManager = createCivilServant("mid");
-        CivilServant civilServant = createCivilServant("uid");
+        CivilServant civilServant = createCivilServant("myuid");
 
         CivilServantResource civilServantResource = new CivilServantResource();
         civilServantResource.setLineManagerEmailAddress(lineManagerEmail);
@@ -134,6 +148,21 @@ public class CivilServantControllerTest {
 
         verify(civilServantRepository).save(any());
         verify(lineManagerService).notifyLineManager(any(), any(), any());
+    }
+
+    @Test
+    public void givenOrgDoesNotExists_shouldReturnNotFound() throws Exception {
+
+        CivilServant civilServant = createCivilServant("myuid");
+
+        when(civilServantRepository.findByPrincipal()).thenReturn(Optional.of(civilServant));
+        when(civilServantResourceFactory.getCivilServantOrganisationalUnitCode(any(CivilServant.class))).thenReturn(Optional.empty());
+
+        mockMvc.perform(
+                get("/civilServants/org")
+                        .accept(APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
     }
 
     public void shouldReturnOkWhenRequestCivilServantByUid() throws Exception {
@@ -162,7 +191,7 @@ public class CivilServantControllerTest {
     @Test
     public void shouldReturnNotFoundWhenRequestCivilServantByUidDoesntExist() throws Exception {
         String uid = "uid";
-        
+
         when(civilServantRepository.findByIdentity(uid)).thenReturn(Optional.empty());
 
         mockMvc.perform(
@@ -174,7 +203,9 @@ public class CivilServantControllerTest {
 
     private CivilServant createCivilServant(String uid) {
         Identity identity = new Identity(uid);
-        return new CivilServant(identity);
+        CivilServant cs = new CivilServant(identity);
+        cs.setId(new Long(123));
+        return cs;
     }
 
     @TestConfiguration

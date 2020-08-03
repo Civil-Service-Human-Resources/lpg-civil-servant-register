@@ -1,35 +1,78 @@
 package uk.gov.cshr.civilservant.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
+import uk.gov.cshr.civilservant.dto.AgencyTokenResponseDto;
 import uk.gov.cshr.civilservant.dto.OrganisationalUnitDto;
 import uk.gov.cshr.civilservant.dto.factory.OrganisationalUnitDtoFactory;
+import uk.gov.cshr.civilservant.exception.CSRSApplicationException;
+import uk.gov.cshr.civilservant.exception.NoOrganisationsFoundException;
+import uk.gov.cshr.civilservant.exception.TokenAlreadyExistsException;
+import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
+import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @Transactional
 public class OrganisationalUnitService extends SelfReferencingEntityService<OrganisationalUnit, OrganisationalUnitDto> {
 
     private OrganisationalUnitRepository repository;
+    private AgencyTokenService agencyTokenService;
+    private IdentityService identityService;
 
-    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository, OrganisationalUnitDtoFactory organisationalUnitDtoFactory) {
+    public OrganisationalUnitService(OrganisationalUnitRepository organisationalUnitRepository, OrganisationalUnitDtoFactory organisationalUnitDtoFactory, AgencyTokenService agencyTokenService, IdentityService identityService) {
         super(organisationalUnitRepository, organisationalUnitDtoFactory);
         this.repository = organisationalUnitRepository;
+        this.agencyTokenService = agencyTokenService;
+        this.identityService = identityService;
     }
 
     public List<OrganisationalUnit> getOrganisationWithParents(String code) {
         List<OrganisationalUnit> organisationalUnitList = new ArrayList<>();
-        getOrganisationalUnit(code, organisationalUnitList);
+        getOrganisationalUnitAndParent(code, organisationalUnitList);
 
         return organisationalUnitList;
     }
 
-    private List<OrganisationalUnit> getOrganisationalUnit(String code, List<OrganisationalUnit> organisationalUnits) {
+    public List<OrganisationalUnit> getOrganisationWithChildren(String code) {
+        List<OrganisationalUnit> organisationalUnitList = new ArrayList<>();
+        getOrganisationalUnitAndChildren(code, organisationalUnitList);
+
+        return organisationalUnitList;
+    }
+
+    public List<OrganisationalUnit> getOrganisationsForDomain(String domain, String userUid) throws CSRSApplicationException {
+        return identityService.getAgencyTokenUid(userUid)
+                .map(s -> {
+                    AgencyToken agencyToken = agencyTokenService.getAgencyTokenByUid(s)
+                            .orElseThrow(TokenDoesNotExistException::new);
+
+                    OrganisationalUnit organisationalUnit = repository.findOrganisationByAgencyToken(agencyToken)
+                            .orElseThrow(() -> new NoOrganisationsFoundException((domain)));
+
+                    return getOrganisationWithChildren(organisationalUnit.getCode());
+                })
+                .orElseGet(() -> repository.findAll());
+    }
+
+    private List<OrganisationalUnit> getOrganisationalUnitAndChildren(String code, List<OrganisationalUnit> organisationalUnits) {
+        repository.findByCode(code).ifPresent(organisationalUnit -> {
+            organisationalUnits.add(organisationalUnit);
+            getChildren(organisationalUnit, organisationalUnits);
+        });
+
+        return organisationalUnits;
+    }
+
+    private List<OrganisationalUnit> getOrganisationalUnitAndParent(String code, List<OrganisationalUnit> organisationalUnits) {
         repository.findByCode(code).ifPresent(organisationalUnit -> {
             organisationalUnits.add(organisationalUnit);
             getParent(organisationalUnit, organisationalUnits);
@@ -40,11 +83,65 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
 
     private void getParent(OrganisationalUnit organisationalUnit, List<OrganisationalUnit> organisationalUnits) {
         Optional<OrganisationalUnit> parent = Optional.ofNullable(organisationalUnit.getParent());
-        parent.ifPresent(parentOrganisationalUnit -> getOrganisationalUnit(parentOrganisationalUnit.getCode(), organisationalUnits));
+        parent.ifPresent(parentOrganisationalUnit -> getOrganisationalUnitAndParent(parentOrganisationalUnit.getCode(), organisationalUnits));
+    }
+
+    private void getChildren(OrganisationalUnit organisationalUnit, List<OrganisationalUnit> organisationalUnits) {
+        if (organisationalUnit.hasChildren()) {
+            List<OrganisationalUnit> listOfChildren = organisationalUnit.getChildren();
+            listOfChildren.stream().forEach(childOrganisationalUnit -> getOrganisationalUnitAndChildren(childOrganisationalUnit.getCode(), organisationalUnits));
+        }
+    }
+
+    public Optional<OrganisationalUnit> getOrganisationalUnit(Long id) {
+        return repository.findById(id);
     }
 
     public List<OrganisationalUnit> getOrganisationsNormalised() {
         return repository.findAllNormalised();
+    }
+
+    public OrganisationalUnit setAgencyToken(OrganisationalUnit organisationalUnit, AgencyToken agencyToken) {
+        if (organisationalUnit.getAgencyToken() != null) {
+            throw new TokenAlreadyExistsException(organisationalUnit.getId().toString());
+        }
+
+        organisationalUnit.setAgencyToken(agencyToken);
+
+        return repository.save(organisationalUnit);
+    }
+
+    public OrganisationalUnit updateAgencyToken(OrganisationalUnit organisationalUnit, AgencyToken newToken) {
+        AgencyToken currentToken = organisationalUnit.getAgencyToken();
+
+        if (currentToken == null) {
+             throw new TokenDoesNotExistException(organisationalUnit.getId().toString());
+        }
+
+        currentToken.setAgencyDomains(newToken.getAgencyDomains());
+        currentToken.setCapacity(newToken.getCapacity());
+        currentToken.setToken(newToken.getToken());
+
+        return repository.save(organisationalUnit);
+    }
+
+    public OrganisationalUnit deleteAgencyToken(OrganisationalUnit organisationalUnit) {
+
+        AgencyToken agencyToken = organisationalUnit.getAgencyToken();
+
+        try {
+            identityService.removeAgencyTokenFromUsers(agencyToken.getUid());
+        } catch (CSRSApplicationException e) {
+            log.error("Error removing users from agency token (%s) to be deleted, error is: %s", agencyToken.getUid(), e.getMessage());
+            return null;
+        }
+
+        organisationalUnit.setAgencyToken(null);
+        OrganisationalUnit updateOrgUnit = repository.save(organisationalUnit);
+
+        agencyTokenService.deleteAgencyToken(agencyToken);
+
+        return updateOrgUnit;
     }
 
     public List<String> getOrganisationalUnitCodes() {
@@ -55,4 +152,13 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     public Optional<OrganisationalUnit> get(Long id) {
         return repository.findById(id);
     }
+
+    public AgencyTokenResponseDto getAgencyToken(Long organisationalUnitId) throws CSRSApplicationException {
+        AgencyToken agencyToken = getOrganisationalUnit(organisationalUnitId)
+                .map(OrganisationalUnit::getAgencyToken)
+                .orElseThrow(TokenDoesNotExistException::new);
+
+        return agencyTokenService.getAgencyTokenResponseDto(agencyToken);
+    }
+
 }

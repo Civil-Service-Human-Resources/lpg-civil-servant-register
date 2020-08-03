@@ -31,7 +31,6 @@ spring:
 
 server:
   port: 9002
-  requestLogginFilterEnabled: ${REQUEST_LOGGING_FILTER_ENABLED:false}
 
 logging:
   pattern:
@@ -39,7 +38,6 @@ logging:
   level:
     root: ${ROOT_LOGGING_LEVEL:INFO}
     com.zaxxer.hikari: INFO
-
 
 oauth:
   clientId: ${CLIENT_ID:9fbd4ae2-2db3-44c7-9544-88e80255b56e}
@@ -54,6 +52,8 @@ oauth:
 
 identity:
   identityAPIUrl: "${oauth.serviceUrl}/api/identities"
+  agencyTokenUrl: "${oauth.serviceUrl}/agency/{agencyTokenUid}"
+  identityAgencyTokenUrl: "${oauth.serviceUrl}/api/identity/agency/"
 
 govNotify:
   enabled: ${GOV_NOTIFY_ENABLED:false}
@@ -61,12 +61,18 @@ govNotify:
   template:
     lineManager: ${GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID:changeme}
 
+#Validation properties
+agencyToken:
+  capacity:
+    max: ${AGENCY_TOKEN_MAX_CAPACITY:1500}
+    min: ${AGENCY_TOKEN_MIN_CAPACITY:1}
+
 ---
 
 spring:
   profiles: test, production
   datasource:
-    url: ${DATASOURCE:jdbc:mysql://localhost:3306/civil_servant_register?user=root&password=password&useSSL=false}
+    url: ${DATASOURCE:jdbc:mysql://localhost:3306/csrs?user=root&password=password&useSSL=false}
     platform: mysql
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:

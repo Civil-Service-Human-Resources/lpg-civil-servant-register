@@ -15,7 +15,7 @@ See the `diagram/` folder for diagram source in draw.io XML format
 
 ### Build-time
 
-For a complete list of build dependencies check the `build.gradle` file. The main source dependencies are:  
+For a complete list of build dependencies check the `build.gradle` file. The main source dependencies are:
 - Spring Boot 2.0 (web, jetty, jersey, security, config)
 - Spring Security OAuth2 2.3.3
 - Spring Data REST 3.0
@@ -29,13 +29,13 @@ For a complete list of build dependencies check the `build.gradle` file. The mai
 
 ### Test-time
 
-For a complete list of test dependencies check the `build.gradle` file. The main test dependencies are:  
+For a complete list of test dependencies check the `build.gradle` file. The main test dependencies are:
 - Spring Boot Starter Test
 - Spring Boot Security Test
 - mockito 2.8
 - powermock 1.7
 
-### Runtime 
+### Runtime
 
 #### Other LPG Services
 
@@ -55,7 +55,7 @@ The CSRS application uses Flyway to manage the DB migrations inside its own sche
 
 #### Caching
 
-The CSRS application is one of few application components in LPG that has explicit caching. The caching implemented is using the `@Cacheable` annotation in the `OrganisationalUnitController` and caches both the endpoint results for the Tree and Flat versions of the organisations hierarchy. The cache is evicted on calls to save and delete in the `OrganisationalUnitRepository`. 
+The CSRS application is one of few application components in LPG that has explicit caching. The caching implemented is using the `@Cacheable` annotation in the `OrganisationalUnitController` and caches both the endpoint results for the Tree and Flat versions of the organisations hierarchy. The cache is evicted on calls to save and delete in the `OrganisationalUnitRepository`.
 
 
 ## Build, run, test, deploy
@@ -73,7 +73,6 @@ The application is packaged as a docker container image and includes an Azure Ap
 The application also inclues a `Jenkinsfile` to define the Jenkins build pipeline stages and linking it to the docker image repository and correct terraform module.
 
 Deployment is controlled via the Terraform scripts in the main PaaS repository, with per-environment configuration values referenced there and secrets injected from keybase.
-
 
 ## Configuration
 
