@@ -11,6 +11,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import com.opencsv.CSVWriter;
+import com.opencsv.bean.ColumnPositionMappingStrategy;
+import com.opencsv.bean.HeaderColumnNameMappingStrategy;
 import com.opencsv.bean.StatefulBeanToCsv;
 import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
@@ -30,6 +32,7 @@ import uk.gov.cshr.civilservant.dto.CivilServantReportDto;
 import uk.gov.cshr.civilservant.dto.SkillsReportsDto;
 import uk.gov.cshr.civilservant.mapping.RoleMapping;
 import uk.gov.cshr.civilservant.service.ReportService;
+import uk.gov.cshr.civilservant.utils.strategy.HeaderColumnNameAndOrderMappingStrategy;
 
 @RestController
 @RequestMapping("/report")
@@ -170,6 +173,10 @@ public class ReportController {
       StatefulBeanToCsv beanToCsv =
           new StatefulBeanToCsvBuilder(writer)
               .withQuotechar(CSVWriter.DEFAULT_QUOTE_CHARACTER)
+              .withMappingStrategy(
+                      new HeaderColumnNameAndOrderMappingStrategy<>(
+                              SkillsReportsDto.class
+                      ))
               .build();
 
       beanToCsv.write(reportsDtoList);

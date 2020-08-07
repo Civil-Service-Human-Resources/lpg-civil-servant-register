@@ -1,28 +1,27 @@
 package uk.gov.cshr.civilservant.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.opencsv.bean.CsvBindByName;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import uk.gov.cshr.civilservant.domain.Status;
+import uk.gov.cshr.civilservant.utils.strategy.CsvBindByNameOrder;
 
 @Builder
 @Getter
 @Setter
-@JsonPropertyOrder({
-  "quizName",
-  "status",
-  "professionName",
-  "questionId",
-  "questionName",
-  "questionTheme",
-  "timesAttempted",
-  "correctCount",
-  "incorrectCount",
-  "skippedCount"
-})
+
+@CsvBindByNameOrder({"Question Id",
+        "Question text",
+        "Quiz Name",
+        "Question Theme",
+        "Profession Name",
+        "Quiz Status",
+        "Correct Count",
+        "Incorrect Count",
+        "Skipped Count",
+        "Times Attempted"})
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class SkillsReportsDto {
   @CsvBindByName(column = "Quiz Name")
