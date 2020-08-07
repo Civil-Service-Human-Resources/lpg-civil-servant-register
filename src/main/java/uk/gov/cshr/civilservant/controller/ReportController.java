@@ -95,7 +95,7 @@ public class ReportController {
       HttpServletResponse response)
       throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
 
-    LocalDateTime fromDate = LocalDateTime.of(from, LocalTime.now());
+    LocalDateTime fromDate = LocalDateTime.of(from, LocalTime.MIN);
 
     LocalDateTime toDate = LocalDateTime.of(to, LocalTime.MAX);
 
@@ -116,7 +116,7 @@ public class ReportController {
       @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
       HttpServletResponse response)
       throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
-    LocalDateTime fromDate = LocalDateTime.of(from, LocalTime.now());
+    LocalDateTime fromDate = LocalDateTime.of(from, LocalTime.MIN);
 
     LocalDateTime toDate = LocalDateTime.of(to, LocalTime.MAX);
 
@@ -137,7 +137,7 @@ public class ReportController {
       @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
       HttpServletResponse response)
       throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
-    LocalDateTime fromDate = LocalDateTime.of(from, LocalTime.now());
+    LocalDateTime fromDate = LocalDateTime.of(from, LocalTime.MIN);
 
     LocalDateTime toDate = LocalDateTime.of(to, LocalTime.MAX);
 
@@ -156,7 +156,7 @@ public class ReportController {
       @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
       HttpServletResponse response)
       throws IOException, CsvDataTypeMismatchException, CsvRequiredFieldEmptyException {
-    LocalDateTime fromDate = LocalDateTime.of(from, LocalTime.now());
+    LocalDateTime fromDate = LocalDateTime.of(from, LocalTime.MIN);
 
     LocalDateTime toDate = LocalDateTime.of(to, LocalTime.MAX);
 

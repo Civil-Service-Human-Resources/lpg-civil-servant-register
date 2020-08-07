@@ -73,7 +73,8 @@ public class QuestionService {
   }
 
   private void populateQuestion(
-      QuestionDto questionDTO, Optional<Question> questionToBeUpdated, Question question) {
+      QuestionDto questionDTO, Optional<Question> questionToBeUpdated, Question question)
+      throws QuizServiceException {
     questionToBeUpdated.get().setValue(question.getValue());
     if (!StringUtils.isEmpty(question.getImgUrl())) {
       questionToBeUpdated.get().setImgUrl(question.getImgUrl());
@@ -85,6 +86,8 @@ public class QuestionService {
     questionToBeUpdated.get().setSuggestions(question.getSuggestions());
     questionToBeUpdated.get().setTheme(question.getTheme());
     questionToBeUpdated.get().setWhy(question.getWhy());
+    questionToBeUpdated.get().setLearningName(question.getLearningName());
+    questionToBeUpdated.get().setLearningReference(question.getLearningReference());
     AnswerDto answerDto = questionDTO.getAnswer();
     if (answerDto.getCorrectAnswers().length > 1) {
       questionToBeUpdated.get().setType(QuestionType.MULTIPLE);
@@ -96,11 +99,11 @@ public class QuestionService {
       if (answer.isPresent()) {
         answer = Optional.of(answerDtoFactory.createEntity(answerDto));
         answer.get().setQuestion(questionToBeUpdated.get());
+      } else {
+        throw new QuizServiceException("Invalid Answer id.");
       }
     } else {
-      Answer newAnswer = answerDtoFactory.createEntity(answerDto);
-      newAnswer.setQuestion(questionToBeUpdated.get());
-      questionToBeUpdated.get().setAnswer(newAnswer);
+      throw new QuizServiceException("Answer id must be a provided for an update.");
     }
   }
 

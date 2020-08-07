@@ -81,6 +81,6 @@ public class QuizBuilder {
     Map<String, Object> answerMap = new LinkedHashMap<>();
     answerMap.put("A", "Answer 1");
     answerMap.put("B", "Answer 2");
-    return Answer.builder().answers(answerMap).correctAnswer("B").build();
+    return Answer.builder().id(1L).answers(answerMap).correctAnswer("B").build();
   }
 }

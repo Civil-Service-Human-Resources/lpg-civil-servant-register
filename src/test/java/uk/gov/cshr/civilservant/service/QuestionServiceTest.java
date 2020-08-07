@@ -20,13 +20,11 @@ import uk.gov.cshr.civilservant.dto.factory.QuestionDtoFactory;
 import uk.gov.cshr.civilservant.exception.QuizNotFoundException;
 import uk.gov.cshr.civilservant.exception.QuizServiceException;
 import uk.gov.cshr.civilservant.repository.AnswerRepository;
-import uk.gov.cshr.civilservant.repository.ProfessionRepository;
 import uk.gov.cshr.civilservant.repository.QuestionRepository;
 import uk.gov.cshr.civilservant.repository.QuizRepository;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuestionServiceTest {
-  @Mock ProfessionRepository professionRepository;
 
   @Mock QuestionDtoFactory questionDtoFactory;
 
@@ -192,11 +190,14 @@ public class QuestionServiceTest {
     questionDto.getAnswer().setCorrectAnswers(new String[] {"A", "B"});
 
     Question entity = QuizBuilder.buildAQuestionEntity();
+    Answer answerEntity = QuizBuilder.buildAnAnswer();
 
     // when
     when(questionDtoFactory.createEntity(questionDto)).thenReturn(entity);
     when(questionRepository.findById(questionDto.getId())).thenReturn(Optional.of(entity));
     when(questionRepository.save(any())).thenReturn(entity);
+    when(answerRepository.findById(anyLong())).thenReturn(Optional.of(answerEntity));
+    when(answerDtoFactory.createEntity(any())).thenReturn(answerEntity);
 
     // then
     Long expectedId = questionService.updateQuizQuestion(questionDto);
