@@ -8,6 +8,7 @@ import java.util.List;
 
 @MappedSuperclass
 public abstract class SelfReferencingEntity<T> implements RegistryEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;

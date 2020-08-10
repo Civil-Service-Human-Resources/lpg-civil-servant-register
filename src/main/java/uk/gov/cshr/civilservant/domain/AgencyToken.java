@@ -9,6 +9,9 @@ import java.util.Set;
 @Data
 @Entity
 public class AgencyToken implements RegistryEntity {
+
+    private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore

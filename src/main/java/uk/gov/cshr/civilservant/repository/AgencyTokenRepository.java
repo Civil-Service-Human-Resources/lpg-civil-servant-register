@@ -2,6 +2,7 @@ package uk.gov.cshr.civilservant.repository;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.stereotype.Repository;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
 
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@RepositoryRestResource(exported = false)
 public interface AgencyTokenRepository extends CrudRepository<AgencyToken, Long> {
 
     @Query("select new uk.gov.cshr.civilservant.domain.AgencyToken(a.id, a.token, a.capacity, a.uid) " +

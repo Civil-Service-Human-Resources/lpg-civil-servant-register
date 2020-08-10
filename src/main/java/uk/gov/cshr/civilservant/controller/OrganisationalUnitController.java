@@ -51,21 +51,15 @@ public class OrganisationalUnitController {
     }
 
     @GetMapping("/tree")
-    @Cacheable("organisationalUnitsTree")
     public ResponseEntity<List<OrganisationalUnit>> listOrganisationalUnitsAsTreeStructure() {
         log.info("Getting org tree");
-        List<OrganisationalUnit> organisationalUnits = organisationalUnitService.getParents();
-
-        return ResponseEntity.ok(organisationalUnits);
+        return ResponseEntity.ok(organisationalUnitService.getOrgTree());
     }
 
     @GetMapping("/flat")
-    @Cacheable("organisationalUnitsFlat")
     public ResponseEntity<List<OrganisationalUnitDto>> listOrganisationalUnitsAsFlatStructure() {
         log.info("Getting org flat");
-        List<OrganisationalUnitDto> organisationalUnitsMap = organisationalUnitService.getListSortedByValue();
-
-        return ResponseEntity.ok(organisationalUnitsMap);
+        return ResponseEntity.ok(organisationalUnitService.getFlatOrg());
     }
 
     @GetMapping("/flat/{domain}/")
