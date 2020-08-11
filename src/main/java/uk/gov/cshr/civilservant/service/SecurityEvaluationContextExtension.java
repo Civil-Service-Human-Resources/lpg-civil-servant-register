@@ -9,15 +9,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class SecurityEvaluationContextExtension extends EvaluationContextExtensionSupport {
 
-    @Override
-    public String getExtensionId() {
-        return "security";
-    }
+  @Override
+  public String getExtensionId() {
+    return "security";
+  }
 
-    @Override
-    public SecurityExpressionRoot getRootObject() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return new SecurityExpressionRoot(authentication) {
-        };
-    }
+  @Override
+  public SecurityExpressionRoot getRootObject() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return new SecurityExpressionRoot(authentication) {};
+  }
 }

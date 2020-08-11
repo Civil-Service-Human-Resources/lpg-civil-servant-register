@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `submitted_answer`
 (
     `id`    SMALLINT(5) UNSIGNED NOT NULL AUTO_INCREMENT,
     `quiz_result_id`    SMALLINT(5) UNSIGNED NOT NULL,
-    `question_id` SMALLINT(5) UNSIGNED NOT NULL,
+    `question` VARCHAR (1500) NOT NULL,
     `submitted_answers` VARCHAR(20),
     `skipped` VARCHAR(10),
     `correct` VARCHAR(10),
@@ -73,7 +73,6 @@ ADD
     `name` VARCHAR(500),
     `status` VARCHAR(15),
     `result` VARCHAR(10),
-    `organisation_id` SMALLINT(5) UNSIGNED NOT NULL,
     `description` VARCHAR(1500),
     `number_of_questions` SMALLINT(3) UNSIGNED,
     `created_on` TIMESTAMP NOT NULL,
@@ -84,10 +83,6 @@ ADD
 ALTER TABLE `answer`
 ADD CONSTRAINT `FK_question` FOREIGN KEY (`question_id`)
 REFERENCES `question` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE `submitted_answer`
-ADD CONSTRAINT `FK_question_submitted_answer` FOREIGN KEY (`question_id`)
-REFERENCES `question` (`id`);
 
 ALTER TABLE
   `question`

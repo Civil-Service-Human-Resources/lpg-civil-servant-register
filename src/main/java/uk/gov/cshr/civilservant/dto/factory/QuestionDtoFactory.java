@@ -10,25 +10,24 @@ import uk.gov.cshr.civilservant.dto.QuestionDto;
 @Component
 public class QuestionDtoFactory extends DtoFactory<QuestionDto, Question> {
 
-    ModelMapper modelMapper;
-    AnswerDtoFactory answerDtoFactory;
+  ModelMapper modelMapper;
+  AnswerDtoFactory answerDtoFactory;
 
-    @Autowired
-    public QuestionDtoFactory(ModelMapper modelMapper,
-                              AnswerDtoFactory answerDtoFactory) {
-        this.answerDtoFactory = answerDtoFactory;
-        this.modelMapper = modelMapper;
-    }
+  @Autowired
+  public QuestionDtoFactory(ModelMapper modelMapper, AnswerDtoFactory answerDtoFactory) {
+    this.answerDtoFactory = answerDtoFactory;
+    this.modelMapper = modelMapper;
+  }
 
-    @Override
-    public QuestionDto create(Question question) {
-        QuestionDto questionDto = modelMapper.map(question, QuestionDto.class);
-        AnswerDto answerDto = answerDtoFactory.create(question.getAnswer());
-        questionDto.setAnswer(answerDto);
-        return questionDto;
-    }
+  @Override
+  public QuestionDto create(Question question) {
+    QuestionDto questionDto = modelMapper.map(question, QuestionDto.class);
+    AnswerDto answerDto = answerDtoFactory.create(question.getAnswer());
+    questionDto.setAnswer(answerDto);
+    return questionDto;
+  }
 
-    public Question createEntity(QuestionDto questionDTO) {
-        return modelMapper.map(questionDTO, Question.class);
-    }
+  public Question createEntity(QuestionDto questionDTO) {
+    return modelMapper.map(questionDTO, Question.class);
+  }
 }

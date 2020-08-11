@@ -11,8 +11,5 @@ import uk.gov.cshr.civilservant.domain.Profession;
 @Getter
 @Setter
 public class CreateQuizDto {
-    @NotNull
-    Profession profession;
-    @NotNull
-    int organisationId;
+  @NotNull Profession profession;
 }

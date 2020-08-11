@@ -1,25 +1,20 @@
 package uk.gov.cshr.civilservant.service;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+import javax.persistence.EntityNotFoundException;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import uk.gov.cshr.civilservant.domain.Profession;
-import uk.gov.cshr.civilservant.domain.Question;
-import uk.gov.cshr.civilservant.domain.Quiz;
-import uk.gov.cshr.civilservant.domain.QuizResult;
-import uk.gov.cshr.civilservant.domain.QuizType;
-import uk.gov.cshr.civilservant.domain.Status;
-import uk.gov.cshr.civilservant.domain.SubmittedAnswer;
-import uk.gov.cshr.civilservant.dto.AnswerDto;
-import uk.gov.cshr.civilservant.dto.QuizDataTableDto;
-import uk.gov.cshr.civilservant.dto.QuizDto;
-import uk.gov.cshr.civilservant.dto.QuizHistoryDto;
-import uk.gov.cshr.civilservant.dto.QuizResultDto;
-import uk.gov.cshr.civilservant.dto.QuizResultSummaryDto;
-import uk.gov.cshr.civilservant.dto.QuizSubmissionDto;
-import uk.gov.cshr.civilservant.dto.SkillsReportsDto;
-import uk.gov.cshr.civilservant.dto.SubmittedAnswerDto;
+import uk.gov.cshr.civilservant.domain.*;
+import uk.gov.cshr.civilservant.dto.*;
 import uk.gov.cshr.civilservant.dto.factory.AnswerDtoFactory;
 import uk.gov.cshr.civilservant.dto.factory.QuizDtoFactory;
 import uk.gov.cshr.civilservant.dto.factory.QuizResultDtoFactory;
@@ -30,30 +25,23 @@ import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.repository.ProfessionRepository;
 import uk.gov.cshr.civilservant.repository.QuizRepository;
 import uk.gov.cshr.civilservant.repository.QuizResultRepository;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-import javax.persistence.EntityNotFoundException;
 
 @Service
+@Slf4j
 @Transactional(
     propagation = Propagation.REQUIRES_NEW,
     rollbackFor = {QuizServiceException.class, QuizNotFoundException.class})
 public class QuizService {
 
+  private final AnswerDtoFactory answerDtoFactory;
   private QuestionService questionService;
   private QuizRepository quizRepository;
   private ProfessionRepository professionRepository;
   private OrganisationalUnitRepository organisationalUnitRepository;
   private QuizResultRepository quizResultRepository;
   private QuizDtoFactory quizDtoFactory;
-  private final AnswerDtoFactory answerDtoFactory;
   private QuizResultDtoFactory quizResultDtoFactory;
+  private ObjectMapper objectMapper;
 
   @Autowired
   public QuizService(
@@ -64,7 +52,8 @@ public class QuizService {
       QuestionService questionService,
       QuizResultRepository quizResultRepository,
       AnswerDtoFactory answerDtoFactory,
-      QuizResultDtoFactory quizResultDtoFactory) {
+      QuizResultDtoFactory quizResultDtoFactory,
+      ObjectMapper objectMapper) {
     this.quizRepository = quizRepository;
     this.quizDtoFactory = quizDtoFactory;
     this.professionRepository = professionRepository;
@@ -73,13 +62,12 @@ public class QuizService {
     this.quizResultRepository = quizResultRepository;
     this.answerDtoFactory = answerDtoFactory;
     this.quizResultDtoFactory = quizResultDtoFactory;
+    this.objectMapper = objectMapper;
   }
 
-  public Optional<QuizDto> getQuizByProfessionIdAndOrganisationId(
-      Long professionId, Long organisationId) {
+  public Optional<QuizDto> getQuizByProfessionId(Long professionId) {
     Optional<Quiz> quiz =
-        quizRepository.findFirstByProfessionIdAndOrganisationIdAndStatusIsNot(
-            professionId, organisationId, Status.INACTIVE);
+        quizRepository.findFirstByProfessionIdAndStatusIsNot(professionId, Status.INACTIVE);
     if (quiz.isPresent()) {
       final Set<Question> questionsToBeRemoved = collectDeletedQuestionsInAQuiz(quiz);
       quiz.get().getQuestions().removeAll(questionsToBeRemoved);
@@ -89,10 +77,9 @@ public class QuizService {
   }
 
   @Transactional
-  public void delete(Long professionId, Long organisationId) {
+  public void delete(Long professionId) {
     Optional<Quiz> optionalEntry =
-        quizRepository.findFirstByProfessionIdAndOrganisationIdAndStatusIsNot(
-            professionId, organisationId, Status.INACTIVE);
+        quizRepository.findFirstByProfessionIdAndStatusIsNot(professionId, Status.INACTIVE);
     if (!optionalEntry.isPresent()) {
       throw new EntityNotFoundException("No quiz found matching the id provided");
     } else {
@@ -107,10 +94,9 @@ public class QuizService {
     return quizDtoFactory.create(quizRepository.save(quiz));
   }
 
-  public QuizDto update(Quiz quiz, Long professionId, Long organisationId) {
+  public QuizDto update(Quiz quiz, Long professionId) {
     Optional<Quiz> quizToBeUpdated =
-        quizRepository.findFirstByProfessionIdAndOrganisationIdAndStatusIsNot(
-            professionId, organisationId, Status.INACTIVE);
+        quizRepository.findFirstByProfessionIdAndStatusIsNot(professionId, Status.INACTIVE);
     if (quizToBeUpdated.isPresent()) {
       Quiz quizEntry = quizToBeUpdated.get();
       quizEntry.setDescription(quiz.getDescription());
@@ -121,13 +107,8 @@ public class QuizService {
     return null;
   }
 
-  public QuizDto create(Long professionId, Long organisationId)
-      throws QuizServiceException, ProfessionNotFoundException {
-    if (!organisationalUnitRepository.findById(organisationId).isPresent()) {
-      throw new QuizServiceException("Invalid organisation supplied");
-    }
-    Optional<QuizDto> quizDto =
-        getQuizByProfessionIdAndOrganisationId(professionId, organisationId);
+  public QuizDto create(Long professionId) throws ProfessionNotFoundException {
+    Optional<QuizDto> quizDto = getQuizByProfessionId(professionId);
     if (!quizDto.isPresent()) {
       Optional<Profession> profession = professionRepository.findById(professionId);
       if (!profession.isPresent()) {
@@ -139,7 +120,6 @@ public class QuizService {
               Quiz.builder()
                   .status(Status.DRAFT)
                   .profession(profession.get())
-                  .organisationId(organisationId)
                   .description("")
                   .createdOn(LocalDateTime.now())
                   .updatedOn(LocalDateTime.now())
@@ -150,11 +130,10 @@ public class QuizService {
     return quizDto.get();
   }
 
-  public Optional<QuizDto> getQuizInfo(Long professionId, Long organisationId) {
+  public Optional<QuizDto> getQuizInfo(Long professionId) {
 
     Optional<Quiz> quizRecord =
-        quizRepository.findFirstByProfessionIdAndOrganisationIdAndStatusIs(
-            professionId, organisationId, Status.PUBLISHED);
+        quizRepository.findFirstByProfessionIdAndStatusIs(professionId, Status.PUBLISHED);
     if (quizRecord.isPresent()) {
       final Set<Question> questionsToBeRemoved = collectDeletedQuestionsInAQuiz(quizRecord);
       quizRecord.get().getQuestions().removeAll(questionsToBeRemoved);
@@ -166,8 +145,8 @@ public class QuizService {
 
   public long publish(Quiz quiz) throws QuizServiceException {
     Optional<Quiz> quizToBePublished =
-        quizRepository.findFirstByProfessionIdAndOrganisationIdAndStatusIsNot(
-            quiz.getProfession().getId(), quiz.getOrganisationId(), Status.INACTIVE);
+        quizRepository.findFirstByProfessionIdAndStatusIsNot(
+            quiz.getProfession().getId(), Status.INACTIVE);
     if (quizToBePublished.isPresent()) {
       Set<Question> activeQuestions =
           quizToBePublished
@@ -221,27 +200,24 @@ public class QuizService {
   }
 
   @Transactional
-  protected int calculateResults(
-      QuizResult result, int correctCount, SubmittedAnswerDto answersDto) {
+  protected int calculateResults(QuizResult result, int correctCount, SubmittedAnswerDto answersDto)
+      throws JsonProcessingException {
+
     Optional<Question> question =
         questionService.getByQuestionId((long) answersDto.getQuestionId());
 
     if (question.isPresent()) {
-      SubmittedAnswer submittedAnswer = SubmittedAnswer.builder().question(question.get()).build();
+      SubmittedAnswer submittedAnswer = SubmittedAnswer.builder().build();
       if (!answersDto.isSkipped()) {
         AnswerDto answerDto = answerDtoFactory.create(question.get().getAnswer());
         if (answerDto != null) {
           if (Arrays.deepEquals(answersDto.getSubmittedAnswers(), answerDto.getCorrectAnswers())) {
             submittedAnswer.setCorrect(true);
-            submittedAnswer
-                .getQuestion()
-                .setCorrectCount(submittedAnswer.getQuestion().getCorrectCount() + 1);
+            question.get().setCorrectCount(question.get().getCorrectCount() + 1);
             correctCount++;
           } else {
             submittedAnswer.setCorrect(false);
-            submittedAnswer
-                .getQuestion()
-                .setIncorrectCount(submittedAnswer.getQuestion().getIncorrectCount() + 1);
+            question.get().setIncorrectCount(question.get().getIncorrectCount() + 1);
           }
         }
         submittedAnswer.setSubmittedAnswers(answersDto.getSubmittedAnswers());
@@ -249,13 +225,12 @@ public class QuizService {
       } else {
         submittedAnswer.setSubmittedAnswers(new String[] {});
         submittedAnswer.setSkipped(true);
-        submittedAnswer
-            .getQuestion()
-            .setSkippedCount(submittedAnswer.getQuestion().getSkippedCount() + 1);
+        question.get().setSkippedCount(question.get().getSkippedCount() + 1);
       }
       question.get().setTimesAttempted(question.get().getTimesAttempted() + 1);
       submittedAnswer.setQuizResult(result);
       questionService.save(question.get());
+      submittedAnswer.setQuestion(objectMapper.writeValueAsString(question.get()));
       result.getAnswers().add(submittedAnswer);
     }
     return correctCount;
@@ -291,12 +266,12 @@ public class QuizService {
     return Optional.of(quizDataTableDtoList);
   }
 
-  public Optional<QuizDataTableDto> getAllResultsForProfessionInOrganisation(
-      long professionId, long organisationId) {
+  public Optional<QuizDataTableDto> getAllResultsForProfession(
+      long professionId) {
     Optional<Profession> profession = professionRepository.findById(professionId);
     if (profession.isPresent()) {
       QuizResultSummaryDto quizResultDto =
-          quizResultRepository.findByProfessionIdAndOrganisationId(professionId, organisationId);
+          quizResultRepository.findByProfessionId(professionId);
 
       if (quizResultDto != null) {
         return Optional.ofNullable(populateDataTableDto(quizResultDto, profession.get().getName()));
@@ -312,11 +287,10 @@ public class QuizService {
     return Optional.empty();
   }
 
-  public Optional<QuizDto> getQuiz(long professionId, long organisationId) {
+  public Optional<QuizDto> getQuiz(long professionId) {
 
     Optional<Quiz> quiz =
-        quizRepository.findFirstByProfessionIdAndOrganisationIdAndStatusIsNot(
-            professionId, organisationId, Status.INACTIVE);
+        quizRepository.findFirstByProfessionIdAndStatusIsNot(professionId, Status.INACTIVE);
 
     if (quiz.isPresent()) {
       final Set<Question> inactiveQuestions = collectDeletedQuestionsInAQuiz(quiz);
@@ -378,8 +352,8 @@ public class QuizService {
 
   public List<Long> deleteQuizResultsBetween(LocalDateTime from, LocalDateTime to) {
     List<QuizResult> quizResults = quizResultRepository.findAllByCompletedOnBetween(from, to);
-    List<Long> resultsQualifiedForDeletion = quizResults.stream()
-        .map(QuizResult :: getId).collect(Collectors.toList());
+    List<Long> resultsQualifiedForDeletion =
+        quizResults.stream().map(QuizResult::getId).collect(Collectors.toList());
     quizResultRepository.deleteAll(quizResults);
     return resultsQualifiedForDeletion;
   }
@@ -411,8 +385,7 @@ public class QuizService {
   public List<SkillsReportsDto> getReportForProfessionAdmin(
       long professionId, LocalDateTime from, LocalDateTime to) {
     List<QuizResult> quizResults =
-        quizResultRepository.findAllByProfessionIdAndCompletedOnBetween(
-            professionId, from, to);
+        quizResultRepository.findAllByProfessionIdAndCompletedOnBetween(professionId, from, to);
 
     return extractReportFromResult(quizResults);
   }
@@ -425,7 +398,16 @@ public class QuizService {
             quizResult
                 .getAnswers()
                 .forEach(
-                    submittedAnswer -> questionIds.add(submittedAnswer.getQuestion().getId())));
+                    submittedAnswer -> {
+                      try {
+                        questionIds.add(
+                            objectMapper
+                                .readValue(submittedAnswer.getQuestion(), Question.class)
+                                .getId());
+                      } catch (IOException e) {
+                        log.error("Reading from question failed {}", e.getMessage());
+                      }
+                    }));
 
     List<Question> questionList = questionService.findAll(questionIds);
 

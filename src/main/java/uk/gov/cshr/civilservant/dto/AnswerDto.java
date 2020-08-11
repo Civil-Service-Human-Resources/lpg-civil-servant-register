@@ -12,7 +12,7 @@ import lombok.*;
 @Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AnswerDto {
-    private Long id;
-    private String[] correctAnswers;
-    private Map<String, String> answers;
+  private Long id;
+  private String[] correctAnswers;
+  private Map<String, String> answers;
 }

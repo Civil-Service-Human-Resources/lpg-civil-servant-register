@@ -1,91 +1,91 @@
 package uk.gov.cshr.civilservant.config;
 
+import java.io.Serializable;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
-
-import java.io.Serializable;
 
 @Component
 @ConfigurationProperties(prefix = "oauth")
 public class OAuthProperties implements Serializable {
 
-    private String serviceUrl;
+  private String serviceUrl;
 
-    private String clientId;
+  private String clientId;
 
-    private String clientSecret;
+  private String clientSecret;
 
-    private String tokenUrl;
+  private String tokenUrl;
 
-    private int maxTotalConnections;
+  private int maxTotalConnections;
 
-    private int defaultMaxConnectionsPerRoute;
+  private int defaultMaxConnectionsPerRoute;
 
-    private int maxPerServiceUrl;
+  private int maxPerServiceUrl;
 
-    private String jwtKey;
+  private String jwtKey;
 
-    public String getServiceUrl() {
-        return serviceUrl;
-    }
+  public String getServiceUrl() {
+    return serviceUrl;
+  }
 
-    public void setServiceUrl(String serviceUrl) {
-        this.serviceUrl = serviceUrl;
-    }
+  public void setServiceUrl(String serviceUrl) {
+    this.serviceUrl = serviceUrl;
+  }
 
-    public String getClientId() {
-        return clientId;
-    }
+  public String getClientId() {
+    return clientId;
+  }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
-    }
+  public void setClientId(String clientId) {
+    this.clientId = clientId;
+  }
 
-    public String getClientSecret() {
-        return clientSecret;
-    }
+  public String getClientSecret() {
+    return clientSecret;
+  }
 
-    public void setClientSecret(String clientSecret) {
-        this.clientSecret = clientSecret;
-    }
+  public void setClientSecret(String clientSecret) {
+    this.clientSecret = clientSecret;
+  }
 
-    public String getTokenUrl() {
-        return tokenUrl;
-    }
+  public String getTokenUrl() {
+    return tokenUrl;
+  }
 
-    public void setTokenUrl(String tokenUrl) {
-        this.tokenUrl = tokenUrl;
-    }
+  public void setTokenUrl(String tokenUrl) {
+    this.tokenUrl = tokenUrl;
+  }
 
-    public int getMaxTotalConnections() {
-        return maxTotalConnections;
-    }
+  public int getMaxTotalConnections() {
+    return maxTotalConnections;
+  }
 
-    public void setMaxTotalConnections(int maxTotalConnections) {
-        this.maxTotalConnections = maxTotalConnections;
-    }
+  public void setMaxTotalConnections(int maxTotalConnections) {
+    this.maxTotalConnections = maxTotalConnections;
+  }
 
-    public int getDefaultMaxConnectionsPerRoute() {
-        return defaultMaxConnectionsPerRoute;
-    }
+  public int getDefaultMaxConnectionsPerRoute() {
+    return defaultMaxConnectionsPerRoute;
+  }
 
-    public void setDefaultMaxConnectionsPerRoute(int defaultMaxConnectionsPerRoute) {
-        this.defaultMaxConnectionsPerRoute = defaultMaxConnectionsPerRoute;
-    }
+  public void setDefaultMaxConnectionsPerRoute(int defaultMaxConnectionsPerRoute) {
+    this.defaultMaxConnectionsPerRoute = defaultMaxConnectionsPerRoute;
+  }
 
-    public int getMaxPerServiceUrl() {
-        return maxPerServiceUrl;
-    }
+  public int getMaxPerServiceUrl() {
+    return maxPerServiceUrl;
+  }
 
-    public void setMaxPerServiceUrl(int maxPerServiceUrl) {
-        this.maxPerServiceUrl = maxPerServiceUrl;
-    }
+  public void setMaxPerServiceUrl(int maxPerServiceUrl) {
+    this.maxPerServiceUrl = maxPerServiceUrl;
+  }
 
-    public String getJwtKey() {
-        return jwtKey;
-    }
+  public String getJwtKey() {
+    return jwtKey;
+  }
 
-    public void setJwtKey(String jwtKey) {
-        this.jwtKey = jwtKey;
-    }
+  public void setJwtKey(String jwtKey) {
+    this.jwtKey = jwtKey;
+  }
 }

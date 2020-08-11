@@ -10,15 +10,14 @@ import uk.gov.cshr.civilservant.mapping.RoleMappingHandlerMapping;
 @Configuration
 public class RequestMappingConfig extends WebMvcConfigurationSupport {
 
-    @Override
-    @Bean
-    public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+  @Override
+  @Bean
+  public RequestMappingHandlerMapping requestMappingHandlerMapping() {
 
-        RoleMappingHandlerMapping mapping = new RoleMappingHandlerMapping();
+    RoleMappingHandlerMapping mapping = new RoleMappingHandlerMapping();
 
-        mapping.setOrder(Ordered.HIGHEST_PRECEDENCE);
+    mapping.setOrder(Ordered.HIGHEST_PRECEDENCE);
 
-        return mapping;
-
-    }
+    return mapping;
+  }
 }

@@ -1,11 +1,13 @@
 {
-  "professionId" : 1,
-  "question":{
+  "professionId": 1,
+  "question": {
     "value": "Why did the chicken cross the road?",
     "why": null,
-    "answer":
-    {
-      "correctAnswers": ["A","B"],
+    "answer": {
+      "correctAnswers": [
+        "A",
+        "B"
+      ],
       "answers": {
         "A": "For money",
         "B": "For fame",

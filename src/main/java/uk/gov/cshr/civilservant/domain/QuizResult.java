@@ -16,47 +16,45 @@ import org.hibernate.annotations.CreationTimestamp;
 @Entity
 public class QuizResult {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Column(name = "staff_id")
+  public String staffId;
 
-    @Column(name = "staff_id")
-    public String staffId;
+  @Column(name = "quiz_id")
+  public long quizId;
 
-    @Column(name = "quiz_id")
-    public long quizId;
+  @Column(name = "profession_id")
+  public long professionId;
 
-    @Column(name = "quiz_name")
-    String quizName;
+  @Column(name = "organisation_id")
+  public long organisationId;
 
-    @Column(name = "profession_id")
-    public long professionId;
+  @Column
+  @Enumerated(EnumType.STRING)
+  public QuizType type;
 
-    @Column(name = "organisation_id")
-    public long organisationId;
+  @Column
+  @Enumerated(EnumType.STRING)
+  public Result result;
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    public QuizType type;
+  @Column(name = "quiz_name")
+  String quizName;
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    public Result result;
+  @Column(name = "correct_count")
+  int correctAnswers;
 
-    @CreationTimestamp
-    private LocalDateTime completedOn;
+  @Column(name = "question_count")
+  int numberOfQuestions;
 
-    @Column(name = "correct_count")
-    int correctAnswers;
+  @Column(name = "score_obtained")
+  float score;
 
-    @Column(name = "question_count")
-    int numberOfQuestions;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "score_obtained")
-    float score;
+  @CreationTimestamp private LocalDateTime completedOn;
 
-    @OneToMany(mappedBy = "quizResult",fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<SubmittedAnswer> answers = new ArrayList<>();
-
+  @OneToMany(mappedBy = "quizResult", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @Builder.Default
+  private List<SubmittedAnswer> answers = new ArrayList<>();
 }
