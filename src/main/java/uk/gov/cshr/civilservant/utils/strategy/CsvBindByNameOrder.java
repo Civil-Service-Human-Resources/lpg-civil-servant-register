@@ -1,12 +1,14 @@
-package uk.gov.cshr.civilservant.mapping;
+package uk.gov.cshr.civilservant.utils.strategy;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.METHOD})
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RoleMapping {
-  String[] value() default {};
+@Target(ElementType.TYPE)
+public @interface CsvBindByNameOrder {
+    String[] value() default {};
 }

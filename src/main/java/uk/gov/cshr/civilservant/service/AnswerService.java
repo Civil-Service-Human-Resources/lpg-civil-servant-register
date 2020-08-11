@@ -13,14 +13,14 @@ import uk.gov.cshr.civilservant.repository.AnswerRepository;
 @Service
 @Transactional
 public class AnswerService {
-    AnswerRepository answerRepository;
+  AnswerRepository answerRepository;
 
-    @Autowired
-    public AnswerService(AnswerRepository answerRepository) {
-        this.answerRepository = answerRepository;
-    }
+  @Autowired
+  public AnswerService(AnswerRepository answerRepository) {
+    this.answerRepository = answerRepository;
+  }
 
-    public Optional<Answer> getByQuestion(Long questionId) {
-        return answerRepository.findByQuestion(questionId);
-    }
+  public Optional<Answer> getByQuestion(Long questionId) {
+    return answerRepository.findByQuestion(questionId);
+  }
 }

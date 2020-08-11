@@ -8,7 +8,6 @@ import lombok.*;
 @Getter
 @Setter
 public class AddQuestionDto {
-    private Integer professionId;
-    private Integer organisationId;
-    private QuestionDto question;
+  private Integer professionId;
+  private QuestionDto question;
 }

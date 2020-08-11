@@ -8,7 +8,7 @@ import lombok.*;
 @Getter
 @Setter
 public class QuizDataTableDto {
-    private String profession;
-    private int numberOfAttempts;
-    private float averageScore;
+  private String profession;
+  private int numberOfAttempts;
+  private float averageScore;
 }

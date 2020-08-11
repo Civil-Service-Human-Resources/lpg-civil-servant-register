@@ -18,7 +18,6 @@ public class QuizDto {
   private Long id;
   private String name;
   private Profession profession;
-  private long organisationId;
   private Set<QuestionDto> questions;
   private LocalDateTime createdOn;
   private LocalDateTime updatedOn;

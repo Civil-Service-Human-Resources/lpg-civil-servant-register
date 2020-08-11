@@ -20,41 +20,30 @@ import org.hibernate.annotations.UpdateTimestamp;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Quiz {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private Long id;
+  @Column String result;
+  @Column Integer numberOfQuestions;
 
-    @Column
-    private String name;
+  @Column
+  @Enumerated(EnumType.STRING)
+  Status status;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    private Profession profession;
+  @Column String description;
 
-    @Column(name = "organisation_id")
-    private long organisationId;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column
+  private Long id;
 
-    @OneToMany(mappedBy = "quiz",fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonManagedReference
-    @Builder.Default
-    private Set<Question> questions = new HashSet<>();
+  @Column private String name;
 
-    @CreationTimestamp
-    private LocalDateTime createdOn;
+  @OneToOne(fetch = FetchType.EAGER)
+  private Profession profession;
 
-    @UpdateTimestamp
-    private LocalDateTime updatedOn;
+  @OneToMany(mappedBy = "quiz", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JsonManagedReference
+  @Builder.Default
+  private Set<Question> questions = new HashSet<>();
 
-    @Column
-    String result;
-
-    @Column
-    Integer numberOfQuestions;
-
-    @Column
-    @Enumerated(EnumType.STRING)
-    Status status;
-
-    @Column
-    String description;
+  @CreationTimestamp private LocalDateTime createdOn;
+  @UpdateTimestamp private LocalDateTime updatedOn;
 }

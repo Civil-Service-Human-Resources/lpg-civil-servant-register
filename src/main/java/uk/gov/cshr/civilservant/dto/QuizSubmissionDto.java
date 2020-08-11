@@ -8,10 +8,10 @@ import lombok.*;
 @Getter
 @Setter
 public class QuizSubmissionDto {
-    String staffId;
-    int quizId;
-    int professionId;
-    int organisationId;
-    String quizName;
-    SubmittedAnswerDto[] answers;
+  String staffId;
+  int quizId;
+  int professionId;
+  int organisationId;
+  String quizName;
+  SubmittedAnswerDto[] answers;
 }

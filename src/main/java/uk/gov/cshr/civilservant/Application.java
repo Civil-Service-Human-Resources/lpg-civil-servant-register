@@ -7,20 +7,18 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.aspectj.EnableSpringConfigured;
 
-/**
- * Main Spring application configuration and entry point.
- */
+/** Main Spring application configuration and entry point. */
 @SpringBootApplication
 @EnableSpringConfigured
 @EnableCaching
 public class Application {
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(Application.class, args);
+  }
 
-    @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
-    }
+  @Bean
+  public ModelMapper modelMapper() {
+    return new ModelMapper();
+  }
 }

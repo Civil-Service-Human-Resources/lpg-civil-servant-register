@@ -8,7 +8,8 @@ import uk.gov.cshr.civilservant.repository.ProfessionRepository;
 
 @Service
 public class ProfessionService extends SelfReferencingEntityService<Profession, ProfessionDto> {
-    public ProfessionService(ProfessionRepository professionRepository, ProfessionDtoFactory dtoFactory) {
-        super(professionRepository, dtoFactory);
-    }
+  public ProfessionService(
+      ProfessionRepository professionRepository, ProfessionDtoFactory dtoFactory) {
+    super(professionRepository, dtoFactory);
+  }
 }

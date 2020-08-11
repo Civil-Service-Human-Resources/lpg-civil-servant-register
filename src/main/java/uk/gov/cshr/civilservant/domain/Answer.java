@@ -3,11 +3,11 @@ package uk.gov.cshr.civilservant.domain;
 import java.util.Map;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
+import org.hibernate.mapping.ToOne;
 import uk.gov.cshr.civilservant.mapping.AnswerMapConverter;
 
 @Getter
@@ -19,29 +19,29 @@ import uk.gov.cshr.civilservant.mapping.AnswerMapConverter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Answer {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @NotNull(message = "No answer text provided.")
-    @Column(nullable = false)
-    private String correctAnswer;
+  @NotNull(message = "No answer text provided.")
+  @Column(nullable = false)
+  private String correctAnswer;
 
-    @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name = "question_id")
-    private Question question;
+  @OneToOne
+  @JsonBackReference
+  @JoinColumn(name = "question_id")
+  private Question question;
 
-    @Convert(converter = AnswerMapConverter.class)
-    @Column
-    private Map<String, Object> answers;
+  @Convert(converter = AnswerMapConverter.class)
+  @Column
+  private Map<String, Object> answers;
 
-    public void setQuestion(Question question) {
-        if (question != null) {
-            question.setAnswer(this);
-        } else if (this.question != null) {
-            this.question.setAnswer(null);
-        }
-        this.question = question;
+  public void setQuestion(Question question) {
+    if (question != null) {
+      question.setAnswer(this);
+    } else if (this.question != null) {
+      this.question.setAnswer(null);
     }
+    this.question = question;
+  }
 }
