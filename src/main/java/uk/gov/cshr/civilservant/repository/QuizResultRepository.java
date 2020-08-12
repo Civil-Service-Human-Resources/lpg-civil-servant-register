@@ -88,4 +88,6 @@ public interface QuizResultRepository extends JpaRepository<QuizResult, Long> {
 
   List<QuizResult> findAllByProfessionIdAndCompletedOnBetween(
       long professionId, LocalDateTime from, LocalDateTime to);
+
+  long deleteQuizResultsByCompletedOnIsLessThanEqual(LocalDateTime before);
 }
