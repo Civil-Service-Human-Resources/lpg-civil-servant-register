@@ -16,7 +16,7 @@ import uk.gov.cshr.civilservant.utils.strategy.CsvBindByNameOrder;
         "Question text",
         "Quiz Name",
         "Question Theme",
-        "Profession Name",
+        "Profession",
         "Quiz Status",
         "Correct Count",
         "Incorrect Count",
@@ -30,7 +30,7 @@ public class SkillsReportsDto {
   @CsvBindByName(column = "Quiz Status")
   private Status status;
 
-  @CsvBindByName(column = "Profession Name")
+  @CsvBindByName(column = "Profession")
   private String professionName;
 
   @CsvBindByName(column = "Question Id")

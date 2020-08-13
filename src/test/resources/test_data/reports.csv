@@ -1,4 +1,4 @@
-"Question Id","Question text","Quiz Name","Question Theme","Profession Name","Quiz Status","Correct Count","Incorrect Count","Skipped Count","Times Attempted"
+"Question Id","Question text","Quiz Name","Question Theme","Profession","Quiz Status","Correct Count","Incorrect Count","Skipped Count","Times Attempted"
 "0","Question number 0","Quiz for profession 0","Some question theme 0","Some profession 0","PUBLISHED","1","3","2","0"
 "1","Question number 1","Quiz for profession 1","Some question theme 1","Some profession 1","PUBLISHED","2","4","3","31"
 "2","Question number 2","Quiz for profession 2","Some question theme 2","Some profession 2","PUBLISHED","3","5","4","62"
