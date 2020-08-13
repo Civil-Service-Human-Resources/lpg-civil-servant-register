@@ -390,6 +390,10 @@ public class QuizService {
     return extractReportFromResult(quizResults);
   }
 
+  public long deleteQuizResultsCompletedBeforeDate(LocalDateTime before) {
+    return quizResultRepository.deleteQuizResultsByCompletedOnIsLessThanEqual(before);
+  }
+
   private List<SkillsReportsDto> extractReportFromResult(List<QuizResult> quizResults) {
     Set<Long> questionIds = new HashSet<>();
 
