@@ -206,8 +206,8 @@ public class QuizServiceTest {
 
     // when
     when(quizResultRepository.findAllByCompletedOnBetween(any(), any()))
-        .thenReturn(buildSomeResults());
-    when(questionService.findAll(anySet())).thenReturn(buildSomeQuestions());
+        .thenReturn(QuizBuilder.buildSomeResults());
+    when(questionService.findAll(anySet())).thenReturn(QuizBuilder.buildSomeQuestions());
     when(objectMapper.readValue(anyString(), eq(Question.class)))
         .thenReturn(Question.builder().id(1L).build());
     // then
@@ -223,8 +223,8 @@ public class QuizServiceTest {
 
     // when
     when(quizResultRepository.findAllByOrganisationIdAndCompletedOnBetween(anyLong(), any(), any()))
-        .thenReturn(buildSomeResults());
-    when(questionService.findAll(anySet())).thenReturn(buildSomeQuestions());
+        .thenReturn(QuizBuilder.buildSomeResults());
+    when(questionService.findAll(anySet())).thenReturn(QuizBuilder.buildSomeQuestions());
     when(objectMapper.readValue(anyString(), eq(Question.class)))
         .thenReturn(Question.builder().id(1L).build());
     // then
@@ -242,8 +242,8 @@ public class QuizServiceTest {
     // when
     when(quizResultRepository.findAllByOrganisationIdAndProfessionIdAndCompletedOnBetween(
             anyLong(), anyLong(), any(), any()))
-        .thenReturn(buildSomeResults());
-    when(questionService.findAll(anySet())).thenReturn(buildSomeQuestions());
+        .thenReturn(QuizBuilder.buildSomeResults());
+    when(questionService.findAll(anySet())).thenReturn(QuizBuilder.buildSomeQuestions());
     when(objectMapper.readValue(anyString(), eq(Question.class)))
         .thenReturn(Question.builder().id(1L).build());
     // then
@@ -260,8 +260,8 @@ public class QuizServiceTest {
 
     // when
     when(quizResultRepository.findAllByProfessionIdAndCompletedOnBetween(anyLong(), any(), any()))
-        .thenReturn(buildSomeResults());
-    when(questionService.findAll(anySet())).thenReturn(buildSomeQuestions());
+        .thenReturn(QuizBuilder.buildSomeResults());
+    when(questionService.findAll(anySet())).thenReturn(QuizBuilder.buildSomeQuestions());
     when(objectMapper.readValue(anyString(), eq(Question.class)))
         .thenReturn(Question.builder().id(1L).build());
     // then
@@ -272,70 +272,15 @@ public class QuizServiceTest {
     assertEquals(1, expectedList.get(1).getQuestionId());
   }
 
-  private List<Question> buildSomeQuestions() {
-    List<Question> questionList = new ArrayList<>();
-    for (int i = 0; i < 5; i++) {
-      Question question =
-          Question.builder()
-              .id((long) i)
-              .quiz(
-                  Quiz.builder().name("Some name").profession(Profession.builder().build()).build())
-              .status(Status.ACTIVE)
-              .alternativeText("")
-              .correctCount(i)
-              .incorrectCount(i)
-              .skippedCount(i)
-              .theme("Some theme")
-              .value("Some text")
-              .build();
-      questionList.add(question);
+    @Test
+    public void deleteQuizResultsCompletedBeforeDate() {
+        LocalDateTime now = LocalDateTime.now();
+
+        when(quizResultRepository.deleteQuizResultsByCompletedOnIsLessThanEqual(now)).thenReturn(1L);
+
+        long deleteCount = quizService.deleteQuizResultsCompletedBeforeDate(now);
+        verify(quizResultRepository, times(1)).deleteQuizResultsByCompletedOnIsLessThanEqual(now);
+        assertEquals(1, deleteCount);
+        verifyNoMoreInteractions(quizResultRepository);
     }
-    return questionList;
-  }
-
-  private List<QuizResult> buildSomeResults() {
-    List<QuizResult> results = new ArrayList<>();
-    for (int i = 0; i < 5; i++) {
-      QuizResult result =
-          QuizResult.builder()
-              .organisationId(1)
-              .professionId(1)
-              .quizName("Some name")
-              .answers(buildSomeSubmittedAnswers())
-              .build();
-      results.add(result);
-    }
-    return results;
-  }
-
-  private List<SubmittedAnswer> buildSomeSubmittedAnswers() {
-    ObjectMapper objectMapperForTest = new ObjectMapper();
-    List<SubmittedAnswer> submittedAnswers = new ArrayList<>();
-    for (int i = 0; i < 5; i++) {
-      SubmittedAnswer submittedAnswer = null;
-      try {
-        submittedAnswer =
-            SubmittedAnswer.builder()
-                .question(
-                    objectMapperForTest.writeValueAsString(Question.builder().id((long) i).build()))
-                .build();
-      } catch (JsonProcessingException e) {
-        e.printStackTrace();
-      }
-      submittedAnswers.add(submittedAnswer);
-    }
-    return submittedAnswers;
-  }
-
-  @Test
-  public void deleteQuizResultsCompletedBeforeDate() {
-    LocalDateTime now = LocalDateTime.now();
-
-    when(quizResultRepository.deleteQuizResultsByCompletedOnIsLessThanEqual(now)).thenReturn(1L);
-
-    long deleteCount = quizService.deleteQuizResultsCompletedBeforeDate(now);
-    verify(quizResultRepository, times(1)).deleteQuizResultsByCompletedOnIsLessThanEqual(now);
-    assertEquals(1, deleteCount);
-    verifyNoMoreInteractions(quizResultRepository);
-  }
 }

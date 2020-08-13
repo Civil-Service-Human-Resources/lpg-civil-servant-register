@@ -2,6 +2,8 @@ package uk.gov.cshr.civilservant.service;
 
 import java.util.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import uk.gov.cshr.civilservant.domain.*;
 import uk.gov.cshr.civilservant.dto.AnswerDto;
 import uk.gov.cshr.civilservant.dto.QuestionDto;
@@ -82,5 +84,60 @@ public class QuizBuilder {
     answerMap.put("A", "Answer 1");
     answerMap.put("B", "Answer 2");
     return Answer.builder().id(1L).answers(answerMap).correctAnswer("B").build();
+  }
+
+  public static List<Question> buildSomeQuestions() {
+    List<Question> questionList = new ArrayList<>();
+    for (int i = 0; i < 5; i++) {
+      Question question =
+              Question.builder()
+                      .id((long) i)
+                      .quiz(
+                              Quiz.builder().name("Some name").profession(Profession.builder().build()).build())
+                      .status(Status.ACTIVE)
+                      .alternativeText("")
+                      .correctCount(i)
+                      .incorrectCount(i)
+                      .skippedCount(i)
+                      .theme("Some theme")
+                      .value("Some text")
+                      .build();
+      questionList.add(question);
+    }
+    return questionList;
+  }
+
+  public static List<QuizResult> buildSomeResults() {
+    List<QuizResult> results = new ArrayList<>();
+    for (int i = 0; i < 5; i++) {
+      QuizResult result =
+              QuizResult.builder()
+                      .organisationId(1)
+                      .professionId(1)
+                      .quizName("Some name")
+                      .answers(buildSomeSubmittedAnswers())
+                      .build();
+      results.add(result);
+    }
+    return results;
+  }
+
+  public static List<SubmittedAnswer> buildSomeSubmittedAnswers() {
+    ObjectMapper objectMapperForTest = new ObjectMapper();
+    List<SubmittedAnswer> submittedAnswers = new ArrayList<>();
+    for (int i = 0; i < 5; i++) {
+      SubmittedAnswer submittedAnswer = null;
+      try {
+        submittedAnswer =
+                SubmittedAnswer.builder()
+                        .question(
+                                objectMapperForTest.writeValueAsString(Question.builder().id((long) i).build()))
+                        .build();
+      } catch (JsonProcessingException e) {
+        e.printStackTrace();
+      }
+      submittedAnswers.add(submittedAnswer);
+    }
+    return submittedAnswers;
   }
 }
