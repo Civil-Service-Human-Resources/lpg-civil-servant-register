@@ -64,6 +64,9 @@ govNotify:
   template:
     lineManager: ${GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID:changeme}
 
+data-retention-windows:
+  skills: ${DATA_RETENTION_WINDOW_SKILLS_DAYS:1095}
+
 #Validation properties
 agencyToken:
   capacity:

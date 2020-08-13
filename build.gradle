@@ -148,6 +148,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
     compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
 
+    compile group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '4.12.0'
+    compile group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '4.12.0'
+
     testCompile 'com.google.code.gson:gson:2.8.2'
     testCompile 'org.springframework.boot:spring-boot-starter-test'
     testCompile 'org.springframework.security:spring-security-test'
