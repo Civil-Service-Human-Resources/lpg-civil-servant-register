@@ -44,6 +44,7 @@ public class CivilServantResourceFactory {
         civilServantResource.setUserId(civilServant.getId());
         civilServantResource.setInterests(civilServant.getInterests());
         civilServantResource.setOtherAreasOfWork(civilServant.getOtherAreasOfWork());
+        civilServantResource.setIdentity(civilServant.getIdentity());
 
         Resource<CivilServantResource> resource = new Resource<>(civilServantResource);
 

@@ -2,6 +2,7 @@ package uk.gov.cshr.civilservant.resource;
 
 import lombok.Data;
 import uk.gov.cshr.civilservant.domain.Grade;
+import uk.gov.cshr.civilservant.domain.Identity;
 import uk.gov.cshr.civilservant.domain.Interest;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 import uk.gov.cshr.civilservant.domain.Profession;
@@ -19,4 +20,5 @@ public class CivilServantResource {
     private String lineManagerName;
     private String lineManagerEmailAddress;
     private Long userId;
+    private Identity identity;
 }
