@@ -1,5 +1,6 @@
 package uk.gov.cshr.civilservant.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,12 +33,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+@Slf4j
 @RepositoryRestController
 @RequestMapping("/civilServants")
 @RestResource(exported = false)
 public class CivilServantController implements ResourceProcessor<RepositoryLinksResource> {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CivilServantController.class);
 
     private final LineManagerService lineManagerService;
 
@@ -58,7 +58,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
     @GetMapping
     public ResponseEntity<Resources<Void>> list() {
-        LOGGER.debug("Listing civil servant links");
+        log.debug("Listing civil servant links");
 
         Resources<Void> resource = new Resources<>(new ArrayList<>());
         resource.add(repositoryEntityLinks.linkToSingleResource(CivilServant.class, "me").withRel("me"));
@@ -68,7 +68,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     @GetMapping("/me")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Resource<CivilServantResource>> get() {
-        LOGGER.debug("Getting civil servant details for logged in user");
+        log.debug("Getting civil servant details for logged in user");
 
         return civilServantRepository.findByPrincipal().map(
                 civilServant -> ResponseEntity.ok(civilServantResourceFactory.create(civilServant)))
@@ -86,20 +86,20 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
 
             IdentityFromService lineManagerIdentity = lineManagerService.checkLineManager(email);
             if (lineManagerIdentity == null) {
-                LOGGER.debug("Line manager email address not found in identity-service.");
+                log.debug("Line manager email address not found in identity-service.");
                 return ResponseEntity.notFound().build();
             }
 
             Optional<CivilServant> optionalLineManager = civilServantRepository.findByIdentity(lineManagerIdentity.getUid());
             if (!optionalLineManager.isPresent()) {
-                LOGGER.debug("Line manager email address exists in identity-service, but no profile. uid = {}", lineManagerIdentity);
+                log.debug("Line manager email address exists in identity-service, but no profile. uid = {}", lineManagerIdentity);
                 return ResponseEntity.notFound().build();
             }
 
             CivilServant lineManager = optionalLineManager.get();
             CivilServant civilServant = optionalCivilServant.get();
             if (lineManager.equals(civilServant)) {
-                LOGGER.info("User tried to set line manager to themself, {}.", civilServant);
+                log.info("User tried to set line manager to themself, {}.", civilServant);
                 return ResponseEntity.badRequest().build();
             }
 

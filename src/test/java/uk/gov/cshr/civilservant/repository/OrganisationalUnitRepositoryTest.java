@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
+import uk.gov.cshr.civilservant.domain.AgencyToken;
 import uk.gov.cshr.civilservant.domain.OrganisationalUnit;
 
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -25,6 +26,9 @@ public class OrganisationalUnitRepositoryTest {
 
     @Autowired
     private OrganisationalUnitRepository repository;
+
+    @Autowired
+    private AgencyTokenRepository agencyTokenRepository;
 
     @Test
     public void shouldFindOrganisationsWhereNameStartsWith() {
@@ -91,5 +95,29 @@ public class OrganisationalUnitRepositoryTest {
         Optional<OrganisationalUnit> result = repository.findByCode("xx");
 
         assertThat(result.get().getPaymentMethods(), is(Arrays.asList("method1", "method2", "method3")));
+    }
+
+    @Test
+    public void findOrganisationByAgencyToken_whenTokenAndOrgExistAndLinked() {
+
+        // Create data
+        AgencyToken savedToken = agencyTokenRepository.save(new AgencyToken(-1, "test-token", 1, "uid"));
+        OrganisationalUnit savedOrg = repository.save(new OrganisationalUnit("org-name", "org-code", "org-abbrv"));
+
+        // Link
+        savedOrg.setAgencyToken(savedToken);
+        repository.save(savedOrg);
+
+        assertEquals(savedOrg, repository.findOrganisationByAgencyToken(savedToken).get());
+    }
+
+    @Test
+    public void findOrganisationByAgencyToken_whenTokenAndOrgExistButNotLinked() {
+
+        // Create data
+        AgencyToken savedToken = agencyTokenRepository.save(new AgencyToken(-1, "test-token", 1, "uid"));
+        OrganisationalUnit savedOrg = repository.save(new OrganisationalUnit("org-name", "org-code", "org-abbrv"));
+
+        assertFalse(repository.findOrganisationByAgencyToken(savedToken).isPresent());
     }
 }
