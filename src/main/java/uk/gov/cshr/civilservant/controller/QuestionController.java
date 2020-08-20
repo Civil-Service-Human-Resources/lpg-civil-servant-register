@@ -1,6 +1,7 @@
 package uk.gov.cshr.civilservant.controller;
 
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolationException;
 import javax.validation.Valid;
 
 import lombok.extern.slf4j.Slf4j;
@@ -69,7 +70,7 @@ public class QuestionController {
     } catch (Exception ex) {
       log.error("Updating record failed {}", ex.getMessage());
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body("There was a problem updating the quiz");
+          .body("There was a problem updating the quiz. Check the values provided");
     }
   }
 

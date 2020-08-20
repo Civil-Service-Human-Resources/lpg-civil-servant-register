@@ -1,6 +1,7 @@
 package uk.gov.cshr.civilservant.domain;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -22,10 +23,12 @@ public class Question {
   @Enumerated(EnumType.STRING)
   private QuestionType type;
 
-  @Column(length = 500)
+  @Column(length = 200)
+  @Size(min = 3, max = 200)
   private String theme;
 
   @Column(length = 500)
+  @Size(min = 10, max = 500)
   private String value;
 
   @Column(length = 500)
