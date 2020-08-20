@@ -1,6 +1,7 @@
 package uk.gov.cshr.civilservant.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.cshr.civilservant.domain.AgencyToken;
@@ -161,4 +162,13 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
         return agencyTokenService.getAgencyTokenResponseDto(agencyToken);
     }
 
+    @Cacheable("organisationalUnitsTree")
+    public List<OrganisationalUnit> getOrgTree() {
+        return this.getParents();
+    }
+
+    @Cacheable("organisationalUnitsFlat")
+    public List<OrganisationalUnitDto> getFlatOrg() {
+        return this.getListSortedByValue();
+    }
 }

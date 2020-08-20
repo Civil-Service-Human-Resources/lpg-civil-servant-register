@@ -1,4 +1,6 @@
 spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration, org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
   data:
     redis:
       repositories:
@@ -69,28 +71,3 @@ agencyToken:
   capacity:
     max: ${AGENCY_TOKEN_MAX_CAPACITY:1500}
     min: ${AGENCY_TOKEN_MIN_CAPACITY:1}
-
----
-
-spring:
-  profiles: test, production
-  datasource:
-    url: ${DATASOURCE:jdbc:mysql://localhost:3306/csrs?user=root&password=password&useSSL=false}
-    platform: mysql
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
-  jpa:
-    properties:
-      hibernate:
-        dialect: uk.gov.cshr.civilservant.config.CustomMySqlDialect
-        enable_lazy_load_no_trans: true
-  redis:
-    host: ${REDIS_HOST:localhost}
-    password: ${REDIS_PASSWORD:}
-    port: ${REDIS_PORT:6379}
-
-govNotify:
-  enabled: ${GOV_NOTIFY_ENABLED:true}

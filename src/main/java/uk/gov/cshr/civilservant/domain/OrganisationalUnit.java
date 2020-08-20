@@ -10,6 +10,9 @@ import java.util.List;
 
 @Entity
 public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit> {
+
+    private static final long serialVersionUID = 1L;
+
     @Column(unique = true, nullable = false, length = 10)
     private String code;
 

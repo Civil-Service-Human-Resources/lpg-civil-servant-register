@@ -91,7 +91,7 @@ public class OrganisationalUnitControllerTest {
     public void shouldReturnOkIfRequestingOrganisationalUnitTree() throws Exception {
         ArrayList<OrganisationalUnit> organisationalUnits = new ArrayList<>();
 
-        when(organisationalUnitService.getParents()).thenReturn(organisationalUnits);
+        when(organisationalUnitService.getOrgTree()).thenReturn(organisationalUnits);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/tree")
@@ -104,7 +104,7 @@ public class OrganisationalUnitControllerTest {
     public void shouldReturnOkIfRequestingOrganisationalUnitFlat() throws Exception {
         List<OrganisationalUnitDto> organisationalUnitsList = new ArrayList<>();
 
-        when(organisationalUnitService.getListSortedByValue()).thenReturn(organisationalUnitsList);
+        when(organisationalUnitService.getFlatOrg()).thenReturn(organisationalUnitsList);
 
         mockMvc.perform(
                 MockMvcRequestBuilders.get("/organisationalUnits/flat")
