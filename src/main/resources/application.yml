@@ -51,7 +51,7 @@ oauth:
   maxTotalConnections: 200
   defaultMaxConnectionsPerRoute: 100
   maxPerServiceUrl: 100
-  jwtKey: ${jwt_key:anything}
+  jwtKey: ${jwt_key}
 
 identity:
   identityAPIUrl: "${oauth.serviceUrl}/api/identities"

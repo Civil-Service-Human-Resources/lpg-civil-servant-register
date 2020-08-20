@@ -118,14 +118,10 @@ public class QuestionService {
         quizRepository.findFirstByProfessionIdAndStatusIsNot(professionId, Status.INACTIVE);
     Quiz quizRecord;
     if (!quiz.isPresent()) {
-      log.info("Quiz Not found for profession : " + professionId);
       throw new QuizNotFoundException("No quiz found for profession");
     } else {
-      log.info("Quiz found");
       quizRecord = quiz.get();
     }
-    log.info("Quiz record found for profession id : " + professionId);
-    log.info("Quiz record id : " + quizRecord.getId());
     Question question = questionDTOFactory.createEntity(questionDTO);
     question.setQuiz(quizRecord);
     if (questionDTO.getAnswer().getCorrectAnswers().length > 1) {
@@ -140,7 +136,6 @@ public class QuestionService {
     quizRecord.getQuestions().add(question);
     quizRecord.setNumberOfQuestions(quizRecord.getQuestions().size());
     long savedQuestionId = questionRepository.save(question).getId();
-    log.info("Saved question and the identifier is : " + savedQuestionId);
     return savedQuestionId;
   }
 

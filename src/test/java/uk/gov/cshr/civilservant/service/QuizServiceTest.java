@@ -1,13 +1,29 @@
 package uk.gov.cshr.civilservant.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import javax.persistence.EntityNotFoundException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import uk.gov.cshr.civilservant.domain.*;
+import uk.gov.cshr.civilservant.domain.Profession;
+import uk.gov.cshr.civilservant.domain.Question;
+import uk.gov.cshr.civilservant.domain.Quiz;
+import uk.gov.cshr.civilservant.domain.Status;
 import uk.gov.cshr.civilservant.dto.QuizDataTableDto;
 import uk.gov.cshr.civilservant.dto.QuizDto;
 import uk.gov.cshr.civilservant.dto.QuizResultSummaryDto;
@@ -17,20 +33,6 @@ import uk.gov.cshr.civilservant.exception.ProfessionNotFoundException;
 import uk.gov.cshr.civilservant.repository.ProfessionRepository;
 import uk.gov.cshr.civilservant.repository.QuizRepository;
 import uk.gov.cshr.civilservant.repository.QuizResultRepository;
-
-import javax.persistence.EntityNotFoundException;
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class QuizServiceTest {
@@ -71,12 +73,12 @@ public class QuizServiceTest {
     // Given
     QuizResultSummaryDto quizResultSummaryDto =
         QuizResultSummaryDto.builder()
-            .averageScore(23.0)
+            .averageScore(23.456456)
             .numberOfAttempts(2)
             .professionId(1)
             .build();
     QuizDataTableDto quizDataTableDto =
-        QuizDataTableDto.builder().profession("").averageScore(23).numberOfAttempts(2).build();
+        QuizDataTableDto.builder().profession("").averageScore(23.46).numberOfAttempts(2).build();
     // When
     when(quizResultRepository.findAllResults()).thenReturn(Arrays.asList(quizResultSummaryDto));
 
@@ -85,7 +87,7 @@ public class QuizServiceTest {
     assertTrue(expected.get().get(0).getProfession().equals(quizDataTableDto.getProfession()));
     assertTrue(
         expected.get().get(0).getNumberOfAttempts() == quizDataTableDto.getNumberOfAttempts());
-    assertTrue(expected.get().get(0).getAverageScore() == quizDataTableDto.getAverageScore());
+    assertTrue(expected.get().get(0).getAverageScore().equals(quizDataTableDto.getAverageScore()));
   }
 
   @Test
@@ -203,73 +205,109 @@ public class QuizServiceTest {
   @Test
   public void shouldReturnReportsForSuperAdmin() throws IOException {
     // Given
-
+    Question question = Question.builder()
+            .quiz(Quiz.builder()
+                    .name("Test quiz")
+                    .profession(Profession.builder()
+                            .build())
+                    .status(Status.PUBLISHED)
+                    .build())
+            .id(1L).build();
+    List<Question> questions = new ArrayList<>();
+    questions.add(question);
     // when
     when(quizResultRepository.findAllByCompletedOnBetween(any(), any()))
         .thenReturn(QuizBuilder.buildSomeResults());
-    when(questionService.findAll(anySet())).thenReturn(QuizBuilder.buildSomeQuestions());
+    when(questionService.findAll(anySet())).thenReturn(questions);
     when(objectMapper.readValue(anyString(), eq(Question.class)))
-        .thenReturn(Question.builder().id(1L).build());
+        .thenReturn(question);
     // then
     List<SkillsReportsDto> expectedList = quizService.getReportForSuperAdmin(any(), any());
 
     assertTrue(expectedList.size() > 0);
-    assertEquals(1, expectedList.get(1).getQuestionId());
+    assertEquals(1, expectedList.get(0).getQuestionId());
   }
 
   @Test
   public void shouldReturnReportsForOrgAdmin() throws IOException {
     // Given
-
+    Question question = Question.builder()
+            .quiz(Quiz.builder()
+                    .name("Test quiz")
+                    .profession(Profession.builder()
+                            .build())
+                    .status(Status.PUBLISHED)
+                    .build())
+            .id(1L).build();
+    List<Question> questions = new ArrayList<>();
+    questions.add(question);
     // when
     when(quizResultRepository.findAllByOrganisationIdAndCompletedOnBetween(anyLong(), any(), any()))
         .thenReturn(QuizBuilder.buildSomeResults());
-    when(questionService.findAll(anySet())).thenReturn(QuizBuilder.buildSomeQuestions());
+    when(questionService.findAll(anySet())).thenReturn(questions);
     when(objectMapper.readValue(anyString(), eq(Question.class)))
-        .thenReturn(Question.builder().id(1L).build());
+        .thenReturn(question);
     // then
     List<SkillsReportsDto> expectedList =
         quizService.getReportForOrganisationAdmin(anyLong(), any(), any());
 
     assertTrue(expectedList.size() > 0);
-    assertEquals(1, expectedList.get(1).getQuestionId());
+    assertEquals(1, expectedList.get(0).getQuestionId());
   }
 
   @Test
   public void shouldReturnReportsForProfReporter() throws IOException {
     // Given
-
+    Question question = Question.builder()
+            .quiz(Quiz.builder()
+                    .name("Test quiz")
+                    .profession(Profession.builder()
+                            .build())
+                    .status(Status.PUBLISHED)
+                    .build())
+            .id(1L).build();
+    List<Question> questions = new ArrayList<>();
+    questions.add(question);
     // when
     when(quizResultRepository.findAllByOrganisationIdAndProfessionIdAndCompletedOnBetween(
             anyLong(), anyLong(), any(), any()))
         .thenReturn(QuizBuilder.buildSomeResults());
-    when(questionService.findAll(anySet())).thenReturn(QuizBuilder.buildSomeQuestions());
+    when(questionService.findAll(anySet())).thenReturn(questions);
     when(objectMapper.readValue(anyString(), eq(Question.class)))
-        .thenReturn(Question.builder().id(1L).build());
+        .thenReturn(question);
     // then
     List<SkillsReportsDto> expectedList =
         quizService.getReportForProfessionReporter(anyLong(), anyLong(), any(), any());
 
     assertTrue(expectedList.size() > 0);
-    assertEquals(1, expectedList.get(1).getQuestionId());
+    assertEquals(1, expectedList.get(0).getQuestionId());
   }
 
   @Test
   public void shouldReturnReportsForProfAdmin() throws IOException {
     // Given
-
+    Question question = Question.builder()
+            .quiz(Quiz.builder()
+                    .name("Test quiz")
+                    .profession(Profession.builder()
+                            .build())
+                    .status(Status.PUBLISHED)
+                    .build())
+            .id(1L).build();
+    List<Question> questions = new ArrayList<>();
+    questions.add(question);
     // when
     when(quizResultRepository.findAllByProfessionIdAndCompletedOnBetween(anyLong(), any(), any()))
         .thenReturn(QuizBuilder.buildSomeResults());
-    when(questionService.findAll(anySet())).thenReturn(QuizBuilder.buildSomeQuestions());
+    when(questionService.findAll(anySet())).thenReturn(questions);
     when(objectMapper.readValue(anyString(), eq(Question.class)))
-        .thenReturn(Question.builder().id(1L).build());
+        .thenReturn(question);
     // then
     List<SkillsReportsDto> expectedList =
         quizService.getReportForProfessionAdmin(anyLong(), any(), any());
 
     assertTrue(expectedList.size() > 0);
-    assertEquals(1, expectedList.get(1).getQuestionId());
+    assertEquals(1, expectedList.get(0).getQuestionId());
   }
 
     @Test
