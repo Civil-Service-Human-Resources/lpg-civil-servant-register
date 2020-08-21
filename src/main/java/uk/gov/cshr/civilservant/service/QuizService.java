@@ -1,6 +1,8 @@
 package uk.gov.cshr.civilservant.service;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -213,11 +215,9 @@ public class QuizService {
         if (answerDto != null) {
           if (Arrays.deepEquals(answersDto.getSubmittedAnswers(), answerDto.getCorrectAnswers())) {
             submittedAnswer.setCorrect(true);
-            question.get().setCorrectCount(question.get().getCorrectCount() + 1);
             correctCount++;
           } else {
             submittedAnswer.setCorrect(false);
-            question.get().setIncorrectCount(question.get().getIncorrectCount() + 1);
           }
         }
         submittedAnswer.setSubmittedAnswers(answersDto.getSubmittedAnswers());
@@ -225,11 +225,8 @@ public class QuizService {
       } else {
         submittedAnswer.setSubmittedAnswers(new String[] {});
         submittedAnswer.setSkipped(true);
-        question.get().setSkippedCount(question.get().getSkippedCount() + 1);
       }
-      question.get().setTimesAttempted(question.get().getTimesAttempted() + 1);
       submittedAnswer.setQuizResult(result);
-      questionService.save(question.get());
       submittedAnswer.setQuestion(objectMapper.writeValueAsString(question.get()));
       result.getAnswers().add(submittedAnswer);
     }
@@ -280,7 +277,7 @@ public class QuizService {
             QuizDataTableDto.builder()
                 .profession(profession.get().getName())
                 .numberOfAttempts(0)
-                .averageScore(0)
+                .averageScore(0d)
                 .build());
       }
     }
@@ -340,12 +337,13 @@ public class QuizService {
 
   private QuizDataTableDto populateDataTableDto(
       QuizResultSummaryDto quizResultSummaryDto, String professionName) {
+    BigDecimal bd = null;
+    if (quizResultSummaryDto.getAverageScore() != null) {
+       bd = new BigDecimal(quizResultSummaryDto.getAverageScore()).setScale(2, RoundingMode.CEILING);
+    }
     return QuizDataTableDto.builder()
         .profession(professionName)
-        .averageScore(
-            quizResultSummaryDto.getAverageScore() != null
-                ? quizResultSummaryDto.getAverageScore().floatValue()
-                : 0)
+        .averageScore(bd != null ? bd.doubleValue() : 0d)
         .numberOfAttempts((int) quizResultSummaryDto.getNumberOfAttempts())
         .build();
   }
@@ -395,7 +393,8 @@ public class QuizService {
   }
 
   private List<SkillsReportsDto> extractReportFromResult(List<QuizResult> quizResults) {
-    Set<Long> questionIds = new HashSet<>();
+
+    Map<Long, QuestionMetrics> metricsMap = new HashMap<>();
 
     quizResults.forEach(
         quizResult ->
@@ -404,40 +403,66 @@ public class QuizService {
                 .forEach(
                     submittedAnswer -> {
                       try {
-                        questionIds.add(
-                            objectMapper
+                        Long questionId = objectMapper
                                 .readValue(submittedAnswer.getQuestion(), Question.class)
-                                .getId());
+                                .getId();
+                          if (!metricsMap.containsKey(questionId)) {
+                              metricsMap.put(questionId,new QuestionMetrics());
+                          }
+                          calculateMetrics(metricsMap.get(questionId), submittedAnswer);
+
                       } catch (IOException e) {
                         log.error("Reading from question failed {}", e.getMessage());
                       }
                     }));
+    return populateQuestionData(metricsMap);
 
-    List<Question> questionList = questionService.findAll(questionIds);
-
-    return populateQuestionMetrics(questionList);
   }
 
-  private List<SkillsReportsDto> populateQuestionMetrics(List<Question> questions) {
+  private void calculateMetrics(QuestionMetrics questionMetrics, SubmittedAnswer submittedAnswer) {
+    int correct = questionMetrics.getCorrectCount();
+    int incorrect = questionMetrics.getIncorrectCount();
+    int skipped = questionMetrics.getSkippedCount();
+    int timesAttempted = questionMetrics.getTimesAttempted();
+    if (submittedAnswer.isCorrect()) {
+      correct++;
+      questionMetrics.setCorrectCount(correct);
+    } else {
+      incorrect++;
+      questionMetrics.setIncorrectCount(incorrect);
+    }
+
+    if (submittedAnswer.isSkipped()) {
+      skipped++;
+      questionMetrics.setSkippedCount(skipped);
+    }
+
+    timesAttempted++;
+    questionMetrics.setTimesAttempted(timesAttempted);
+  }
+
+  private List<SkillsReportsDto> populateQuestionData(
+          Map<Long, QuestionMetrics> metricsMap) {
+    List<Question> questionList = questionService.findAll(metricsMap.keySet());
     List<SkillsReportsDto> skillsReportsDtoList = new ArrayList<>();
 
-    questions.forEach(
-        question -> {
-          final SkillsReportsDto skillsReportsDto =
-              SkillsReportsDto.builder()
-                  .quizName(question.getQuiz().getName())
-                  .status(question.getQuiz().getStatus())
-                  .professionName(question.getQuiz().getProfession().getName())
-                  .questionName(question.getValue())
-                  .questionTheme(question.getTheme())
-                  .questionId(question.getId())
-                  .timesAttempted(question.getTimesAttempted())
-                  .incorrectCount(question.getIncorrectCount())
-                  .correctCount(question.getCorrectCount())
-                  .skippedCount(question.getSkippedCount())
-                  .build();
-          skillsReportsDtoList.add(skillsReportsDto);
-        });
+    questionList.forEach(
+            question -> {
+              final SkillsReportsDto skillsReportsDto =
+                      SkillsReportsDto.builder()
+                              .quizName(question.getQuiz().getName())
+                              .status(question.getQuiz().getStatus())
+                              .professionName(question.getQuiz().getProfession().getName())
+                              .questionName(question.getValue())
+                              .questionTheme(question.getTheme())
+                              .questionId(question.getId())
+                              .timesAttempted(metricsMap.get(question.getId()).getTimesAttempted())
+                              .incorrectCount(metricsMap.get(question.getId()).getIncorrectCount())
+                              .correctCount(metricsMap.get(question.getId()).getCorrectCount())
+                              .skippedCount(metricsMap.get(question.getId()).getSkippedCount())
+                              .build();
+              skillsReportsDtoList.add(skillsReportsDto);
+            });
     return skillsReportsDtoList;
   }
 }
