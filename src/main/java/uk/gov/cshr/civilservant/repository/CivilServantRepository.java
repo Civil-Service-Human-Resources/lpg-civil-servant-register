@@ -58,11 +58,6 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
 
     @Query("select c from CivilServant c " +
             "LEFT JOIN FETCH c.organisationalUnit " +
-            "LEFT JOIN FETCH c.profession " +
-            "LEFT JOIN FETCH c.lineManager " +
-            "LEFT JOIN FETCH c.grade " +
-            "LEFT JOIN FETCH c.otherAreasOfWork " +
-            "LEFT JOIN FETCH c.interests " +
             "LEFT JOIN FETCH c.identity " +
             "WHERE c.organisationalUnit.code = ?1")
     List<CivilServant> findAllByOrganisationCode(String organisationalUnitCode);
