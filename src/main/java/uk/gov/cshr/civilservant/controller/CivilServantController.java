@@ -1,11 +1,11 @@
 package uk.gov.cshr.civilservant.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.extern.slf4j.Slf4j;
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.repository.CivilServantRepository;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
@@ -13,8 +13,6 @@ import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
 import uk.gov.cshr.civilservant.service.LineManagerService;
 import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
@@ -133,6 +131,7 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     @GetMapping("/organisation/{code}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<Resource<CivilServantResource>>> civilServantByOrganisationCode(@PathVariable("code") String code) {
+        log.info("Getting civil servants by code: {}", code);
         return ResponseEntity.ok(civilServantRepository.findAllByOrganisationCode(code).stream()
             .map(civilServantResourceFactory::create)
             .collect(Collectors.toList()));
