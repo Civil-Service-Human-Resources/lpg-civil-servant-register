@@ -1,13 +1,14 @@
 package uk.gov.cshr.civilservant.resource.factory;
 
-import org.springframework.hateoas.Resource;
-import org.springframework.stereotype.Component;
+import java.util.Optional;
+
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
-import java.util.Optional;
+import org.springframework.hateoas.Resource;
+import org.springframework.stereotype.Component;
 
 @Component
 public class CivilServantResourceFactory {
@@ -56,6 +57,25 @@ public class CivilServantResourceFactory {
         resource.add(linkFactory.createRelationshipLink(civilServant, "organisationalUnit"));
         resource.add(linkFactory.createRelationshipLink(civilServant, "grade"));
         resource.add(linkFactory.createRelationshipLink(civilServant, "profession"));
+
+        return resource;
+    }
+
+    public Resource<CivilServantResource> createResourceForNotification(CivilServant civilServant) {
+        CivilServantResource civilServantResource = new CivilServantResource();
+
+        if (civilServant.getOrganisationalUnit().isPresent()) {
+            civilServantResource.setOrganisationalUnit(civilServant.getOrganisationalUnit().get());
+        }
+
+        civilServantResource.setUserId(civilServant.getId());
+
+        civilServantResource.setIdentity(civilServant.getIdentity());
+
+        Resource<CivilServantResource> resource = new Resource<>(civilServantResource);
+
+        resource.add(linkFactory.createSelfLink(civilServant));
+        resource.add(linkFactory.createRelationshipLink(civilServant, "organisationalUnit"));
 
         return resource;
     }
