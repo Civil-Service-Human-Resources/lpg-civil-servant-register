@@ -134,9 +134,12 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         log.info("Getting civil servants by code: {}", code);
         List<CivilServant> civilServants = civilServantRepository.findAllByOrganisationCode(code);
         log.info("Mapping");
-        return ResponseEntity.ok(civilServants.stream()
+        ResponseEntity<List<Resource<CivilServantResource>>> entity = ResponseEntity.ok(civilServants.stream()
             .map(civilServantResourceFactory::create)
             .collect(Collectors.toList()));
+        log.info("Mapping finished for {} servants", civilServants.size());
+
+        return entity;
     }
 
     @Override
