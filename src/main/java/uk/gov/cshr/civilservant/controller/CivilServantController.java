@@ -132,7 +132,9 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<Resource<CivilServantResource>>> civilServantByOrganisationCode(@PathVariable("code") String code) {
         log.info("Getting civil servants by code: {}", code);
-        return ResponseEntity.ok(civilServantRepository.findAllByOrganisationCode(code).stream()
+        List<CivilServant> civilServants = civilServantRepository.findAllByOrganisationCode(code);
+        log.info("Mapping");
+        return ResponseEntity.ok(civilServants.stream()
             .map(civilServantResourceFactory::create)
             .collect(Collectors.toList()));
     }
