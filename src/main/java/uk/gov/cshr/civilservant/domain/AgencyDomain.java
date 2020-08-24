@@ -8,6 +8,9 @@ import javax.persistence.*;
 @Data
 @Entity
 public class AgencyDomain implements RegistryEntity {
+
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore

@@ -55,8 +55,15 @@ The CSRS application uses Flyway to manage the DB migrations inside its own sche
 
 #### Caching
 
-The CSRS application is one of few application components in LPG that has explicit caching. The caching implemented is using the `@Cacheable` annotation in the `OrganisationalUnitController` and caches both the endpoint results for the Tree and Flat versions of the organisations hierarchy. The cache is evicted on calls to save and delete in the `OrganisationalUnitRepository`.
+The CSRS application is one of few application components in LPG that has explicit caching. 
 
+The caching implemented is using the Spring `@Cacheable` annotation in the `OrganisationalUnitService` and `OrganisationalUnitRepository` classes, caching the results for flat and tree representations of organisations.
+ 
+The cache is stored in a Redis instance configured in `application.yml`. Redis support for the cache is provided by the Spring Data Redis package which automatically provides Redis based caching for the `@Cacheable` annotation.
+ 
+The cache is evicted on calls to save and delete in the `OrganisationalUnitRepository`.
+
+Data is stored in the cache via Java default serialization. Any class needing to be cached must implement the java.io interface `Serializable`.
 
 ## Build, run, test, deploy
 
