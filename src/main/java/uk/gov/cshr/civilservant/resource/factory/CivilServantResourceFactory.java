@@ -64,18 +64,23 @@ public class CivilServantResourceFactory {
     public Resource<CivilServantResource> createResourceForNotification(CivilServant civilServant) {
         CivilServantResource civilServantResource = new CivilServantResource();
 
+        if (civilServant.getGrade().isPresent()) {
+            civilServantResource.setGrade(civilServant.getGrade().get());
+        }
+
         if (civilServant.getOrganisationalUnit().isPresent()) {
             civilServantResource.setOrganisationalUnit(civilServant.getOrganisationalUnit().get());
         }
 
         civilServantResource.setUserId(civilServant.getId());
-
+        civilServantResource.setOtherAreasOfWork(civilServant.getOtherAreasOfWork());
         civilServantResource.setIdentity(civilServant.getIdentity());
 
         Resource<CivilServantResource> resource = new Resource<>(civilServantResource);
 
         resource.add(linkFactory.createSelfLink(civilServant));
         resource.add(linkFactory.createRelationshipLink(civilServant, "organisationalUnit"));
+        resource.add(linkFactory.createRelationshipLink(civilServant, "grade"));
 
         return resource;
     }
