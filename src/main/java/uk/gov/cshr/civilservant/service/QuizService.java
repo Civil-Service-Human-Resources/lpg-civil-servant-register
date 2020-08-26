@@ -3,6 +3,7 @@ package uk.gov.cshr.civilservant.service;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -277,7 +278,7 @@ public class QuizService {
             QuizDataTableDto.builder()
                 .profession(profession.get().getName())
                 .numberOfAttempts(0)
-                .averageScore(0d)
+                .averageScore("")
                 .build());
       }
     }
@@ -337,13 +338,15 @@ public class QuizService {
 
   private QuizDataTableDto populateDataTableDto(
       QuizResultSummaryDto quizResultSummaryDto, String professionName) {
-    BigDecimal bd = null;
-    if (quizResultSummaryDto.getAverageScore() != null) {
-       bd = new BigDecimal(quizResultSummaryDto.getAverageScore()).setScale(2, RoundingMode.CEILING);
+    String bd = "0.00";
+    DecimalFormat dec = new DecimalFormat("#.00");
+    if (quizResultSummaryDto.getAverageScore() != null
+    && quizResultSummaryDto.getAverageScore() != 0d) {
+       bd = dec.format(new BigDecimal(quizResultSummaryDto.getAverageScore()).setScale(2, RoundingMode.CEILING));
     }
     return QuizDataTableDto.builder()
         .profession(professionName)
-        .averageScore(bd != null ? bd.doubleValue() : 0d)
+        .averageScore(bd)
         .numberOfAttempts((int) quizResultSummaryDto.getNumberOfAttempts())
         .build();
   }

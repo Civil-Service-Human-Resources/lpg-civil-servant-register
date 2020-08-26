@@ -10,5 +10,5 @@ import lombok.*;
 public class QuizDataTableDto {
   private String profession;
   private int numberOfAttempts;
-  private Double averageScore;
+  private String averageScore;
 }

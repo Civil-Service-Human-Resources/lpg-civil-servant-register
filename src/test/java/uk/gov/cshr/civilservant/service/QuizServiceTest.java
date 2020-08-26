@@ -78,7 +78,7 @@ public class QuizServiceTest {
             .professionId(1)
             .build();
     QuizDataTableDto quizDataTableDto =
-        QuizDataTableDto.builder().profession("").averageScore(23.46).numberOfAttempts(2).build();
+        QuizDataTableDto.builder().profession("").averageScore("23.46").numberOfAttempts(2).build();
     // When
     when(quizResultRepository.findAllResults()).thenReturn(Arrays.asList(quizResultSummaryDto));
 
@@ -87,6 +87,51 @@ public class QuizServiceTest {
     assertTrue(expected.get().get(0).getProfession().equals(quizDataTableDto.getProfession()));
     assertTrue(
         expected.get().get(0).getNumberOfAttempts() == quizDataTableDto.getNumberOfAttempts());
+    assertTrue(expected.get().get(0).getAverageScore().equals(quizDataTableDto.getAverageScore()));
+  }
+
+  @Test
+  public void shouldReturnDecimalZeroes() {
+    // Given
+    QuizResultSummaryDto quizResultSummaryDto =
+            QuizResultSummaryDto.builder()
+                    .averageScore(23d)
+                    .numberOfAttempts(2)
+                    .professionId(1)
+                    .build();
+    QuizDataTableDto quizDataTableDto =
+            QuizDataTableDto.builder().profession("").averageScore("23.00").numberOfAttempts(2).build();
+    // When
+    when(quizResultRepository.findAllResults()).thenReturn(Arrays.asList(quizResultSummaryDto));
+
+    // then
+    Optional<List<QuizDataTableDto>> expected = quizService.getAllResults();
+    assertTrue(expected.get().get(0).getProfession().equals(quizDataTableDto.getProfession()));
+    assertTrue(
+            expected.get().get(0).getNumberOfAttempts() == quizDataTableDto.getNumberOfAttempts());
+    assertTrue(expected.get().get(0).getAverageScore().equals(quizDataTableDto.getAverageScore()));
+  }
+
+  @Test
+  public void shouldReturnDecimalZeroesWhenAvgScoreIsZero() {
+    // Given
+    QuizResultSummaryDto quizResultSummaryDto =
+            QuizResultSummaryDto.builder()
+                    .averageScore(0d)
+                    .numberOfAttempts(2)
+                    .professionId(1)
+                    .build();
+    QuizDataTableDto quizDataTableDto =
+            QuizDataTableDto.builder().profession("").averageScore("0.00").numberOfAttempts(2).build();
+    // When
+    when(quizResultRepository.findAllResults()).thenReturn(Arrays.asList(quizResultSummaryDto));
+
+    // then
+    Optional<List<QuizDataTableDto>> expected = quizService.getAllResults();
+    assertTrue(expected.get().get(0).getProfession().equals(quizDataTableDto.getProfession()));
+    assertTrue(
+            expected.get().get(0).getNumberOfAttempts() == quizDataTableDto.getNumberOfAttempts());
+    System.out.println("Average score - " + expected.get().get(0).getAverageScore());
     assertTrue(expected.get().get(0).getAverageScore().equals(quizDataTableDto.getAverageScore()));
   }
 
