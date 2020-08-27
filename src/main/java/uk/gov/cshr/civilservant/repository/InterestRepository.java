@@ -7,6 +7,4 @@ import uk.gov.cshr.civilservant.domain.Interest;
 
 @Repository
 @RepositoryRestResource
-public interface InterestRepository extends CrudRepository<Interest, Long> {
-
-}
+public interface InterestRepository extends CrudRepository<Interest, Long> {}

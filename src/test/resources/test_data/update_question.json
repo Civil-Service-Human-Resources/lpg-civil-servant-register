@@ -1,0 +1,16 @@
+{
+  "id": 1,
+  "value": "What is the capital of Ireland?",
+  "answer": {
+    "id": 1,
+    "correctAnswers": [
+      "A"
+    ],
+    "answers": {
+      "A": "Dublin",
+      "B": "London",
+      "C": "New York",
+      "D": "Melbourne"
+    }
+  }
+}

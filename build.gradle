@@ -140,6 +140,16 @@ dependencies {
     compile('uk.gov.service.notify:notifications-java-client:3.9.1-RELEASE')
 
     compile 'org.projectlombok:lombok:1.18.4'
+    compile 'com.opencsv:opencsv:4.3'
+
+    // https://mvnrepository.com/artifact/org.modelmapper/modelmapper
+    compile group: 'org.modelmapper', name: 'modelmapper', version: '0.7.5'
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+
+    compile group: 'net.javacrumbs.shedlock', name: 'shedlock-spring', version: '4.12.0'
+    compile group: 'net.javacrumbs.shedlock', name: 'shedlock-provider-jdbc-template', version: '4.12.0'
 
     testCompile 'com.google.code.gson:gson:2.8.2'
     testCompile 'org.springframework.boot:spring-boot-starter-test'

@@ -8,8 +8,8 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Res
 @Configuration
 @EnableResourceServer
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
-    @Override
-    public void configure(ResourceServerSecurityConfigurer security) throws Exception {
-        security.stateless(false);
-    }
+  @Override
+  public void configure(ResourceServerSecurityConfigurer security) throws Exception {
+    security.stateless(false);
+  }
 }

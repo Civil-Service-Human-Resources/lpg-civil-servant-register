@@ -1,0 +1,15 @@
+{
+  "quizId": "1",
+  "quizName": "Quiz for Analysis",
+  "staffId": "1232",
+  "professionId": "1",
+  "answers": [
+    {
+      "questionId": "1",
+      "submittedAnswers": [
+        "C"
+      ],
+      "skipped": "false"
+    }
+  ]
+}

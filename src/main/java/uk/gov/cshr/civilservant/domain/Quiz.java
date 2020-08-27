@@ -1,24 +1,49 @@
 package uk.gov.cshr.civilservant.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-
-import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
+import javax.persistence.*;
 
-@Data
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+@Builder
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Quiz {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonIgnore
-    private Long id;
+  @Column String result;
+  @Column Integer numberOfQuestions;
 
-    @OneToOne
-    private Profession profession;
+  @Column
+  @Enumerated(EnumType.STRING)
+  Status status;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<Question> questions = new HashSet<>();
+  @Column String description;
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column
+  private Long id;
+
+  @Column private String name;
+
+  @OneToOne(fetch = FetchType.EAGER)
+  private Profession profession;
+
+  @OneToMany(mappedBy = "quiz", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+  @JsonManagedReference
+  @Builder.Default
+  private Set<Question> questions = new HashSet<>();
+
+  @CreationTimestamp private LocalDateTime createdOn;
+  @UpdateTimestamp private LocalDateTime updatedOn;
 }

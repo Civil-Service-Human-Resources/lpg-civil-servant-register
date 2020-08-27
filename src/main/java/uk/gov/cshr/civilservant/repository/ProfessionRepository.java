@@ -9,9 +9,9 @@ import uk.gov.cshr.civilservant.domain.Profession;
 @RepositoryRestResource
 public interface ProfessionRepository extends SelfReferencingEntityRepository<Profession> {
 
-    @PreAuthorize("hasAuthority('PROFESSION_MANAGER')")
-    @Override
-    Profession save(Profession profession);
+  @PreAuthorize("hasAuthority('PROFESSION_MANAGER')")
+  @Override
+  Profession save(Profession profession);
 
-    Profession findByName(String name);
+  Profession findByName(String name);
 }
