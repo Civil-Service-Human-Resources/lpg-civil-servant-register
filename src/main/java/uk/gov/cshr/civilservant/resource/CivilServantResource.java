@@ -20,14 +20,5 @@ public class CivilServantResource {
   private String lineManagerName;
   private String lineManagerEmailAddress;
   private Long userId;
-    private String fullName;
-    private Grade grade;
-    private OrganisationalUnit organisationalUnit;
-    private Profession profession;
-    private Set<Profession> otherAreasOfWork;
-    private Set<Interest> interests;
-    private String lineManagerName;
-    private String lineManagerEmailAddress;
-    private Long userId;
-    private Identity identity;
+  private Identity identity;
 }
