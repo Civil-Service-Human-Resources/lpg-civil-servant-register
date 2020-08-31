@@ -1,0 +1,644 @@
+{
+  "id": 1,
+  "staffId": "1232",
+  "quizId": 1,
+  "quizName": "Quiz for Analysis",
+  "professionId": 1,
+  "type": "LONG",
+  "result": null,
+  "completedOn": [
+    2020,
+    6,
+    16,
+    14,
+    55,
+    48,
+    824000000
+  ],
+  "correctAnswers": 17,
+  "numberOfQuestions": 20,
+  "score": 85.0,
+  "answers": [
+    {
+      "questionId": 1,
+      "submittedAnswers": [
+        "C"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 1,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 2,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 2,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 3,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 2,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 4,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 2,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 5,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 3,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 6,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 4,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 7,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 5,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 8,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": "",
+        "value": "Why did the chicken cross the road??",
+        "why": "",
+        "answer": {
+          "id": 6,
+          "correctAnswers": [
+            "A",
+            "B",
+            "E"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these",
+            "E": ""
+          }
+        },
+        "imgUrl": null,
+        "suggestions": "",
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 9,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 7,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 10,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 8,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 11,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 9,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 12,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 10,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 13,
+      "submittedAnswers": [
+        ""
+      ],
+      "skipped": true,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 11,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 14,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 12,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 15,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 13,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 16,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 14,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 17,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 5,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 18,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": "",
+        "value": "Why did the chicken cross the road??",
+        "why": "",
+        "answer": {
+          "id": 16,
+          "correctAnswers": [
+            "A",
+            "B",
+            "E"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these",
+            "E": ""
+          }
+        },
+        "imgUrl": null,
+        "suggestions": "",
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 19,
+      "submittedAnswers": [
+        "A",
+        "B"
+      ],
+      "skipped": false,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 17,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    },
+    {
+      "questionId": 20,
+      "submittedAnswers": [
+        ""
+      ],
+      "skipped": true,
+      "question": {
+        "type": "MULTIPLE",
+        "theme": null,
+        "value": "Why did the chicken cross the road??",
+        "why": null,
+        "answer": {
+          "id": 18,
+          "correctAnswers": [
+            "A",
+            "B"
+          ],
+          "answers": {
+            "A": "For money",
+            "B": "For fame",
+            "C": "For fun",
+            "D": "None of these"
+          }
+        },
+        "imgUrl": null,
+        "suggestions": null,
+        "status": "ACTIVE",
+        "alternativeText": null
+      }
+    }
+  ]
+}

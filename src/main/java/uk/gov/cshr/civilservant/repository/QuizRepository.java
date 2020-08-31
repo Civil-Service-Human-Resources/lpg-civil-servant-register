@@ -1,15 +1,18 @@
 package uk.gov.cshr.civilservant.repository;
 
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
-import uk.gov.cshr.civilservant.domain.Quiz;
-
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Repository;
+import uk.gov.cshr.civilservant.domain.Quiz;
+import uk.gov.cshr.civilservant.domain.Status;
+
 @Repository
-public interface QuizRepository extends CrudRepository<Quiz, Long> {
+@PreAuthorize("isAuthenticated()")
+public interface QuizRepository extends JpaRepository<Quiz, Long> {
 
-    Optional<Quiz> findFirstByProfessionId(long id);
+  Optional<Quiz> findFirstByProfessionIdAndStatusIsNot(long professionId, Status status);
 
-    void deleteAllByProfessionId(long id);
+  Optional<Quiz> findFirstByProfessionIdAndStatusIs(long professionId, Status status);
 }
