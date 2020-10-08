@@ -72,9 +72,14 @@ public class CivilServantResourceFactory {
             civilServantResource.setOrganisationalUnit(civilServant.getOrganisationalUnit().get());
         }
 
+        if (civilServant.getProfession().isPresent()) {
+            civilServantResource.setProfession(civilServant.getProfession().get());
+        }
+
         civilServantResource.setUserId(civilServant.getId());
         civilServantResource.setOtherAreasOfWork(civilServant.getOtherAreasOfWork());
         civilServantResource.setIdentity(civilServant.getIdentity());
+        civilServantResource.setInterests(civilServant.getInterests());
 
         Resource<CivilServantResource> resource = new Resource<>(civilServantResource);
 

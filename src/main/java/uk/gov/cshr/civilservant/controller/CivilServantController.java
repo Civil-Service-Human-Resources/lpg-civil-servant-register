@@ -131,13 +131,10 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
     @GetMapping("/organisation/{code}")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<Resource<CivilServantResource>>> civilServantByOrganisationCode(@PathVariable("code") String code) {
-        log.info("Getting civil servants by code: {}", code);
         List<CivilServant> civilServants = civilServantRepository.findAllByOrganisationCode(code);
-        log.info("Mapping");
         ResponseEntity<List<Resource<CivilServantResource>>> entity = ResponseEntity.ok(civilServants.stream()
             .map(civilServantResourceFactory::createResourceForNotification)
             .collect(Collectors.toList()));
-        log.info("Mapping finished for {} servants", civilServants.size());
 
         return entity;
     }
