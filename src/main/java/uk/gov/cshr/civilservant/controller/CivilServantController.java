@@ -1,6 +1,18 @@
 package uk.gov.cshr.civilservant.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
+import uk.gov.cshr.civilservant.domain.CivilServant;
+import uk.gov.cshr.civilservant.repository.CivilServantRepository;
+import uk.gov.cshr.civilservant.resource.CivilServantResource;
+import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
+import uk.gov.cshr.civilservant.service.LineManagerService;
+import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
+
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.data.rest.webmvc.RepositoryLinksResource;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
@@ -12,16 +24,12 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-import uk.gov.cshr.civilservant.domain.CivilServant;
-import uk.gov.cshr.civilservant.repository.CivilServantRepository;
-import uk.gov.cshr.civilservant.resource.CivilServantResource;
-import uk.gov.cshr.civilservant.resource.factory.CivilServantResourceFactory;
-import uk.gov.cshr.civilservant.service.LineManagerService;
-import uk.gov.cshr.civilservant.service.identity.IdentityFromService;
-
-import java.util.ArrayList;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @RepositoryRestController
@@ -118,6 +126,17 @@ public class CivilServantController implements ResourceProcessor<RepositoryLinks
         return civilServantRepository.findByIdentity(uid).map(
                 civilServant -> ResponseEntity.ok(civilServantResourceFactory.create(civilServant)))
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/organisation/{code}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<Resource<CivilServantResource>>> civilServantByOrganisationCode(@PathVariable("code") String code) {
+        List<CivilServant> civilServants = civilServantRepository.findAllByOrganisationCode(code);
+        ResponseEntity<List<Resource<CivilServantResource>>> entity = ResponseEntity.ok(civilServants.stream()
+            .map(civilServantResourceFactory::createResourceForNotification)
+            .collect(Collectors.toList()));
+
+        return entity;
     }
 
     @Override

@@ -57,6 +57,17 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
 
   List<CivilServant> findAllByProfession(Profession profession);
 
+  @Query("select c from CivilServant c " +
+      "LEFT JOIN FETCH c.organisationalUnit " +
+      "LEFT JOIN FETCH c.profession " +
+      "LEFT JOIN FETCH c.lineManager " +
+      "LEFT JOIN FETCH c.grade " +
+      "LEFT JOIN FETCH c.otherAreasOfWork " +
+      "LEFT JOIN FETCH c.interests " +
+      "LEFT JOIN FETCH c.identity " +
+      "WHERE c.organisationalUnit.code = ?1")
+  List<CivilServant> findAllByOrganisationCode(String organisationalUnitCode);
+
   @Query(
       "select new uk.gov.cshr.civilservant.dto.CivilServantReportDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name, group_concat(oaw.name)) "
           + "from CivilServant c "

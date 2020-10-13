@@ -1,13 +1,14 @@
 package uk.gov.cshr.civilservant.resource.factory;
 
-import org.springframework.hateoas.Resource;
-import org.springframework.stereotype.Component;
+import java.util.Optional;
+
 import uk.gov.cshr.civilservant.domain.CivilServant;
 import uk.gov.cshr.civilservant.dto.OrgCodeDTO;
 import uk.gov.cshr.civilservant.resource.CivilServantResource;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
-import java.util.Optional;
+import org.springframework.hateoas.Resource;
+import org.springframework.stereotype.Component;
 
 @Component
 public class CivilServantResourceFactory {
@@ -48,6 +49,7 @@ public class CivilServantResourceFactory {
 
         civilServantResource.setInterests(civilServant.getInterests());
         civilServantResource.setOtherAreasOfWork(civilServant.getOtherAreasOfWork());
+        civilServantResource.setIdentity(civilServant.getIdentity());
 
         Resource<CivilServantResource> resource = new Resource<>(civilServantResource);
 
@@ -55,6 +57,35 @@ public class CivilServantResourceFactory {
         resource.add(linkFactory.createRelationshipLink(civilServant, "organisationalUnit"));
         resource.add(linkFactory.createRelationshipLink(civilServant, "grade"));
         resource.add(linkFactory.createRelationshipLink(civilServant, "profession"));
+
+        return resource;
+    }
+
+    public Resource<CivilServantResource> createResourceForNotification(CivilServant civilServant) {
+        CivilServantResource civilServantResource = new CivilServantResource();
+
+        if (civilServant.getGrade().isPresent()) {
+            civilServantResource.setGrade(civilServant.getGrade().get());
+        }
+
+        if (civilServant.getOrganisationalUnit().isPresent()) {
+            civilServantResource.setOrganisationalUnit(civilServant.getOrganisationalUnit().get());
+        }
+
+        if (civilServant.getProfession().isPresent()) {
+            civilServantResource.setProfession(civilServant.getProfession().get());
+        }
+
+        civilServantResource.setUserId(civilServant.getId());
+        civilServantResource.setOtherAreasOfWork(civilServant.getOtherAreasOfWork());
+        civilServantResource.setIdentity(civilServant.getIdentity());
+        civilServantResource.setInterests(civilServant.getInterests());
+
+        Resource<CivilServantResource> resource = new Resource<>(civilServantResource);
+
+        resource.add(linkFactory.createSelfLink(civilServant));
+        resource.add(linkFactory.createRelationshipLink(civilServant, "organisationalUnit"));
+        resource.add(linkFactory.createRelationshipLink(civilServant, "grade"));
 
         return resource;
     }
