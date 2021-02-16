@@ -65,12 +65,12 @@ public class OrganisationalUnit extends SelfReferencingEntity<OrganisationalUnit
 
     @Override
     public List<OrganisationalUnit> getChildren() {
-        return Collections.checkedList (children, OrganisationalUnit.class);
+        return Collections.checkedList(children, OrganisationalUnit.class);
     }
 
     @Override
     public void setChildren(List<OrganisationalUnit> children) {
-        this.children = Collections.checkedList (children, OrganisationalUnit.class);
+        this.children = Collections.checkedList(children, OrganisationalUnit.class);
     }
 
     public List<String> getPaymentMethods() {

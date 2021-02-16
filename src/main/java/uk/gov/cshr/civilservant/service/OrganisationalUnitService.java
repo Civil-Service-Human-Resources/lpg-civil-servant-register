@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -179,9 +178,13 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     private void sortOrganisationList(List<OrganisationalUnit> list) {
         list.forEach(org ->
             {
-                if(org.hasChildren())
-                    org.getChildren().sort(Comparator.comparing(OrganisationalUnit :: getName, String.CASE_INSENSITIVE_ORDER)) ;
-                    sortOrganisationList(org.getChildren());
+                if(org.hasChildren()) {
+                    List<OrganisationalUnit> children = org.getChildren();
+                    children.sort(Comparator.comparing(OrganisationalUnit::getName, String.CASE_INSENSITIVE_ORDER));
+                    //Below line is a recursive call which will be called recursively
+                    //until there are children as per above if condition.
+                    sortOrganisationList(children);
+                }
             }
         );
     }
