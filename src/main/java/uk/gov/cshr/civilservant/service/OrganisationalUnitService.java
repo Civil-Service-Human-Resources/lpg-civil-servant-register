@@ -17,6 +17,7 @@ import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -164,11 +165,27 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
 
     @Cacheable("organisationalUnitsTree")
     public List<OrganisationalUnit> getOrgTree() {
-        return this.getParents();
+        List<OrganisationalUnit> listOrg = this.getParents();
+        sortOrganisationList(listOrg);
+        return listOrg;
     }
 
     @Cacheable("organisationalUnitsFlat")
     public List<OrganisationalUnitDto> getFlatOrg() {
         return this.getListSortedByValue();
+    }
+
+    private void sortOrganisationList(List<OrganisationalUnit> list) {
+        list.forEach(org ->
+            {
+                if(org.hasChildren()) {
+                    List<OrganisationalUnit> children = org.getChildren();
+                    children.sort(Comparator.comparing(OrganisationalUnit::getName, String.CASE_INSENSITIVE_ORDER));
+                    //Below line is a recursive call which will be called recursively
+                    //until there are children as per above if condition.
+                    sortOrganisationList(children);
+                }
+            }
+        );
     }
 }
