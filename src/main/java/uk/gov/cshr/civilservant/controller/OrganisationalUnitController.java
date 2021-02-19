@@ -1,7 +1,6 @@
 package uk.gov.cshr.civilservant.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -79,7 +78,7 @@ public class OrganisationalUnitController {
             }
             List<OrganisationalUnitDto> dtos = organisationalUnits.stream()
                     .map(ou -> organisationalUnitDtoFactory.create(ou))
-                    .sorted(Comparator.comparing(OrganisationalUnitDto::getFormattedName))
+                    .sorted(Comparator.comparing(OrganisationalUnitDto::getFormattedName, String.CASE_INSENSITIVE_ORDER))
                     .collect(Collectors.toList());
             return ResponseEntity.ok(dtos);
         } catch(CivilServantNotFoundException | TokenDoesNotExistException e) {

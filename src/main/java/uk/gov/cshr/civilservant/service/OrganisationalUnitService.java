@@ -16,10 +16,7 @@ import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -40,14 +37,14 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     public List<OrganisationalUnit> getOrganisationWithParents(String code) {
         List<OrganisationalUnit> organisationalUnitList = new ArrayList<>();
         getOrganisationalUnitAndParent(code, organisationalUnitList);
-
+        sortOrganisationList(organisationalUnitList);
         return organisationalUnitList;
     }
 
     public List<OrganisationalUnit> getOrganisationWithChildren(String code) {
         List<OrganisationalUnit> organisationalUnitList = new ArrayList<>();
         getOrganisationalUnitAndChildren(code, organisationalUnitList);
-
+        sortOrganisationList(organisationalUnitList);
         return organisationalUnitList;
     }
 
@@ -100,7 +97,9 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     }
 
     public List<OrganisationalUnit> getOrganisationsNormalised() {
-        return repository.findAllNormalised();
+        List<OrganisationalUnit> organisationalUnits = repository.findAllNormalised();
+        sortOrganisationList(organisationalUnits);
+        return organisationalUnits;
     }
 
     public OrganisationalUnit setAgencyToken(OrganisationalUnit organisationalUnit, AgencyToken agencyToken) {
@@ -147,7 +146,9 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     }
 
     public List<String> getOrganisationalUnitCodes() {
-        return repository.findAllCodes();
+        List<String> allCodes = repository.findAllCodes();
+        Collections.sort(allCodes, String.CASE_INSENSITIVE_ORDER);
+        return allCodes;
     }
 
     @Transactional
