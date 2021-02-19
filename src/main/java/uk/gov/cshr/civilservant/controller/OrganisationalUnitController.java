@@ -79,7 +79,7 @@ public class OrganisationalUnitController {
             }
             List<OrganisationalUnitDto> dtos = organisationalUnits.stream()
                     .map(ou -> organisationalUnitDtoFactory.create(ou))
-                    .sorted(Comparator.comparing(OrganisationalUnitDto::getFormattedName))
+                    .sorted(Comparator.comparing(OrganisationalUnitDto::getFormattedName, String.CASE_INSENSITIVE_ORDER))
                     .collect(Collectors.toList());
             return ResponseEntity.ok(dtos);
         } catch(CivilServantNotFoundException | TokenDoesNotExistException e) {

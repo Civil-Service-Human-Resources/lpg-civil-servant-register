@@ -23,12 +23,16 @@ public class ProfessionServiceTest {
   @Test
   public void shouldReturnListOfParents() {
     Profession parent1 = new Profession();
+    parent1.setName("parent1");
     Profession child1 = new Profession();
+    child1.setName("child1");
     Profession child2 = new Profession();
+    child2.setName("child2");
     child1.setParent(parent1);
     child2.setParent(child1);
 
     Profession parent2 = new Profession();
+    parent2.setName("parent2");
 
     when(professionRepository.findAllByOrderByNameAsc())
         .thenReturn(Arrays.asList(parent1, child1, child2, parent2));

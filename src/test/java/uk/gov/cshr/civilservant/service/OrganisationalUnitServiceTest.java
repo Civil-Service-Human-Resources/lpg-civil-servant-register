@@ -98,12 +98,16 @@ public class OrganisationalUnitServiceTest {
     @Test
     public void shouldReturnParentOrganisationalUnits() {
         OrganisationalUnit parent1 = new OrganisationalUnit();
+        parent1.setName("parent1");
         OrganisationalUnit child1 = new OrganisationalUnit();
+        child1.setName("child1");
         OrganisationalUnit child2 = new OrganisationalUnit();
+        child2.setName("child2");
         child1.setParent(parent1);
         child2.setParent(child1);
 
         OrganisationalUnit parent2 = new OrganisationalUnit();
+        parent2.setName("parent2");
 
         when(organisationalUnitRepository.findAllByOrderByNameAsc()).thenReturn(Arrays.asList(parent1, child1, child2, parent2));
 
@@ -500,13 +504,16 @@ public class OrganisationalUnitServiceTest {
         // glasgows children x 2
         OrganisationalUnit maryhillNHS = new OrganisationalUnit();
         maryhillNHS.setCode("NHSMARYHILL");
+        maryhillNHS.setName("maryhillNHS");
 
         OrganisationalUnit govanNHS = new OrganisationalUnit();
         govanNHS.setCode("NHSGOVAN");
+        govanNHS.setName("govanNHS");
 
         // set up org for nhs glasgow
         OrganisationalUnit greaterGlasgowNHS = new OrganisationalUnit();
         greaterGlasgowNHS.setCode("NHSGLASGOW");
+        greaterGlasgowNHS.setName("greaterGlasgowNHS");
         greaterGlasgowNHS.setAgencyToken(at);
 
         List<OrganisationalUnit> children = new ArrayList<>();

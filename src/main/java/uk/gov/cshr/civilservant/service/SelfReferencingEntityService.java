@@ -28,6 +28,7 @@ public abstract class SelfReferencingEntityService<
         .findAllByOrderByNameAsc()
         .stream()
         .filter(org -> !org.hasParent())
+        .sorted(Comparator.comparing(T::getName, String.CASE_INSENSITIVE_ORDER))
         .collect(Collectors.toList());
   }
 
@@ -38,7 +39,7 @@ public abstract class SelfReferencingEntityService<
         .findAll()
         .stream()
         .map(o -> dtoFactory.create(o))
-        .sorted(Comparator.comparing(K::getFormattedName))
+        .sorted(Comparator.comparing(K::getFormattedName, String.CASE_INSENSITIVE_ORDER))
         .collect(Collectors.toList());
   }
 }
