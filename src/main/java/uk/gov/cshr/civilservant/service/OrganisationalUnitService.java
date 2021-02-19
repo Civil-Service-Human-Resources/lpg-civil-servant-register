@@ -94,7 +94,6 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
 
     public Optional<OrganisationalUnit> getOrganisationalUnit(Long id) {
         return repository.findById(id);
-
     }
 
     public List<OrganisationalUnit> getOrganisationsNormalised() {
