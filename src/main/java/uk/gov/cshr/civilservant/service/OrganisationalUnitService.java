@@ -16,9 +16,7 @@ import uk.gov.cshr.civilservant.exception.TokenDoesNotExistException;
 import uk.gov.cshr.civilservant.repository.OrganisationalUnitRepository;
 import uk.gov.cshr.civilservant.service.identity.IdentityService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -39,14 +37,14 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     public List<OrganisationalUnit> getOrganisationWithParents(String code) {
         List<OrganisationalUnit> organisationalUnitList = new ArrayList<>();
         getOrganisationalUnitAndParent(code, organisationalUnitList);
-
+        sortOrganisationList(organisationalUnitList);
         return organisationalUnitList;
     }
 
     public List<OrganisationalUnit> getOrganisationWithChildren(String code) {
         List<OrganisationalUnit> organisationalUnitList = new ArrayList<>();
         getOrganisationalUnitAndChildren(code, organisationalUnitList);
-
+        sortOrganisationList(organisationalUnitList);
         return organisationalUnitList;
     }
 
@@ -99,7 +97,9 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     }
 
     public List<OrganisationalUnit> getOrganisationsNormalised() {
-        return repository.findAllNormalised();
+        List<OrganisationalUnit> organisationalUnits = repository.findAllNormalised();
+        sortOrganisationList(organisationalUnits);
+        return organisationalUnits;
     }
 
     public OrganisationalUnit setAgencyToken(OrganisationalUnit organisationalUnit, AgencyToken agencyToken) {
@@ -146,7 +146,9 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
     }
 
     public List<String> getOrganisationalUnitCodes() {
-        return repository.findAllCodes();
+        List<String> allCodes = repository.findAllCodes();
+        Collections.sort(allCodes, String.CASE_INSENSITIVE_ORDER);
+        return allCodes;
     }
 
     @Transactional
@@ -164,11 +166,27 @@ public class OrganisationalUnitService extends SelfReferencingEntityService<Orga
 
     @Cacheable("organisationalUnitsTree")
     public List<OrganisationalUnit> getOrgTree() {
-        return this.getParents();
+        List<OrganisationalUnit> listOrg = this.getParents();
+        sortOrganisationList(listOrg);
+        return listOrg;
     }
 
     @Cacheable("organisationalUnitsFlat")
     public List<OrganisationalUnitDto> getFlatOrg() {
         return this.getListSortedByValue();
+    }
+
+    private void sortOrganisationList(List<OrganisationalUnit> list) {
+        list.forEach(org ->
+            {
+                if(org.hasChildren()) {
+                    List<OrganisationalUnit> children = org.getChildren();
+                    children.sort(Comparator.comparing(OrganisationalUnit::getName, String.CASE_INSENSITIVE_ORDER));
+                    //Below line is a recursive call which will be called recursively
+                    //until there are children as per above if condition.
+                    sortOrganisationList(children);
+                }
+            }
+        );
     }
 }
