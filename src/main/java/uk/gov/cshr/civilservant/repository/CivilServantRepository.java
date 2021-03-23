@@ -80,6 +80,18 @@ public interface CivilServantRepository extends JpaRepository<CivilServant, Long
   List<CivilServantReportDto> findAllNormalised();
 
   @Query(
+          "select new uk.gov.cshr.civilservant.dto.CivilServantReportDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name, group_concat(oaw.name)) "
+                  + "from CivilServant c "
+                  + "left join OrganisationalUnit ou on ou.id = c.organisationalUnit.id "
+                  + "left join Profession p on p.id = c.profession.id "
+                  + "left join Identity i on i.id = c.identity.id "
+                  + "left join Grade g on g.id = c.grade.id "
+                  + "join c.otherAreasOfWork oaw "
+                  + "where i.uid in (?1) "
+                  + "group by c.id ")
+  List<CivilServantReportDto> findAllByUidsNormalised(List<String> uids);
+
+  @Query(
       "select new uk.gov.cshr.civilservant.dto.CivilServantReportDto(c.id, c.fullName, ou.name, p.name, i.uid, g.name, group_concat(oaw.name)) "
           + "from CivilServant c "
           + "left join OrganisationalUnit ou on ou.id = c.organisationalUnit.id "
