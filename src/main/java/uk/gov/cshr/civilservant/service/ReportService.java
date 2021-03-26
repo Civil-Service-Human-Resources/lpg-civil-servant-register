@@ -91,6 +91,14 @@ public class ReportService {
             Collectors.toMap(CivilServantReportDto::getUid, civilServantDto -> civilServantDto));
   }
 
+  public Map<String, CivilServantReportDto> getCivilServantMapForUidsNormalised(List<String> uids) {
+    return civilServantRepository
+            .findAllByUidsNormalised(uids)
+            .stream()
+            .collect(
+                    Collectors.toMap(CivilServantReportDto::getUid, civilServantDto -> civilServantDto));
+  }
+
   @Transactional(readOnly = true)
   public Map<String, CivilServantReportDto> getCivilServantMapNormalisedWithCodes() {
     return civilServantRepository
