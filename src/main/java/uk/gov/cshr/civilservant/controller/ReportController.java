@@ -65,6 +65,11 @@ public class ReportController {
     return ResponseEntity.ok(reportService.getCivilServantMapNormalised());
   }
 
+  @GetMapping(value = "/civil-servants-for-uids", params = "uids")
+  public ResponseEntity<Map<String, CivilServantReportDto>> listCivilServantsForUids(@RequestParam List<String> uids) {
+    return ResponseEntity.ok(reportService.getCivilServantMapForUidsNormalised(uids));
+  }
+
   @GetMapping("/civilServants/code")
   public ResponseEntity<Map<String, CivilServantReportDto>> listAllCivilServantsWithCodes() {
     return ResponseEntity.ok(reportService.getCivilServantMapNormalisedWithCodes());
