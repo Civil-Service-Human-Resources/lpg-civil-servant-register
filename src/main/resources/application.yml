@@ -1,4 +1,8 @@
 spring:
+  datasource:
+    url: ${DATASOURCE:jdbc:mysql://localhost:3306/csrs?user=root&password=password&useSSL=false}
+    platform: mysql
+    driver-class-name: com.mysql.cj.jdbc.Driver
   data:
     redis:
       repositories:
@@ -22,15 +26,15 @@ spring:
         dialect: uk.gov.cshr.civilservant.config.CustomMySqlDialect
         show_sql: false
         format_sql: false
-  datasource:
-    hikari:
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
-  h2:
-    console:
-      enabled: true
-      path: "/h2-console"
+  # datasource:
+  #   hikari:
+  #     connection-timeout: 30000
+  #     idle-timeout: 600000
+  #     max-lifetime: 1800000
+  # h2:
+  #   console:
+  #     enabled: true
+  #     path: "/h2-console"
 
 server:
   port: 9002
@@ -51,7 +55,7 @@ oauth:
   maxTotalConnections: 200
   defaultMaxConnectionsPerRoute: 100
   maxPerServiceUrl: 100
-  jwtKey: ${jwt_key}
+  jwtKey: ${jwt_key:dummy}
 
 identity:
   identityAPIUrl: "${oauth.serviceUrl}/api/identities"
@@ -59,10 +63,10 @@ identity:
   identityAgencyTokenUrl: "${oauth.serviceUrl}/api/identity/agency/"
 
 govNotify:
-  enabled: ${GOV_NOTIFY_ENABLED:false}
-  key: ${GOV_NOTIFY_API_KEY:changeme}
+  enabled: ${GOV_NOTIFY_ENABLED:true}
+  key: ${GOV_NOTIFY_API_KEY:test-22877568-4bca-40f9-8f54-8bf7922583cf-e2f80f22-e3de-4007-9ce2-b50a2b5785b7}
   template:
-    lineManager: ${GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID:changeme}
+    lineManager: ${GOV_NOTIFY_LINEMANAGER_TEMPLATE_ID:52052be1-b468-40ad-a161-cb5e4f034d4f}
 
 data-retention-windows:
   skills: ${DATA_RETENTION_WINDOW_SKILLS_DAYS:1095}
